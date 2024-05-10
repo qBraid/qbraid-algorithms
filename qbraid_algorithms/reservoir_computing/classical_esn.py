@@ -116,5 +116,6 @@ class EchoStateNetwork(torch.nn.Module):
         self.reservoir.evolve(u)  # Pass through reservoir
 
         h = self.fc(self.reservoir.x.t())  # Pass transposed output x through the linear layer
-        h_soft = self.softmax(h)  # Apply softmax
-        return h_soft
+        if len(h[0]) != 1:
+            h = self.softmax(h)  # Apply softmax
+        return h
