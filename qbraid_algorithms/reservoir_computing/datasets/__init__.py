@@ -9,15 +9,19 @@
 # THERE IS NO WARRANTY for the qBraid-SDK, as per Section 15 of the GPL v3.
 
 """
-Module defining datasets for reservoir computing tasks.
+Dataset generation for reservoir computing tasks.
+
+Functions
+----------
+
+.. autosummary::
+    :toctree: ../stubs/
+
+    create_sequences
+    create_time_series_data
+
 
 """
-import torch
+from .sequences import create_sequences, create_time_series_data
 
-def create_sequences(data, n_steps):
-    X, y = [], []
-    for i in range(len(data) - n_steps):
-        seq_x, seq_y = data[i:i+n_steps], data[i+n_steps]
-        X.append(seq_x)
-        y.append(seq_y)
-    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32).view(-1, 1, 1)
+__all__ = ["create_sequences", "create_time_series_data"]
