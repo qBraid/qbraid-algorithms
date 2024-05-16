@@ -33,7 +33,7 @@ qbraid-algorithms requires Python 3.9 or greater, and can be installed with pip 
 pip install qbraid-algorithms
 ```
 
-| :warning: This project is actively being developed and remains in an experimental stage. It is not yet available for installation. |
+| :warning: This project is actively being developed and is not yet available for installation. |
 |:---------------------------|
 
 ### Install from source

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qbraid-algorithms"
-version = "0.1.0"
+version = "0.1.0a0"
 authors = [{name = "qBraid Development Team"}, {email = "contact@qbraid.com"}]
 description = "Python package for building, simulating, and benchmarking hybrid quantum-classical algorithms."
 readme = "README.md"
