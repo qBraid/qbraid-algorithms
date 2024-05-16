@@ -19,7 +19,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install isort ruff qbraid-cli
-      - name: Check isort, black, headers
+      - name: Check isort, ruff, headers
         run: |
           ruff check qbraid_algorithms examples tests tools
           isort --check-only qbraid_algorithms tests tools
