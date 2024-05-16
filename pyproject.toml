@@ -35,16 +35,13 @@ Discord = "https://discord.gg/TPBU2sa8Et"
 "Launch on Lab" = "https://account.qbraid.com/?gitHubUrl=https://github.com/qBraid/qbraid-algorithms.git"
 
 [project.optional-dependencies]
+visualization = ["matplotlib"]
 test = ["pytest", "pytest-cov"]
-lint = ["black[jupyter]", "isort", "pylint", "qbraid-cli"]
+lint = ["isort", "ruff", "qbraid-cli"]
 docs = ["sphinx~=7.3.7", "sphinx-autodoc-typehints>=1.24,<2.2", "sphinx-rtd-theme~=2.0.0", "docutils<0.22"]
 
 [tool.setuptools_scm]
 write_to = "qbraid_algorithms/_version.py"
-
-[tool.black]
-line-length = 100
-target-version = ["py39", "py310", "py311", "py312"]
 
 [tool.isort]
 profile = "black"
@@ -54,14 +51,8 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 100
 
-[tool.pylint.'MESSAGES CONTROL']
-max-line-length = 100
-disable = "C0415, R0914, W0511"
-
-[tool.pylint.MASTER]
-ignore-paths = [
-  "^.*\\_version.py$",
-]
+[tool.ruff]
+extend-include = ["*.ipynb"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"

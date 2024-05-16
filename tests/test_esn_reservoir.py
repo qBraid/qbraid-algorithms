@@ -67,7 +67,7 @@ def test_raising_error_on_invalid_weight_generation():
 def test_spectral_radius():
     """Test setting the spectral radius of the internal weight matrix."""
     reservoir = EchoStateReservoir(input_size=10, hidden_size=100, sparsity=0.5, spectral_radius=0.95)
-    eigenvalues = torch.linalg.eigvals(reservoir.w)  # pylint: disable=not-callable
+    eigenvalues = torch.linalg.eigvals(reservoir.w)
     max_eigenvalue = torch.max(torch.abs(eigenvalues)).item()
     assert pytest.approx(max_eigenvalue, 0.01) == 0.95
 

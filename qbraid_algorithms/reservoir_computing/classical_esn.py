@@ -20,7 +20,7 @@ from .exceptions import ReservoirGenerationError
 
 
 @dataclass
-class EchoStateReservoir:  # pylint: disable=too-many-instance-attributes
+class EchoStateReservoir:
     """Dataclass for a reservoir component of an Echo State Network."""
 
     input_size: int
@@ -50,7 +50,7 @@ class EchoStateReservoir:  # pylint: disable=too-many-instance-attributes
                 mean=mean, std=self.spectral_radius
             )
             w = torch.where(torch.rand_like(w) > self.sparsity, w, torch.zeros_like(w))
-            eigenvalues = torch.linalg.eigvals(w)  # pylint: disable=not-callable
+            eigenvalues = torch.linalg.eigvals(w)
             max_abs_eigenvalue = torch.max(torch.abs(eigenvalues)).item()
             if max_abs_eigenvalue != 0:
                 w *= self.spectral_radius / max_abs_eigenvalue
