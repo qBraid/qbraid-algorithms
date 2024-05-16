@@ -44,7 +44,7 @@ in the root directory of the repository:
 ```bash
 git clone https://github.com/qBraid/qbraid-algorithms.git
 cd qbraid-algorithms
-pip install .
+pip3 install .
 ```
 
 ## Check version

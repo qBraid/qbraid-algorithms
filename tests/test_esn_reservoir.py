@@ -16,8 +16,7 @@ Unit tests for the Reservoir data class used by the Echo State Network (ESN) mod
 import pytest
 import torch
 
-from qbraid_algorithms.reservoir_computing.classical_esn import EchoStateReservoir
-from qbraid_algorithms.reservoir_computing.exceptions import ReservoirGenerationError
+from qbraid_algorithms.esn import EchoStateReservoir, ReservoirGenerationError
 
 
 @pytest.mark.parametrize("input_size,hidden_size", [(10, 100), (5, 80), (3, 150)])
@@ -41,7 +40,9 @@ def test_reservoir_matrix_meets_target_sparsity():
     """Test whether the internal weight matrix 'w' of a Reservoir instance meets
     the target sparsity within an acceptable margin of error."""
     target_sparsity = 0.8
-    reservoir = EchoStateReservoir(input_size=10, hidden_size=100, sparsity=target_sparsity)
+    reservoir = EchoStateReservoir(
+        input_size=10, hidden_size=100, sparsity=target_sparsity
+    )
     total_elements = reservoir.w.numel()
     non_zero_elements = reservoir.w.nonzero().size(0)
     zero_elements = total_elements - non_zero_elements
@@ -51,7 +52,11 @@ def test_reservoir_matrix_meets_target_sparsity():
     expected_sparsity_lower_bound = target_sparsity - (target_sparsity * tolerance)
     expected_sparsity_upper_bound = target_sparsity + (target_sparsity * tolerance)
 
-    assert expected_sparsity_lower_bound <= actual_sparsity <= expected_sparsity_upper_bound, (
+    assert (
+        expected_sparsity_lower_bound
+        <= actual_sparsity
+        <= expected_sparsity_upper_bound
+    ), (
         f"Actual sparsity {actual_sparsity} outside of expected range "
         f"[{expected_sparsity_lower_bound}, {expected_sparsity_upper_bound}]"
     )
@@ -66,7 +71,9 @@ def test_raising_error_on_invalid_weight_generation():
 
 def test_spectral_radius():
     """Test setting the spectral radius of the internal weight matrix."""
-    reservoir = EchoStateReservoir(input_size=10, hidden_size=100, sparsity=0.5, spectral_radius=0.95)
+    reservoir = EchoStateReservoir(
+        input_size=10, hidden_size=100, sparsity=0.5, spectral_radius=0.95
+    )
     eigenvalues = torch.linalg.eigvals(reservoir.w)
     max_eigenvalue = torch.max(torch.abs(eigenvalues)).item()
     assert pytest.approx(max_eigenvalue, 0.01) == 0.95
@@ -83,7 +90,8 @@ def test_evolve_state():
 
 def test_leaking_rate_effect():
     """Tests the reservoir's responsiveness by verifying that a low leaking rate limits state
-    changes to less than the input's norm, indicating minimal integration of new information."""
+    changes to less than the input's norm, indicating minimal integration of new information.
+    """
     reservoir = EchoStateReservoir(input_size=3, hidden_size=5, sparsity=0.5, leak=0.1)
     initial_state = torch.clone(reservoir.x)
     u = torch.randn(3, 1)

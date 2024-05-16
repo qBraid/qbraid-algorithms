@@ -15,7 +15,7 @@ Unit tests for the clasical Echo State Network (ESN) model.
 import pytest
 import torch
 
-from qbraid_algorithms.reservoir_computing.classical_esn import EchoStateNetwork, EchoStateReservoir
+from qbraid_algorithms.esn import EchoStateNetwork, EchoStateReservoir
 
 
 @pytest.mark.parametrize("input_size,hidden_size,output_size", [(10, 20, 5)])

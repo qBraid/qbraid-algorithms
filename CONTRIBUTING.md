@@ -17,7 +17,7 @@ Before you start working on a new feature or a fix, here's how you can contribut
 ```bash
 git clone https://github.com/qBraid/qbraid-algorithms.git
 cd qbraid-algorithms
-pip install -e .
+pip3 install -e .
 ```
 
 ## Pull request checklist

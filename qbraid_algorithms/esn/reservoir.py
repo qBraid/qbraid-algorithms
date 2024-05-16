@@ -9,7 +9,7 @@
 # THERE IS NO WARRANTY for the qBraid-SDK, as per Section 15 of the GPL v3.
 
 """
-Module for classical reservoir computing with Echo State Networks (ESNs).
+Module for generating classical reservoir for Echo State Networks.
 
 """
 from dataclasses import dataclass, field
@@ -41,7 +41,9 @@ class EchoStateReservoir:
 
     def _generate_w_in(self, mean: float = 0.0) -> torch.Tensor:
         """Generates and returns a random input weight matrix, w_in."""
-        return torch.randn(self.hidden_size, self.input_size + 1).normal_(mean=mean, std=self.a)
+        return torch.randn(self.hidden_size, self.input_size + 1).normal_(
+            mean=mean, std=self.a
+        )
 
     def _generate_w(self, mean: float = 0.0, max_retries: int = 3) -> torch.Tensor:
         """Generates a sparse internal weight matrix, w, with retries if necessary."""
@@ -71,51 +73,8 @@ class EchoStateReservoir:
 
         """
         temp_state = torch.tanh(
-            torch.mm(self.w_in, torch.cat((torch.tensor([[1.0]]), u), 0)) + torch.mm(self.w, self.x)
+            torch.mm(self.w_in, torch.cat((torch.tensor([[1.0]]), u), 0))
+            + torch.mm(self.w, self.x)
         )
         new_state = (1 - self.leak) * self.x + self.leak * temp_state
         self.x = new_state
-
-
-class EchoStateNetwork(torch.nn.Module):
-    """
-    An Echo State Network module that combines a Reservoir with a fully connected output layer.
-
-    Attributes:
-        reservoir (Reservoir): The reservoir component of the ESN.
-        fc (torch.nn.Linear): Linear layer to map reservoir states to output dimensions.
-        softmax (torch.nn.Softmax): Softmax activation function for generating output probabilities.
-    """
-
-    def __init__(self, reservoir: EchoStateReservoir, output_size: int):
-        """
-        Initializes the Echo State Network with a reservoir and a linear output layer.
-
-        Args:
-            reservoir (EchoStateReservoir): Reservoir component of the ESN.
-            output_size (int): Size of each output sample.
-        """
-        super().__init__()
-        self.reservoir = reservoir
-        self.fc = torch.nn.Linear(in_features=reservoir.hidden_size, out_features=output_size)
-        self.softmax = torch.nn.Softmax(dim=-1)
-
-    def forward(self, input_data: torch.Tensor) -> torch.Tensor:
-        """
-        Processes the input through the network and returns the output probabilities.
-
-        Args:
-            input_data: A tensor of input data.
-
-        Returns:
-            torch.Tensor: A tensor containing the softmax probabilities of the outputs.
-        """
-        u = input_data.flatten()  # Flatten data into a single vector
-        u = u.unsqueeze(dim=0).t()  # Transpose to desired input shape for the reservoir
-
-        self.reservoir.evolve(u)  # Pass through reservoir
-
-        h = self.fc(self.reservoir.x.t())  # Pass transposed output x through the linear layer
-        if len(h[0]) != 1:
-            h = self.softmax(h)  # Apply softmax
-        return h
