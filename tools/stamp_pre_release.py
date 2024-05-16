@@ -53,7 +53,9 @@ def get_bumped_version(latest: str, local: str) -> str:
                 if local_version.pre[0] < latest_version.pre[0]:
                     return bump_prerelease(latest_version)
                 return f"{local_version.base_version}-{local_version.pre[0]}.0"
-            raise PreReleaseVersionError("Latest version is prerelease but local version is not.")
+            raise PreReleaseVersionError(
+                "Latest version is prerelease but local version is not."
+            )
         if local_version.is_prerelease:
             return f"{local_version.base_version}-{local_version.pre[0]}.0"
         if local_version == latest_version:
@@ -61,7 +63,9 @@ def get_bumped_version(latest: str, local: str) -> str:
         raise PreReleaseVersionError(
             "Local version base is equal to latest, but no clear upgrade path found."
         )
-    raise PreReleaseVersionError("Latest version base is greater than local, cannot bump.")
+    raise PreReleaseVersionError(
+        "Latest version base is greater than local, cannot bump."
+    )
 
 
 if __name__ == "__main__":
