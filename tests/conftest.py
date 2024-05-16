@@ -13,4 +13,4 @@ Fixtures imported/defined in this file can be used by any test in this directory
 without needing to import them (pytest will automatically discover them).
 
 """
-from .fixtures.reservoir_computing import * # noqa: F403
+from .fixtures.reservoir_computing import *  # noqa: F403
