@@ -4,20 +4,20 @@
   <a href="https://github.com/qBraid/qbraid-algorithms/actions/workflows/main.yml">
     <img src="https://github.com/qBraid/qbraid-algorithms/actions/workflows/main.yml/badge.svg?branch=main" alt="CI"/>
   </a>
-  <!-- <a href="https://pypi.org/project/qbraid-algorithms/">
+  <a href="https://pypi.org/project/qbraid-algorithms/">
     <img src="https://img.shields.io/pypi/v/qbraid-algorithms.svg?color=blue" alt="PyPI version"/>
   </a>
   <a href="https://pypi.org/project/qbraid-algorithms/">
     <img src="https://img.shields.io/pypi/pyversions/qbraid-algorithms.svg?color=blue" alt="PyPI version"/>
   </a>
-  <a href="https://pepy.tech/project/qbraid-algorithms">
+  <!-- <a href="https://pepy.tech/project/qbraid-algorithms">
     <img src="https://static.pepy.tech/badge/qbraid-algorithms" alt="Downloads"/>
   </a> -->
   <a href="https://www.gnu.org/licenses/gpl-3.0.html">
     <img src="https://img.shields.io/github/license/qBraid/qbraid.svg" alt="License"/>
   </a>
   <a href="https://discord.gg/TPBU2sa8Et">
-    <img src="https://img.shields.io/discord/771898982564626445.svg?color=pink" alt="Discord"/>
+    <img src="https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white" alt="Discord"/>
   </a>
 </p>
 
@@ -32,6 +32,9 @@ qbraid-algorithms requires Python 3.9 or greater, and can be installed with pip 
 ```bash
 pip install qbraid-algorithms
 ```
+
+| :warning: This project is actively being developed and is not yet available for installation. |
+|:---------------------------|
 
 ### Install from source
 

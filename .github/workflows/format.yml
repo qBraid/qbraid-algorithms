@@ -18,9 +18,9 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install black[jupyter] isort qbraid-cli
-      - name: Check isort, black, headers
+          python3 -m pip install isort ruff qbraid-cli
+      - name: Check isort, ruff, headers
         run: |
-          black --check qbraid_algorithms examples tests tools
+          ruff check qbraid_algorithms examples tests tools
           isort --check-only qbraid_algorithms tests tools
           qbraid admin headers qbraid_algorithms tests tools

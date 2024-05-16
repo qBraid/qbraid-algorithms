@@ -87,20 +87,18 @@ Workflow: [`format.yml`](.github/workflows/format.yml)
 - [ ] Formatting/linters checks pass
 - [ ] All files have appropriate licensing header
 
-For code style, our project uses a combination of [isort](https://github.com/PyCQA/isort), [pylint](https://github.com/pylint-dev/pylint),
-and [black](https://github.com/psf/black). Specific configurations for these tools should be added to [`pyproject.toml`](pyproject.toml).
+For code style, our project uses a combination of [isort](https://github.com/PyCQA/isort) and [ruff](https://github.com/astral-sh/ruff). Specific configurations for these tools should be added to [`pyproject.toml`](pyproject.toml).
 
 Install linters:
 
 ```bash
-pip install black isort pylint qbraid-cli
+pip install isort ruff qbraid-cli
 ```
 
 Run the following and make changes as needed to satisfy format checks:
 
 ```bash
-black qbraid_algorithms tests tools
 isort qbraid_algorithms tests tools
-pylint qbraid_algorithms tests tools
+ruff fix qbraid_algorithms examples tests tools
 qbraid admin headers qbraid_algorithms tests tools --type=gpl --fix
 ```

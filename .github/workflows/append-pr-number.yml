@@ -1,0 +1,20 @@
+name: Append PR Number to Commit Message
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  append-pr-number:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Append PR Number to Commit Message
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          NEW_COMMIT_MSG="${LAST_COMMIT_MSG} (PR #${PR_NUMBER})"
+          git commit --amend -m "${NEW_COMMIT_MSG}"
+          git push --force

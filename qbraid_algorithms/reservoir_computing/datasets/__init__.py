@@ -9,8 +9,19 @@
 # THERE IS NO WARRANTY for the qBraid-SDK, as per Section 15 of the GPL v3.
 
 """
-Fixtures imported/defined in this file can be used by any test in this directory
-without needing to import them (pytest will automatically discover them).
+Dataset generation for reservoir computing tasks.
+
+Functions
+----------
+
+.. autosummary::
+    :toctree: ../stubs/
+
+    create_sequences
+    create_time_series_data
+
 
 """
-from .fixtures.reservoir_computing import *  # noqa: F403
+from .sequences import create_sequences, create_time_series_data
+
+__all__ = ["create_sequences", "create_time_series_data"]
