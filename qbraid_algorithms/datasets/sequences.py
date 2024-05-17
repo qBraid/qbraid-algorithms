@@ -12,6 +12,7 @@
 Module defining datasets for reservoir computing tasks.
 
 """
+
 import numpy as np
 import torch
 from numpy.lib.stride_tricks import sliding_window_view

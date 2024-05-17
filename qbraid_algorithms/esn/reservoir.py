@@ -12,6 +12,7 @@
 Module for generating classical reservoir for Echo State Networks.
 
 """
+
 from dataclasses import dataclass, field
 
 import torch
@@ -41,9 +42,7 @@ class EchoStateReservoir:
 
     def _generate_w_in(self, mean: float = 0.0) -> torch.Tensor:
         """Generates and returns a random input weight matrix, w_in."""
-        return torch.randn(self.hidden_size, self.input_size + 1).normal_(
-            mean=mean, std=self.a
-        )
+        return torch.randn(self.hidden_size, self.input_size + 1).normal_(mean=mean, std=self.a)
 
     def _generate_w(self, mean: float = 0.0, max_retries: int = 3) -> torch.Tensor:
         """Generates a sparse internal weight matrix, w, with retries if necessary."""
@@ -73,8 +72,7 @@ class EchoStateReservoir:
 
         """
         temp_state = torch.tanh(
-            torch.mm(self.w_in, torch.cat((torch.tensor([[1.0]]), u), 0))
-            + torch.mm(self.w, self.x)
+            torch.mm(self.w_in, torch.cat((torch.tensor([[1.0]]), u), 0)) + torch.mm(self.w, self.x)
         )
         new_state = (1 - self.leak) * self.x + self.leak * temp_state
         self.x = new_state

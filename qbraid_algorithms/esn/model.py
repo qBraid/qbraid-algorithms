@@ -12,6 +12,7 @@
 Module for classical reservoir computing with Echo State Networks (ESNs).
 
 """
+
 import torch
 
 from .reservoir import EchoStateReservoir
@@ -37,9 +38,7 @@ class EchoStateNetwork(torch.nn.Module):
         """
         super().__init__()
         self.reservoir = reservoir
-        self.fc = torch.nn.Linear(
-            in_features=reservoir.hidden_size, out_features=output_size
-        )
+        self.fc = torch.nn.Linear(in_features=reservoir.hidden_size, out_features=output_size)
         self.softmax = torch.nn.Softmax(dim=-1)
 
     def forward(self, input_data: torch.Tensor) -> torch.Tensor:
@@ -57,9 +56,7 @@ class EchoStateNetwork(torch.nn.Module):
 
         self.reservoir.evolve(u)  # Pass through reservoir
 
-        h = self.fc(
-            self.reservoir.x.t()
-        )  # Pass transposed output x through the linear layer
+        h = self.fc(self.reservoir.x.t())  # Pass transposed output x through the linear layer
         if len(h[0]) != 1:
             h = self.softmax(h)  # Apply softmax
         return h

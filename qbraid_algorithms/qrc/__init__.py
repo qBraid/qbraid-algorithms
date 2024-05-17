@@ -17,25 +17,10 @@ Classes
 .. autosummary::
     :toctree: ../stubs/
 
-    QuantumAdapter
-    DynamicsSimulator
-    InputHandler
-    OutputHandler
-    ReservoirParameters
-    QuantumReservoir
+    QRCModel
 
 """
-from .adapter import QuantumAdapter
-from .dynamics import DynamicsSimulator
-from .io_handler import InputHandler, OutputHandler
-from .parameters import ReservoirParameters
-from .reservoir import QuantumReservoir
 
-__all__ = [
-    "QuantumAdapter",
-    "DynamicsSimulator",
-    "InputHandler",
-    "OutputHandler",
-    "ReservoirParameters",
-    "QuantumReservoir",
-]
+from .model import QRCModel
+
+__all__ = ["QRCModel"]

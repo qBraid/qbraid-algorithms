@@ -13,36 +13,57 @@ Module for simulating the dynamics of a quantum reservoir.
 
 """
 
+from dataclasses import dataclass, field
+from typing import Any
 
-class DynamicsSimulator:
-    """Simulate the dynamics of the quantum system.
+import numpy as np
+from bloqade.emulate.ir.atom_type import AtomType
+from bloqade.emulate.ir.emulator import Register
 
-    Attributes:
-        reservoir (QuantumReservoir): The quantum reservoir instance to simulate.
+
+@dataclass
+class DetuningLayer:
+    """Class representing a detuning layer in a quantum reservoir."""
+
+    atoms: list[AtomType]  # Atom positions
+    readouts: list[Any]  # Readout observables
+    omega: float  # Rabi frequency
+    t_start: float  # Evolution starting time
+    t_end: float  # Evolution ending time
+    step: float  # Readout time step
+    reg: Register = field(
+        default_factory=lambda *args, **kwargs: Register(*args, **kwargs)
+    )  # Quantum state storage
+
+
+def generate_sites(lattice_type, dimension, scale):
     """
+    Generate positions for atoms on a specified lattice type with a given scale.
 
-    def __init__(self, reservoir):
-        """Initialize the DynamicsSimulator with a quantum reservoir.
+    Args:
+        lattice_type (Any): Type of the lattice.
+        dimension (int): Number of principal components.
+        scale (float): Scale factor for lattice spacing.
 
-        Args:
-            reservoir (QuantumReservoir): The quantum reservoir to simulate.
-        """
-        self.reservoir = reservoir
+    Returns:
+        Any: Positions of atoms.
 
-    def simulate(self, steps):
-        """Perform the simulation for a given number of steps.
+    TODO: Implement actual site generation based on lattice type.
+    """
+    raise NotImplementedError
 
-        Args:
-            steps (int): The number of simulation steps to execute.
-        """
-        for _ in range(steps):
-            input_signal = self.generate_input()
-            self.reservoir.update_state(input_signal)
 
-    def generate_input(self):
-        """Generate a sample input signal for the simulation.
+def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
+    """
+    Simulate quantum evolution and record output for a given set of PCA values (x).
 
-        Returns:
-            Any: The generated input signal.
-        """
-        return 0
+    Args:
+        layer (DetuningLayer): Configuration and quantum state of the layer.
+        x (np.ndarray): Vector or matrix of real numbers representing PCA values for each image.
+
+    Returns:
+        np.ndarray: Output values from the simulation.
+
+    TODO: Implement the actual simulation using suitable quantum simulation libraries.
+    """
+    raise NotImplementedError

@@ -34,6 +34,7 @@ Exceptions
     ReservoirGenerationError
 
 """
+
 from .exceptions import ReservoirGenerationError
 from .model import EchoStateNetwork
 from .reservoir import EchoStateReservoir

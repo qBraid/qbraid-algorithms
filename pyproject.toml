@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics"
 ]
-dependencies = ["torch", "numpy"]
+dependencies = ["torch>=2.3.0,<3.0", "numpy>=1.17,<1.27", "bloqade>=0.15.12,<0.16"]
 
 [project.urls]
 Homepage = "https://github.com/qBraid/qbraid-algorithms"
@@ -51,8 +51,19 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 100
 
-[tool.ruff]
-extend-include = ["*.ipynb"]
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.__pycache__
+  | \.tox
+  | \.venv
+  | dist
+)/
+'''
 
 [tool.pytest.ini_options]
 addopts = "-ra"

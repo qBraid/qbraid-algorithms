@@ -99,6 +99,6 @@ Run the following and make changes as needed to satisfy format checks:
 
 ```bash
 isort qbraid_algorithms tests tools
-ruff fix qbraid_algorithms examples tests tools
+ruff format qbraid_algorithms examples tests tools
 qbraid admin headers qbraid_algorithms tests tools --type=gpl --fix
 ```
