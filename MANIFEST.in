@@ -1,0 +1,4 @@
+include *.txt *.md
+recursive-include docs *.txt *.rst *.py *.png *.ico
+recursive-include qbraid_algorithms *.py
+prune docs/build/
