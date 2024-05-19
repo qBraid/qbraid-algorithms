@@ -18,9 +18,11 @@ Classes
     :toctree: ../stubs/
 
     QRCModel
+    MagnusExpansion
 
 """
 
 from .model import QRCModel
+from .magnus_expansion import MagnusExpansion
 
-__all__ = ["QRCModel"]
+__all__ = ["QRCModel", "MagnusExpansion"]
