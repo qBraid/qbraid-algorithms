@@ -14,7 +14,7 @@ Module for encoding of data.
 """
 
 import torch
-
+from sklearn.preprocessing import OneHotEncoder
 
 def one_hot_encoding(labels: torch.Tensor, num_classes: int) -> torch.Tensor:
     """
@@ -30,4 +30,7 @@ def one_hot_encoding(labels: torch.Tensor, num_classes: int) -> torch.Tensor:
     TODO: Implement the one-hot encoding function.
     """
     # Placeholder for actual implementation.
-    return torch.nn.functional.one_hot(labels, num_classes=num_classes)
+    encoder = OneHotEncoder(sparse_output=False)
+    # I don't know if the reshape params will be universal or not
+    encoded_data = encoder.fit_transform(lables.targets.numpy().reshape(-1, 1))
+    # return torch.nn.functional.one_hot(labels, num_classes=num_classes)
