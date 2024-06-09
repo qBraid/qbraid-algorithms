@@ -34,3 +34,4 @@ def one_hot_encoding(labels: torch.Tensor, num_classes: int) -> torch.Tensor:
     # I don't know if the reshape params will be universal or not
     encoded_data = encoder.fit_transform(lables.targets.numpy().reshape(-1, 1))
     # return torch.nn.functional.one_hot(labels, num_classes=num_classes)
+    return encoded_data
