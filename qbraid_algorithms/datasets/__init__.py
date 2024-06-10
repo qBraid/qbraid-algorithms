@@ -19,10 +19,12 @@ Functions
 
     create_sequences
     create_time_series_data
+    load_mnist_data
 
 
 """
 
+from .mnist import load_mnist_data
 from .sequences import create_sequences, create_time_series_data
 
-__all__ = ["create_sequences", "create_time_series_data"]
+__all__ = ["create_sequences", "create_time_series_data", "load_mnist_data"]

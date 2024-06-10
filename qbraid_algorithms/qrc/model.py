@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 import numpy as np
+import torch.nn as nn
 
 from .dynamics import DetuningLayer
 
@@ -44,3 +45,35 @@ class QRCModel:
         TODO: Implement the transformation and prediction steps.
         """
         raise NotImplementedError
+
+
+# Define neural network model
+# class Net(nn.Module):
+#     def __init__(self):
+#         super(Net, self).__init__()
+#         self.fc1 = nn.Linear(dim_pca, 10)
+#     def forward(self, x):
+#         x = torch.relu(self.fc1(x))
+#         return x
+#     # Train classical model using PCA features
+#     model_reg = Net()
+#     criterion = nn.CrossEntropyLoss()
+#     optimizer = optim.Adam(model_reg.parameters(), lr=0.01)
+#     for epoch in range(1000):
+#         for x, y in train_loader:
+#             x = x.view(-1, 28*28)
+#             x_pca = pca.transform(x.numpy())
+#             x_pca = torch.tensor(x_pca, dtype=torch.float32)
+#             y = torch.tensor(y, dtype=torch.long)
+#             optimizer.zero_grad()
+#             output = model_reg(x_pca)
+#             loss = criterion(output, y)
+#             loss.backward()
+#             optimizer.step()
+#     # Train QRC model using quantum reservoir computing
+#     pre_layer = DetuningLayer(atoms, readouts, Ω, t_start, t_end, step)
+#     model_qrc = Net()
+#     for epoch in range(1000):
+#         for x, y in train_loader:
+#             x = x.view(-1, 28*28)
+#             x_pca = pca.transform(x.numpy())
