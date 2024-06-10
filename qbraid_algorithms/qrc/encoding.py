@@ -12,25 +12,26 @@
 Module for encoding of data.
 
 """
-
+import numpy as np
 import torch
 from sklearn.preprocessing import OneHotEncoder
 
-def one_hot_encoding(labels: torch.Tensor, num_classes: int) -> torch.Tensor:
+
+def one_hot_encoding(labels: np.ndarray, train: bool = True) -> torch.Tensor:
     """
     Convert a tensor of numeric labels into a one-hot encoded matrix using PyTorch.
 
     Args:
-        labels (torch.Tensor): The tensor of labels to encode.
-        num_classes (int): The total number of classes.
+        labels (np.ndarray): The array of labels to encode.
 
     Returns:
         torch.Tensor: The one-hot encoded matrix where each row corresponds to a label.
 
-    TODO: Implement the one-hot encoding function.
     """
-    # Placeholder for actual implementation.
     encoder = OneHotEncoder(sparse_output=False)
-    # I don't know if the reshape params will be universal or not
-    encoded_data = encoder.fit_transform(lables.targets.numpy().reshape(-1, 1))
-    # return torch.nn.functional.one_hot(labels, num_classes=num_classes)
+    reshaped_data = labels.reshape(-1, 1)
+    if train:
+        encoded_data = encoder.fit_transform(reshaped_data)
+    else:
+        encoded_data = encoder.transform(reshaped_data)
+    return encoded_data

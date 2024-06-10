@@ -40,9 +40,7 @@ def test_reservoir_matrix_meets_target_sparsity():
     """Test whether the internal weight matrix 'w' of a Reservoir instance meets
     the target sparsity within an acceptable margin of error."""
     target_sparsity = 0.8
-    reservoir = EchoStateReservoir(
-        input_size=10, hidden_size=100, sparsity=target_sparsity
-    )
+    reservoir = EchoStateReservoir(input_size=10, hidden_size=100, sparsity=target_sparsity)
     total_elements = reservoir.w.numel()
     non_zero_elements = reservoir.w.nonzero().size(0)
     zero_elements = total_elements - non_zero_elements
@@ -52,11 +50,7 @@ def test_reservoir_matrix_meets_target_sparsity():
     expected_sparsity_lower_bound = target_sparsity - (target_sparsity * tolerance)
     expected_sparsity_upper_bound = target_sparsity + (target_sparsity * tolerance)
 
-    assert (
-        expected_sparsity_lower_bound
-        <= actual_sparsity
-        <= expected_sparsity_upper_bound
-    ), (
+    assert expected_sparsity_lower_bound <= actual_sparsity <= expected_sparsity_upper_bound, (
         f"Actual sparsity {actual_sparsity} outside of expected range "
         f"[{expected_sparsity_lower_bound}, {expected_sparsity_upper_bound}]"
     )

@@ -13,12 +13,16 @@ Module for simulating the dynamics of a quantum reservoir.
 
 """
 
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
+from bloqade.emulate.ir.state_vector import RydbergHamiltonian
+
+from .krylov import KrylovEvolution
 
 
 @dataclass
@@ -53,6 +57,30 @@ def generate_sites(lattice_type, dimension, scale):
     raise NotImplementedError
 
 
+def rydberg_h(atoms: list[AtomType], delta: float, omega: float) -> RydbergHamiltonian:
+    """
+    Generate the Hamiltonian for a Rydberg atom system.
+
+    Args:
+        atoms (list[AtomType]): Atom positions.
+        omega (float): Rabi frequency.
+
+    Returns:
+        RydbergHamiltonian: Hamiltonian matrix.
+    """
+    raise NotImplementedError
+
+
+def set_zero_state(reg: Register):
+    """
+    Set the quantum state to the zero state.
+
+    Args:
+        reg (Register): Quantum state storage.
+    """
+    raise NotImplementedError
+
+
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
     Simulate quantum evolution and record output for a given set of PCA values (x).
@@ -66,4 +94,32 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
 
     TODO: Implement the actual simulation using suitable quantum simulation libraries.
     """
-    raise NotImplementedError
+    h = rydberg_h(layer.atoms, x, layer.omega)
+
+    reg = layer.reg
+    reg = set_zero_state(reg)
+
+    t_start = layer.t_start
+    t_end = layer.t_end
+    t_step = layer.step
+    start_clock = NotImplemented
+
+    # initialize output vector
+    steps = math.floor((t_end - t_start) / t_step)
+    out = np.zeros(steps * len(layer.readouts))
+
+    # Numerically simulate the quantum evolution with Krylov methods and store the readouts
+    i = 1
+    prob = KrylovEvolution(reg, start_clock=start_clock, hamiltonian=h)
+    for i in range(steps):
+        # ignore first time step, this is just the initial state
+        if i == 0:
+            continue
+
+        # TODO: Implement the emulation step function.
+        # NOTE: The following lines are placeholders, are not necessarily correct, and should be replaced.
+        prob = prob.emulate_step(i, t_start + i * t_step, t_step)
+        for j, readout in enumerate(layer.readouts):
+            out[i * len(layer.readouts) + j] = readout(prob)
+
+    return out

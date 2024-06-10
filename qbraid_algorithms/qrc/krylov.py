@@ -12,11 +12,13 @@
 Module for quantum time evolution using Krylov subspace methods.
 
 """
-
 from dataclasses import dataclass
 
+import numpy as np
+from bloqade.atom_arrangement import Square
 from bloqade.emulate.ir.emulator import Register
-from bloqade.emulate.ir.state_vector import RydbergHamiltonian
+from bloqade.emulate.ir.state_vector import RybdbergInteraction, RydbergHamiltonian
+from scipy.linalg import expm
 
 
 # Placeholder for Krylov options with dummy attributes
@@ -65,6 +67,31 @@ class KrylovEvolution:
     hamiltonian: RydbergHamiltonian
     options: KrylovOptions
 
+    def generate_krylov_basis(self, h, psi_0, m):
+        """Generates the first m Krylov basis vectors."""
+        n = len(psi_0)
+        k = np.zeros((n, m), dtype=complex)
+        k[:, 0] = psi_0 / np.linalg.norm(psi_0)
+        for j in range(1, m):
+            k[:, j] = h @ k[:, j - 1]
+            for i in range(j):
+                k[:, j] -= np.dot(k[:, i], k[:, j]) * k[:, i]
+            k[:, j] /= np.linalg.norm(k[:, j])
+        return k
+
+    def gram_schmidt(self, v):
+        """Orthonormalizes the vectors using the Gram-Schmidt process."""
+        q, _ = np.linalg.qr(v)
+        return q
+
+    def krylov_evolution(self, h, psi_0, t, m):
+        """Projects H onto the Krylov subspace and computes the time evolution."""
+        k = self.generate_krylov_basis(h, psi_0, m)
+        h_m = k.T.conj() @ h @ k
+        exp_h_m = np.expm(-1j * h_m * t)
+        psi_t = k @ exp_h_m @ k.T.conj() @ psi_0
+        return psi_t
+
     def emulate_step(self, step: int, clock: float, duration: float) -> "KrylovEvolution":
         """
         Simulate a single time step of quantum evolution using the Krylov subspace method.
@@ -79,7 +106,14 @@ class KrylovEvolution:
 
         TODO: Implement the emulation step function.
         """
-        raise NotImplementedError
+        try:
+            psi_0 = self.reg.state_vector
+            evolved_state = self.krylov_evolution(
+                self.hamiltonian.rydberg, psi_0, duration, len(self.durations)
+            )
+            self.reg.state_vector = evolved_state
+        except Exception as err:
+            raise NotImplementedError("Emulation step failed") from err
 
     def normalize_register(self):
         """
@@ -87,4 +121,7 @@ class KrylovEvolution:
 
         TODO: Implement the normalization logic.
         """
-        raise NotImplementedError
+        if self.options.normalize_finally:
+            norm = np.linalg.norm(self.reg.state_vector)
+            if norm > self.options.tol:
+                self.reg.state_vector /= norm

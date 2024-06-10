@@ -9,7 +9,7 @@
 # THERE IS NO WARRANTY for the qBraid-SDK, as per Section 15 of the GPL v3.
 
 """
-Module defining datasets for reservoir computing tasks.
+Module defining time-series datasets for reservoir computing tasks.
 
 """
 

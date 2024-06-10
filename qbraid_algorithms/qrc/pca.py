@@ -12,13 +12,18 @@
 Module implemting Principal Component Analysis (PCA) for dimensionality reduction.
 
 """
-
+import numpy as np
 import torch
 from sklearn.decomposition import PCA
 
+
 def pca_reduction(
-    data: torch.Tensor, n_components: int = 2, data_dim: int = 10, delta_max: int = 10,
-) -> tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor, torch.Tensor]]:
+    data: torch.Tensor,
+    n_components: int,
+    data_dim: int,
+    delta_max: int,
+    train: bool = True,
+) -> torch.Tensor:
     """
     Perform PCA reduction on the provided data using PyTorch's pca_lowrank to
     reduce its dimensionality.
@@ -28,22 +33,21 @@ def pca_reduction(
         n_components (int): The number of principal components to retain.
         data_dim (int) : The dimension of the input data required for doing PCA.
         delta_max (int) : The scaling factor for bring PCA values to the feasible range of local detuning.
+        train (bool, optional): Whether the data is training data. Defaults to True.
 
     Returns:
-        tuple[torch.Tensor, tuple[torch.Tensor, torch.Tensor, torch.Tensor]]: A tuple containing the
-            transformed data and the PCA components (u, s, v) used for the transformation.
-
-    TODO: Implement the PCA reduction function using torch.pca_lowrank or another suitable method.
+        torch.Tensor: The transformed data
     """
     # Perform PCA on training data
     pca = PCA(n_components=n_components)
-    data_pca = pca.fit_transform(data.data.numpy().reshape(data_dim))
-    
+    data_array: np.ndarray = data.data.numpy()
+    data_reshaped = data_array.reshape(-1, data_dim)
+    if train:
+        data_pca = pca.fit_transform(data_reshaped)
+    else:
+        data_pca = pca.transform(data_reshaped)
+
     # Scale PCA values to feasible range of local detuning
     scaled_data_pca = data_pca / np.max(np.abs(data_pca)) * delta_max
-
-    # u, s, v = torch.pca_lowrank(data, q=n_components)
-    # transformed_data = torch.mm(data, v[:, :n_components])
-    # return transformed_data, (u, s, v)
 
     return scaled_data_pca
