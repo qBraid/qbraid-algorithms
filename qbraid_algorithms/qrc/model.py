@@ -17,9 +17,10 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 import numpy as np
-import torch.nn as nn
 
 from .dynamics import DetuningLayer
+
+# from torch import nn
 
 
 @dataclass

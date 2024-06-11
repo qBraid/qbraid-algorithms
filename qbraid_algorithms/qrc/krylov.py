@@ -15,14 +15,15 @@ Module for quantum time evolution using Krylov subspace methods.
 from dataclasses import dataclass
 
 import numpy as np
-from bloqade.atom_arrangement import Square
-from bloqade.emulate.ir.emulator import Register
-from bloqade.emulate.ir.state_vector import RybdbergInteraction, RydbergHamiltonian
+
+# from bloqade.atom_arrangement import Square
+# from bloqade.emulate.ir.emulator import Register
+from bloqade.emulate.ir.state_vector import RydbergHamiltonian, StateVector
 from scipy.linalg import expm
 
 
 # Placeholder for Krylov options with dummy attributes
-class KrylovOptions:
+class KrylovOptions:  # pylint: disable=too-few-public-methods
     """Class that describes options for a Krylov subspace method.
 
     Args:
@@ -34,6 +35,7 @@ class KrylovOptions:
 
     """
 
+    # pylint: disable-next=too-many-arguments
     def __init__(
         self,
         progress: bool = False,
@@ -61,7 +63,7 @@ class KrylovEvolution:
         options (KrylovOptions): Options for the evolution process.
     """
 
-    reg: Register
+    reg: StateVector  # Register?
     start_clock: float
     durations: list[float]
     hamiltonian: RydbergHamiltonian
@@ -88,10 +90,11 @@ class KrylovEvolution:
         """Projects H onto the Krylov subspace and computes the time evolution."""
         k = self.generate_krylov_basis(h, psi_0, m)
         h_m = k.T.conj() @ h @ k
-        exp_h_m = np.expm(-1j * h_m * t)
+        exp_h_m = expm(-1j * h_m * t)
         psi_t = k @ exp_h_m @ k.T.conj() @ psi_0
         return psi_t
 
+    # pylint: disable-next=unused-argument
     def emulate_step(self, step: int, clock: float, duration: float) -> "KrylovEvolution":
         """
         Simulate a single time step of quantum evolution using the Krylov subspace method.
@@ -107,21 +110,25 @@ class KrylovEvolution:
         TODO: Implement the emulation step function.
         """
         try:
-            psi_0 = self.reg.state_vector
+            psi_0 = self.reg
             evolved_state = self.krylov_evolution(
                 self.hamiltonian.rydberg, psi_0, duration, len(self.durations)
             )
-            self.reg.state_vector = evolved_state
+            self.reg = evolved_state
         except Exception as err:
             raise NotImplementedError("Emulation step failed") from err
 
-    def normalize_register(self):
+    def normalize_register(self) -> None:
         """
         Normalize the quantum register if specified in options.
 
         TODO: Implement the normalization logic.
         """
+        # https://github.com/QuEraComputing/bloqade-python/blob/17585b21ad8f099ac8ffe126257e8ffb6c7f4588/src/bloqade/emulate/ir/state_vector.py#L208-L215
+        # data = self.reg.data
+        # data /= np.linalg.norm(data)
+        # self.reg.data = data
         if self.options.normalize_finally:
-            norm = np.linalg.norm(self.reg.state_vector)
+            norm = np.linalg.norm(self.reg)
             if norm > self.options.tol:
-                self.reg.state_vector /= norm
+                self.reg /= norm

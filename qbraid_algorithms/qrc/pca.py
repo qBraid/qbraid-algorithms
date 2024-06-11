@@ -31,8 +31,8 @@ def pca_reduction(
     Args:
         data (torch.Tensor): The input data tensor where each row represents a sample.
         n_components (int): The number of principal components to retain.
-        data_dim (int) : The dimension of the input data required for doing PCA.
-        delta_max (int) : The scaling factor for bring PCA values to the feasible range of local detuning.
+        data_dim (int): The dimension of the input data required for doing PCA.
+        delta_max (int): Scaling factor to bring PCA vals into a feasible range for local detuning.
         train (bool, optional): Whether the data is training data. Defaults to True.
 
     Returns:

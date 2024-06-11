@@ -10,17 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install isort ruff qbraid-cli
+          python3 -m pip install isort 'black[jupyter]' pylint ruff pylint qbraid-cli
       - name: Check isort, ruff, headers
         run: |
           ruff check qbraid_algorithms examples tests tools
           isort --check-only qbraid_algorithms tests tools
-          qbraid admin headers qbraid_algorithms tests tools
+          black --check qbraid_algorithms tests tools examples --line-length 100
+          pylint qbraid_algorithms tests tools examples --disable=W0108,W0511,W0401,R0902 --ignore=qbraid_algorithms/_version.py
+          qbraid admin headers qbraid_algorithms tests tools --type gpl --skip qbraid_algorithms/_version.py

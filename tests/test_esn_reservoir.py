@@ -68,7 +68,7 @@ def test_spectral_radius():
     reservoir = EchoStateReservoir(
         input_size=10, hidden_size=100, sparsity=0.5, spectral_radius=0.95
     )
-    eigenvalues = torch.linalg.eigvals(reservoir.w)
+    eigenvalues = torch.linalg.eigvals(reservoir.w)  # pylint: disable=not-callable
     max_eigenvalue = torch.max(torch.abs(eigenvalues)).item()
     assert pytest.approx(max_eigenvalue, 0.01) == 0.95
 
