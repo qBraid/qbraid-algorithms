@@ -24,5 +24,5 @@ jobs:
           ruff check qbraid_algorithms examples tests tools
           isort --check-only qbraid_algorithms tests tools
           black --check qbraid_algorithms tests tools examples --line-length 100
-          pylint qbraid_algorithms tests tools examples --disable=W0108,W0511,W0401,R0902 --ignore=qbraid_algorithms/_version.py
+          pylint qbraid_algorithms tests tools examples --disable=W0108,W0511,W0401,R0902,E0401 --ignore=qbraid_algorithms/_version.py
           qbraid admin headers qbraid_algorithms tests tools --type gpl --skip qbraid_algorithms/_version.py

@@ -64,7 +64,7 @@ jobs:
         shell: pwsh
       - name: Install testing dependencies
         run: |
-          pip install pytest
+          pip install pytest pytest-cov
       - name: Run tests with pytest
         run: |
           pytest tests --cov=qbraid_algorithms --cov-config=pyproject.toml --cov-report=term --cov-report=xml

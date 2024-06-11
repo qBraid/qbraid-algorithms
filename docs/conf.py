@@ -27,6 +27,8 @@ extensions = [
     "sphinx.ext.autosummary",
 ]
 
+autodoc_mock_imports = ["torchvision"]
+
 # The master toctree document.
 master_doc = "index"
 
