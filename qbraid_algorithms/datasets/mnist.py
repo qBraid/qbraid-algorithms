@@ -13,13 +13,14 @@ Module defining MNIST dataset for reservoir computing tasks.
 
 """
 import numpy as np
-import torchvision as tv
 
 
 def load_mnist_data(download: bool = False, train: bool = True) -> np.ndarray:
     """Load the MNIST dataset."""
-    transform = tv.transforms.Compose([tv.transforms.ToTensor()])
-    dataset = tv.datasets.MNIST(
+    import torchvision  # pylint: disable=import-outside-toplevel
+
+    transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
+    dataset = torchvision.datasets.MNIST(
         "./MNIST_data/", download=download, train=train, transform=transform
     )
     dataset_array: np.ndarray = dataset.data.numpy()

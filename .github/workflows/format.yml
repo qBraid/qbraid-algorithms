@@ -1,4 +1,4 @@
-name: Formatting check
+name: Format
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  main:
+  check:
     runs-on: ubuntu-latest
 
     steps:
