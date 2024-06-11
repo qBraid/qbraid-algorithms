@@ -18,7 +18,7 @@ import torch
 from .reservoir import EchoStateReservoir
 
 
-class EchoStateNetwork(torch.nn.Module):
+class EchoStateNetwork(torch.nn.Module):  # pylint: disable=too-few-public-methods
     """
     An Echo State Network module that combines a Reservoir with a fully connected output layer.
 
