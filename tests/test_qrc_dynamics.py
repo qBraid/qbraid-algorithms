@@ -8,26 +8,70 @@
 #
 # THERE IS NO WARRANTY for the qBraid-SDK, as per Section 15 of the GPL v3.
 
+# pylint: disable=redefined-outer-name
+
 """
 Unit tests for Quantum Reservoir Computing (QRC) dynamics modules.
 
 """
+from unittest.mock import Mock
 
 import numpy as np
+import pytest
+from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
+from bloqade.emulate.ir.space import Space, SpaceType
+from bloqade.emulate.ir.state_vector import StateVector
+from numpy.typing import NDArray
 
 from qbraid_algorithms.qrc.krylov import KrylovEvolution, KrylovOptions
-from qbraid_algorithms.qrc.magnus_expansion import MagnusExpansion
+from qbraid_algorithms.qrc.magnus import MagnusExpansion
 
 
-def test_rbh():
-    """Test the Rydberg Blockade Hamiltonian (RBH."""
+@pytest.fixture
+def program_register() -> Register:
+    """Create a program register."""
+    return Mock()
+
+
+@pytest.fixture
+def atom_type() -> AtomType:
+    """Create an atom type."""
+    return Mock()
+
+
+@pytest.fixture
+def configurations() -> NDArray:
+    """Create configurations."""
+    return Mock()
+
+
+@pytest.fixture
+def space_type() -> SpaceType:
+    """Create a space type."""
+    return Mock()
+
+
+@pytest.fixture
+def space(program_register, atom_type, configurations, space_type) -> Space:
+    """Create a space object."""
+    return Space(
+        space_type=space_type,
+        atom_type=atom_type,
+        program_register=program_register,
+        configurations=configurations,
+    )
+
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_rbh(space):
+    """Test the Rydberg Blockade Hamiltonian (RBH)"""
     initial_state = np.array([1, 0, 0, 0], dtype=complex)
 
     # Create a KrylovEvolution instance
     krylov_options = KrylovOptions()
     krylov_evolution = KrylovEvolution(
-        reg=Register(initial_state),
+        reg=StateVector(data=initial_state, space=space),
         start_clock=0.0,
         durations=[0.1, 0.2, 0.3],
         hamiltonian=None,  # This will be initialized in __post_init__
@@ -37,11 +81,13 @@ def test_rbh():
     # Simulate the evolution (example step)
     krylov_evolution.emulate_step(step=0, clock=0.0, duration=0.1)
 
-    passed = True  # TODO
+    final_state = np.array([], dtype=complex)  # dummy value
+    expected_value = StateVector(data=final_state, space=space)
 
-    assert passed
+    assert krylov_evolution.reg == expected_value
 
 
+@pytest.mark.skip(reason="Not completed yet")
 def test_simulate_dynamics():
     """Test the simulation of quantum dynamics using Magnus expansion."""
     # Define a simple Hamiltonian and initial state

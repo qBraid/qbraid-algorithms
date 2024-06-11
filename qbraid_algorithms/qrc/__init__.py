@@ -22,7 +22,7 @@ Classes
 
 """
 
-from .magnus_expansion import MagnusExpansion
+from .magnus import MagnusExpansion
 from .model import QRCModel
 
 __all__ = ["QRCModel", "MagnusExpansion"]

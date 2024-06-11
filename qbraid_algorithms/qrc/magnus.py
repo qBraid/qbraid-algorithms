@@ -22,49 +22,49 @@ class MagnusExpansion:
 
     """
 
-    def __init__(self, H):
-        self.H = H
+    def __init__(self, h):
+        self.h = h
 
-    def commutator(self, A, B):
+    def commutator(self, a, b):
         """Compute the commutator of two matrices."""
-        return A @ B - B @ A
+        return a @ b - b @ a
 
     def compute_magnus_terms(self, t):
         """Compute the terms of the Magnus expansion."""
-        H_t = self.H * t
-        Ω1 = H_t
+        h_t = self.h * t
+        omega_1 = h_t
 
         # Second-order term
-        comm_H1_H2 = self.commutator(self.H, self.H)
-        Ω2 = 0.5 * (comm_H1_H2 * t**2)
+        comm_h1_h2 = self.commutator(self.h, self.h)
+        omega_2 = 0.5 * (comm_h1_h2 * t**2)
 
         # Third-order term
-        comm_H1_comm_H2_H3 = self.commutator(self.H, self.commutator(self.H, self.H))
-        comm_H3_comm_H2_H1 = self.commutator(self.commutator(self.H, self.H), self.H)
-        Ω3 = (1 / 6) * (comm_H1_comm_H2_H3 + comm_H3_comm_H2_H1) * t**3
+        comm_h1_comm_h2_h3 = self.commutator(self.h, self.commutator(self.h, self.h))
+        comm_h3_comm_h2_h1 = self.commutator(self.commutator(self.h, self.h), self.h)
+        omega_3 = (1 / 6) * (comm_h1_comm_h2_h3 + comm_h3_comm_h2_h1) * t**3
 
         # Fourth-order term
-        comm_H1_comm_H2_comm_H3_H4 = self.commutator(
-            self.H, self.commutator(self.H, self.commutator(self.H, self.H))
+        comm_h1_comm_h2_comm_h3_h4 = self.commutator(
+            self.h, self.commutator(self.h, self.commutator(self.h, self.h))
         )
-        comm_H4_comm_H3_comm_H2_H1 = self.commutator(
-            self.commutator(self.commutator(self.H, self.H), self.H), self.H
+        comm_h4_comm_h3_comm_h2_h1 = self.commutator(
+            self.commutator(self.commutator(self.h, self.h), self.h), self.h
         )
-        Ω4 = (1 / 24) * (comm_H1_comm_H2_comm_H3_H4 + comm_H4_comm_H3_comm_H2_H1) * t**4
+        omega_4 = (1 / 24) * (comm_h1_comm_h2_comm_h3_h4 + comm_h4_comm_h3_comm_h2_h1) * t**4
 
-        return Ω1 + Ω2 + Ω3 + Ω4
+        return omega_1 + omega_2 + omega_3 + omega_4
 
     def time_evolution_operator(self, t):
         """Compute the time evolution operator using Magnus expansion."""
-        Ω = self.compute_magnus_terms(t)
-        return expm(Ω)
+        omega = self.compute_magnus_terms(t)
+        return expm(omega)
 
     def simulate_dynamics(self, psi0, t_final, dt):
         """Simulate the dynamics of the system."""
         psi = psi0
         t = 0
         while t < t_final:
-            U = self.time_evolution_operator(dt)
-            psi = U @ psi
+            u = self.time_evolution_operator(dt)
+            psi = u @ psi
             t += dt
         return psi

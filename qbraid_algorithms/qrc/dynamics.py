@@ -110,15 +110,17 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
 
     # Numerically simulate the quantum evolution with Krylov methods and store the readouts
     i = 1
-    prob = KrylovEvolution(reg, start_clock=start_clock, hamiltonian=h)
+    prob = KrylovEvolution(
+        reg, start_clock=start_clock, durations=[t_step] * steps, hamiltonian=h, options=None
+    )
     for i in range(steps):
         # ignore first time step, this is just the initial state
         if i == 0:
             continue
 
         # TODO: Implement the emulation step function.
-        # NOTE: The following lines are placeholders, are not necessarily correct, and should be replaced.
-        prob = prob.emulate_step(i, t_start + i * t_step, t_step)
+        # NOTE: The following lines are placehoders. They are not correct, and should be replaced.
+        prob.emulate_step(i, t_start + i * t_step, t_step)
         for j, readout in enumerate(layer.readouts):
             out[i * len(layer.readouts) + j] = readout(prob)
 

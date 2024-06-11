@@ -51,7 +51,7 @@ class EchoStateReservoir:
                 mean=mean, std=self.spectral_radius
             )
             w = torch.where(torch.rand_like(w) > self.sparsity, w, torch.zeros_like(w))
-            eigenvalues = torch.linalg.eigvals(w)
+            eigenvalues = torch.linalg.eigvals(w)  # pylint: disable=not-callable
             max_abs_eigenvalue = torch.max(torch.abs(eigenvalues)).item()
             if max_abs_eigenvalue != 0:
                 w *= self.spectral_radius / max_abs_eigenvalue
