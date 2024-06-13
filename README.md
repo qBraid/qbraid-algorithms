@@ -1,5 +1,7 @@
 # qbraid-algorithms
 
+Notebook I am [currently working](https://colab.research.google.com/drive/1udbj_spVYH98PEjCizKZPd0qM314e-w-?usp=sharing) on.
+
 <p align="left">
   <a href="https://github.com/qBraid/qbraid-algorithms/actions/workflows/main.yml">
     <img src="https://github.com/qBraid/qbraid-algorithms/actions/workflows/main.yml/badge.svg?branch=main" alt="CI"/>
