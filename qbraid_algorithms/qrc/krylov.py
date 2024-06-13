@@ -13,13 +13,10 @@ Module for quantum time evolution using Krylov subspace methods.
 
 """
 from dataclasses import dataclass
-
 import numpy as np
-
-# from bloqade.atom_arrangement import Square
-# from bloqade.emulate.ir.emulator import Register
-from bloqade.emulate.ir.state_vector import RydbergHamiltonian, StateVector
 from scipy.linalg import expm
+from bloqade.emulate.ir.state_vector import StateVector, RydbergHamiltonian
+from bloqade.factory import rydberg_h  # Import the rydberg_h function
 
 
 # Placeholder for Krylov options with dummy attributes
@@ -53,24 +50,15 @@ class KrylovOptions:  # pylint: disable=too-few-public-methods
 
 @dataclass
 class KrylovEvolution:
-    """Class that describes a time evolution using Krylov subspace methods.
-
-    Args:
-        reg (Register): Quantum register for the evolution.
-        start_clock (float): Start time of the evolution.
-        durations (list[float]): Durations of each time step.
-        hamiltonian (RydbergHamiltonian): Hamiltonian for the evolution.
-        options (KrylovOptions): Options for the evolution process.
-    """
-
-    reg: StateVector  # Register?
+    reg: StateVector
     start_clock: float
     durations: list[float]
-    hamiltonian: RydbergHamiltonian
+    atoms: list  # Add atoms attribute
+    delta: float  # Add delta attribute
+    omega: float  # Add omega attribute
     options: KrylovOptions
 
     def generate_krylov_basis(self, h, psi_0, m):
-        """Generates the first m Krylov basis vectors."""
         n = len(psi_0)
         k = np.zeros((n, m), dtype=complex)
         k[:, 0] = psi_0 / np.linalg.norm(psi_0)
@@ -82,52 +70,28 @@ class KrylovEvolution:
         return k
 
     def gram_schmidt(self, v):
-        """Orthonormalizes the vectors using the Gram-Schmidt process."""
         q, _ = np.linalg.qr(v)
         return q
 
     def krylov_evolution(self, h, psi_0, t, m):
-        """Projects H onto the Krylov subspace and computes the time evolution."""
         k = self.generate_krylov_basis(h, psi_0, m)
         h_m = k.T.conj() @ h @ k
         exp_h_m = expm(-1j * h_m * t)
         psi_t = k @ exp_h_m @ k.T.conj() @ psi_0
         return psi_t
 
-    # pylint: disable-next=unused-argument
     def emulate_step(self, step: int, clock: float, duration: float) -> "KrylovEvolution":
-        """
-        Simulate a single time step of quantum evolution using the Krylov subspace method.
-
-        Args:
-            step: Current step index.
-            clock: Current time.
-            duration: Duration of the current time step.
-
-        Returns:
-            Self with the quantum state updated.
-
-        TODO: Implement the emulation step function.
-        """
         try:
             psi_0 = self.reg
+            hamiltonian = rydberg_h(self.atoms, self.delta, self.omega)  # Use rydberg_h function
             evolved_state = self.krylov_evolution(
-                self.hamiltonian.rydberg, psi_0, duration, len(self.durations)
+                hamiltonian.rydberg, psi_0, duration, len(self.durations)
             )
             self.reg = evolved_state
         except Exception as err:
             raise NotImplementedError("Emulation step failed") from err
 
     def normalize_register(self) -> None:
-        """
-        Normalize the quantum register if specified in options.
-
-        TODO: Implement the normalization logic.
-        """
-        # https://github.com/QuEraComputing/bloqade-python/blob/17585b21ad8f099ac8ffe126257e8ffb6c7f4588/src/bloqade/emulate/ir/state_vector.py#L208-L215
-        # data = self.reg.data
-        # data /= np.linalg.norm(data)
-        # self.reg.data = data
         if self.options.normalize_finally:
             norm = np.linalg.norm(self.reg)
             if norm > self.options.tol:
