@@ -14,9 +14,13 @@ Module for quantum time evolution using Krylov subspace methods.
 """
 
 from dataclasses import dataclass
-
+from typing import Any
+import numpy as np
+from scipy.optimize import newton_krylov
+from bloqade import rydberg_h
 from bloqade.emulate.ir.emulator import Register
 from bloqade.emulate.ir.state_vector import RydbergHamiltonian
+from bloqade.atom_arrangement import Square
 
 
 # Placeholder for Krylov options with dummy attributes
@@ -64,6 +68,55 @@ class KrylovEvolution:
     durations: list[float]
     hamiltonian: RydbergHamiltonian
     options: KrylovOptions
+    lattice_size: int
+    lattice_spacing: float
+    max_rabi: float
+    max_detuning: float
+    atom_arrangement: Any = None
+
+    def __post_init__(self):
+        self.atom_arrangement = Square(self.lattice_size, lattice_spacing=self.lattice_spacing)
+        self.hamiltonian = self.define_hamiltonian()
+
+    def define_hamiltonian(self):
+        adiabatic_durations = [0.4, 3.2, 0.4]
+
+        program = (
+            self.atom_arrangement
+            .rydberg.rabi.amplitude.uniform.piecewise_linear(
+                durations=adiabatic_durations, values=[0.0, self.max_rabi, self.max_rabi, 0.0]
+            )
+            .rydberg.detuning.uniform.piecewise_linear(
+                durations=adiabatic_durations,
+                values=[
+                    -self.max_detuning,
+                    -self.max_detuning,
+                    self.max_detuning,
+                    self.max_detuning,
+                ],
+            )
+        )
+        return program
+
+    def krylov_time_evolution(self, initial_state, time_steps):
+        time_index = [0]
+
+        def time_evolution(state):
+            current_time = time_steps[time_index[0]]
+            time_index[0] += 1
+
+            # Evaluate the Hamiltonian at the current time step
+            program_instance = self.hamiltonian
+
+            # Use the current state and time to get the next state
+            return rydberg_h(
+                atoms_positions=self.atom_arrangement.positions,
+                detuning=program_instance.rydberg.detuning(current_time),
+                amplitude=program_instance.rydberg.rabi.amplitude(current_time)
+            )
+
+        final_state = newton_krylov(time_evolution, initial_state, method='lgmres', maxiter=100)
+        return final_state
 
     def emulate_step(self, step: int, clock: float, duration: float) -> "KrylovEvolution":
         """
@@ -88,3 +141,23 @@ class KrylovEvolution:
         TODO: Implement the normalization logic.
         """
         raise NotImplementedError
+
+
+if __name__ == "__main__":
+    krylov_evolution = KrylovEvolution(
+        reg=Register(),
+        start_clock=0.0,
+        durations=[0.4, 3.2, 0.4],
+        hamiltonian=RydbergHamiltonian(),
+        options=KrylovOptions(),
+        lattice_size=3,
+        lattice_spacing=5.0,
+        max_rabi=15.8,
+        max_detuning=16.33
+    )
+
+    initial_state = np.zeros((krylov_evolution.lattice_size, krylov_evolution.lattice_size))
+    time_steps = np.linspace(0, 1, 100)
+
+    final_state = krylov_evolution.krylov_time_evolution(initial_state, time_steps)
+    print(final_state)
