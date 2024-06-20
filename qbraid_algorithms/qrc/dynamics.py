@@ -1,26 +1,12 @@
-i# Copyright (C) 2024 qBraid
-#
-# This file is part of the qBraid-SDK
-#
-# The qBraid-SDK is free software released under the GNU General Public License v3
-# or later. You can redistribute and/or modify it under the terms of the GPL v3.
-# See the LICENSE file in the project root or <https://www.gnu.org/licenses/gpl-3.0.html>.
-#
-# THERE IS NO WARRANTY for the qBraid-SDK, as per Section 15 of the GPL v3.
-
-"""
-Module for simulating the dynamics of a quantum reservoir.
-
-"""
+# qbraid_algorithms/qrc/dynamics.py
 
 from dataclasses import dataclass, field
 from typing import Any
-
 import numpy as np
+from bloqade import waveform
 from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
 from bloqade.atom_arrangement import AtomArrangement, Chain, Square, Triangular, Honeycomb, Kagome, Lieb, ListOfLocations
-
 
 @dataclass
 class DetuningLayer:
@@ -36,6 +22,35 @@ class DetuningLayer:
         default_factory=lambda *args, **kwargs: Register(*args, **kwargs)
     )  # Quantum state storage
 
+    def generate_waveform(self):
+        """Generate a waveform for detuning based on the step variable."""
+        total_duration = self.t_end - self.t_start
+        num_steps = int(total_duration / self.step)
+        adiabatic_durations = [self.step] * num_steps
+
+        @waveform(total_duration)
+        def detuning_waveform(t):
+            return np.piecewise(t,
+                                [t < adiabatic_durations[0],
+                                 (t >= adiabatic_durations[0]) & (t < adiabatic_durations[0] + adiabatic_durations[1]),
+                                 t >= adiabatic_durations[0] + adiabatic_durations[1]],
+                                [-self.omega, self.omega, -self.omega])
+
+        return detuning_waveform.sample(0.05, "linear")
+
+    def setup_program(self, atom_arrangement):
+        """Define the Hamiltonian using the rydberg_h function."""
+        detuning = self.generate_waveform()
+
+        program = (
+            atom_arrangement
+            .rydberg.rabi.amplitude.uniform.piecewise_linear(
+                durations=[self.step] * int((self.t_end - self.t_start) / self.step),
+                values=[0.0, self.omega, self.omega, 0.0]
+            )
+            .rydberg.detuning.uniform.apply(detuning)
+        )
+        return program
 
 def generate_sites(lattice_type: str, dimension, scale):
     """
@@ -48,11 +63,7 @@ def generate_sites(lattice_type: str, dimension, scale):
 
     Returns:
         Any: Positions of atoms.
-
-
     """
-
-
     if lattice_type == "AtomArrangement":
         return AtomArrangement(L1=dimension, lattice_spacing=scale)
     elif lattice_type == "Chain":
@@ -69,8 +80,6 @@ def generate_sites(lattice_type: str, dimension, scale):
         return Kagome(L1=dimension, lattice_spacing=scale)
     else:
         return ListOfLocations(L1=dimension, lattice_spacing=scale)
-
-
 
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
