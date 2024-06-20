@@ -1,4 +1,4 @@
-# Copyright (C) 2024 qBraid
+i# Copyright (C) 2024 qBraid
 #
 # This file is part of the qBraid-SDK
 #
@@ -19,6 +19,7 @@ from typing import Any
 import numpy as np
 from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
+from bloqade.atom_arrangement import AtomArrangement, Chain, Square, Triangular, Honeycomb, Kagome, Lieb, ListOfLocations
 
 
 @dataclass
@@ -36,7 +37,7 @@ class DetuningLayer:
     )  # Quantum state storage
 
 
-def generate_sites(lattice_type, dimension, scale):
+def generate_sites(lattice_type: str, dimension, scale):
     """
     Generate positions for atoms on a specified lattice type with a given scale.
 
@@ -48,9 +49,27 @@ def generate_sites(lattice_type, dimension, scale):
     Returns:
         Any: Positions of atoms.
 
-    TODO: Implement actual site generation based on lattice type.
+
     """
-    raise NotImplementedError
+
+
+    if lattice_type == "AtomArrangement":
+        return AtomArrangement(L1=dimension, lattice_spacing=scale)
+    elif lattice_type == "Chain":
+        return Chain(L1=dimension, lattice_spacing=scale)
+    elif lattice_type == "Square":
+        return Square(L1=dimension, lattice_spacing=scale)
+    elif lattice_type == "Triangular":
+        return Triangular(L1=dimension, lattice_spacing=scale)
+    elif lattice_type == "Honeycomb":
+        return Honeycomb(L1=dimension, lattice_spacing=scale)
+    elif lattice_type == "Lieb":
+        return Lieb(L1=dimension, lattice_spacing=scale)
+    elif lattice_type == "Kagome":
+        return Kagome(L1=dimension, lattice_spacing=scale)
+    else:
+        return ListOfLocations(L1=dimension, lattice_spacing=scale)
+
 
 
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
