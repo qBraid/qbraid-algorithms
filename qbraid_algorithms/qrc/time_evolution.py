@@ -17,6 +17,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from bloqade.atom_arrangement import Square, Chain, Rectangular, Honeycomb, Triangular, Lieb, Kagome, AtomArrangement
+from bloqade.builder.waveform import PiecewiseLinear
 
 class GeometryOptions:  # pylint: disable=too-few-public-methods
 
@@ -48,10 +49,12 @@ class AnalogEvolution:
             self,
             rabi_amplitudes: list[float],
             durations: list[float],
+            simulation: bool,
             geometric_configuration: GeometryOptions
             ):
 
 
+        self.simulation = simulation
         self.amplitudes = rabi_amplitudes
         self.durations = durations
 
@@ -68,20 +71,38 @@ class AnalogEvolution:
         prob /= total_shots
         return prob
 
-    def time_evolution(self, durations: list[float], rabi_detuning_values: list[float], amp_waveform: PiecewiseLinear, num_atoms: int):
+    def _time_evolution(self, amp_waveform, num_atoms: int):
         """
         evolves the program over discrete list of time steps
         """
+
         program = (
-            amp_waveform
-            .detuning.uniform.piecewise_linear(durations, rabi_detuning_values)
-        )
+                amp_waveform
+                .detuning.uniform.piecewise_linear(self.durations, self.amplitudes)
+            )
 
-        # TODO: Create some sort of config for defining whether to run an emulation or hardware run
-        hardware_run_bitstrings = program.braket.aquila.run_async(100).report().counts()
+        if self.simulation:
+            [emulation] = (program.bloqade.python().hamiltonian())
+            emulation.evolve(times=self.durations)
 
-        expected_statevector = self.get_prob(hardware_run_bitstrings, num_atoms)
-        return expected_statevector
+            return emulation.hamiltonian.tocsr(time=self.durations[-1]).toarray()
+
+
+
+        else:
+            hardware_run_bitstrings = program.braket.aquila.run_async(100).report().counts()
+
+            expected_statevector = self.get_prob(hardware_run_bitstrings, num_atoms)
+            return expected_statevector
+
+    def time_evolution(self, num_atoms: int):
+        """
+        evolves the program over discrete list of time steps
+        """
+        program_setup = self.geometric_configuration.atom_arrangement(
+            lattice_spacing=self.geometric_configuration.lattice_spacing
+            ).rydberg.rabi.amplitude.uniform.constant(15.0, 4.0)
+        return self._time_evolution(program_setup, num_atoms)
 
 
 
