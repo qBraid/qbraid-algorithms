@@ -19,7 +19,7 @@ from typing import Any
 import numpy as np
 from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
-
+from bloqade.atom_arrangement import Chain
 
 @dataclass
 class DetuningLayer:
@@ -39,7 +39,9 @@ class DetuningLayer:
 def generate_sites(lattice_type, dimension, scale):
     """
     Generate positions for atoms on a specified lattice type with a given scale.
-
+    
+    Note: For now adding a simple lattice type, later we can add different options.
+    
     Args:
         lattice_type (Any): Type of the lattice.
         dimension (int): Number of principal components.
@@ -50,13 +52,15 @@ def generate_sites(lattice_type, dimension, scale):
 
     TODO: Implement actual site generation based on lattice type.
     """
-    raise NotImplementedError
-
+    return Chain(dimension, lattice_spacing=scale)
 
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
     Simulate quantum evolution and record output for a given set of PCA values (x).
 
+    Note: Frequency omega is not a input for rydberg_h python function, instead amplitude is there.
+    For detuning we use x.
+    
     Args:
         layer (DetuningLayer): Configuration and quantum state of the layer.
         x (np.ndarray): Vector or matrix of real numbers representing PCA values for each image.
@@ -66,4 +70,19 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
 
     TODO: Implement the actual simulation using suitable quantum simulation libraries.
     """
-    raise NotImplementedError
+    # using omega as amplitude for now, since other things don't make sense. 
+    #detuning has to be of form wave so need to get back to it
+    hamiltonian = rydberg_h(
+          layer.atoms, detuning = x, amplitude = layer.omega,
+      )
+    
+    layer.t_start = 0
+    layer.t_end = 5
+    layer.t_step = 0.1
+    steps = (t_end - t_start)/t_step + 1
+    times = []
+    for i in range(int(steps)):
+        times.append(t_start + i*t_step)
+    
+    # something like should be the chronological order
+    hamiltonian.evolve(times=times)
