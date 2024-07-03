@@ -4,6 +4,9 @@
   <a href="https://github.com/qBraid/qbraid-algorithms/actions/workflows/main.yml">
     <img src="https://github.com/qBraid/qbraid-algorithms/actions/workflows/main.yml/badge.svg?branch=main" alt="CI"/>
   </a>
+  <a href="https://codecov.io/gh/qBraid/qbraid-algorithms"> 
+    <img src="https://codecov.io/gh/qBraid/qbraid-algorithms/graph/badge.svg?token=7jYcnneDys"/>
+  </a>
   <a href="https://pypi.org/project/qbraid-algorithms/">
     <img src="https://img.shields.io/pypi/v/qbraid-algorithms.svg?color=blue" alt="PyPI version"/>
   </a>

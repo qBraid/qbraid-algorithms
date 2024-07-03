@@ -24,7 +24,7 @@ from bloqade.emulate.ir.space import Space, SpaceType
 from bloqade.emulate.ir.state_vector import StateVector
 from numpy.typing import NDArray
 
-from qbraid_algorithms.qrc.krylov import KrylovEvolution, KrylovOptions
+from qbraid_algorithms.qrc.time_evolution import AnalogEvolution, EvolveOptions
 from qbraid_algorithms.qrc.magnus import MagnusExpansion
 
 
@@ -69,8 +69,9 @@ def test_rbh(space):
     initial_state = np.array([1, 0, 0, 0], dtype=complex)
 
     # Create a KrylovEvolution instance
-    krylov_options = KrylovOptions()
-    krylov_evolution = KrylovEvolution(
+
+    krylov_options = EvolveOptions()
+    krylov_evolution = AnalogEvolution(
         reg=StateVector(data=initial_state, space=space),
         start_clock=0.0,
         durations=[0.1, 0.2, 0.3],

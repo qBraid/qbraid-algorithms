@@ -14,6 +14,7 @@ Module for simulating the dynamics of a quantum reservoir.
 """
 
 import math
+import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -22,7 +23,8 @@ from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
 from bloqade.emulate.ir.state_vector import RydbergHamiltonian
 
-from .krylov import KrylovEvolution
+
+from .time_evolution import AnalogEvolution
 
 
 @dataclass
@@ -81,6 +83,30 @@ def set_zero_state(reg: Register):
     raise NotImplementedError
 
 
+def rydberg_h(atoms: list[AtomType], delta: float, omega: float) -> RydbergHamiltonian:
+    """
+    Generate the Hamiltonian for a Rydberg atom system.
+
+    Args:
+        atoms (list[AtomType]): Atom positions.
+        omega (float): Rabi frequency.
+
+    Returns:
+        RydbergHamiltonian: Hamiltonian matrix.
+    """
+    raise NotImplementedError
+
+
+def set_zero_state(reg: Register):
+    """
+    Set the quantum state to the zero state.
+
+    Args:
+        reg (Register): Quantum state storage.
+    """
+    raise NotImplementedError
+
+
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
     Simulate quantum evolution and record output for a given set of PCA values (x).
@@ -110,7 +136,8 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
 
     # Numerically simulate the quantum evolution with Krylov methods and store the readouts
     i = 1
-    prob = KrylovEvolution(
+
+    prob = AnalogEvolution(
         reg, start_clock=start_clock, durations=[t_step] * steps, hamiltonian=h, options=None
     )
     for i in range(steps):
