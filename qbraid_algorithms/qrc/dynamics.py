@@ -76,13 +76,14 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
           layer.atoms, detuning = x, amplitude = layer.omega,
       )
     
-    layer.t_start = 0
-    layer.t_end = 5
-    layer.t_step = 0.1
+    t_start = layer.t_start
+    t_end = layer.t_end
+    t_step = layer.t_step
     steps = (t_end - t_start)/t_step + 1
     times = []
+    
     for i in range(int(steps)):
-        times.append(t_start + i*t_step)
+        times.append(t_start + i * t_step)
     
     # something like should be the chronological order
     hamiltonian.evolve(times=times)
