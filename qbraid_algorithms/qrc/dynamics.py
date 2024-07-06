@@ -16,13 +16,9 @@ Module for simulating the dynamics of a quantum reservoir.
 from dataclasses import dataclass, field
 from typing import Any
 
-import numpy as np
-from bloqade.emulate.ir.atom_type import AtomType
-from bloqade.emulate.ir.emulator import Register
-from bloqade.atom_arrangement import Chain, Square, Rectangular, Honeycomb, Triangular, Lieb, Kagome, AtomArrangement
+from bloqade.atom_arrangement import AtomArrangement
 from bloqade.ir import Waveform
-from bloqade.builder.field import uniform, scale, location
-from bloqade import rydberg_h
+from bloqade.builder import field
 
 @dataclass
 class DetuningLayer:
@@ -33,15 +29,22 @@ class DetuningLayer:
         program: AtomArrangement,
         spatial_modulation: str
     ):
+
         if spatial_modulation == "uniform":
-            self.detuning: uniform = program.detuning.uniform
+            self.detuning: field.uniform = program.detuning.uniform
         elif spatial_modulation == "scale":
-            self.detuning: scale = program.detuning.scale
+            raise NotImplementedError(
+            f"{self.__class__.__name__}.spatial_modulation == 'scale' not implemented\n"
+        )
+            # self.detuning: scale = program.detuning.scale
         elif spatial_modulation == "location":
-            self.detuning: location = program.detuning.location
+            raise NotImplementedError(
+            f"{self.__class__.__name__}.spatial_modulation == 'location' not implemented\n"
+        )
+            # self.detuning: location = program.detuning.location
         else:
             raise ValueError("Invalid spatial modulation type.")
 
 
-def apply_layer(self):
-    return self.detuning
+    def apply_layer(self, program):
+        return self.detuning.piecewise_linear(program.durations, program.amplitudes)
