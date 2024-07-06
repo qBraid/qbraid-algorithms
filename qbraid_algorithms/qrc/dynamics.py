@@ -13,103 +13,56 @@ Module for simulating the dynamics of a quantum reservoir.
 
 """
 
-import math
-import math
 from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
-from bloqade.emulate.ir.state_vector import RydbergHamiltonian
-
-
-from .time_evolution import AnalogEvolution
-
+from bloqade.atom_arrangement import Chain, Square, Rectangular, Honeycomb, Triangular, Lieb, Kagome, AtomArrangement
+from bloqade.ir import Waveform
+from bloqade.builder import Uniform, Scale, Location
+from bloqade import rydberg_h
 
 @dataclass
 class DetuningLayer:
     """Class representing a detuning layer in a quantum reservoir."""
 
-    atoms: list[AtomType]  # Atom positions
-    readouts: list[Any]  # Readout observables
-    omega: float  # Rabi frequency
-    t_start: float  # Evolution starting time
-    t_end: float  # Evolution ending time
-    step: float  # Readout time step
-    reg: Register = field(
-        default_factory=lambda *args, **kwargs: Register(*args, **kwargs)
-    )  # Quantum state storage
+    def __init__(
+        self,
+        program: AtomArrangement,
+        spatial_modulation: str
+    ):
+        if spatial_modulation == "uniform":
+            self.detuning = program.detuning.uniform
+        elif spatial_modulation == "scale":
+            self.detuning = program.detuning.scale
+        elif spatial_modulation == "location":
+            self.detuning = program.detuning.location
+        else:
+            raise ValueError("Invalid spatial modulation type.")
 
 
-def generate_sites(lattice_type, dimension, scale):
+
+
+def generate_sites(self):
     """
     Generate positions for atoms on a specified lattice type with a given scale.
 
-    Args:
-        lattice_type (Any): Type of the lattice.
-        dimension (int): Number of principal components.
-        scale (float): Scale factor for lattice spacing.
+
 
     Returns:
-        Any: Positions of atoms.
+        AtomArrangement: Positions of atoms.
 
-    TODO: Implement actual site generation based on lattice type.
     """
-    raise NotImplementedError
+    pass
 
-
-def rydberg_h(atoms: list[AtomType], delta: float, omega: float) -> RydbergHamiltonian:
-    """
-    Generate the Hamiltonian for a Rydberg atom system.
-
-    Args:
-        atoms (list[AtomType]): Atom positions.
-        omega (float): Rabi frequency.
-
-    Returns:
-        RydbergHamiltonian: Hamiltonian matrix.
-    """
-    raise NotImplementedError
-
-
-def set_zero_state(reg: Register):
-    """
-    Set the quantum state to the zero state.
-
-    Args:
-        reg (Register): Quantum state storage.
-    """
-    raise NotImplementedError
-
-
-def rydberg_h(atoms: list[AtomType], delta: float, omega: float) -> RydbergHamiltonian:
-    """
-    Generate the Hamiltonian for a Rydberg atom system.
-
-    Args:
-        atoms (list[AtomType]): Atom positions.
-        omega (float): Rabi frequency.
-
-    Returns:
-        RydbergHamiltonian: Hamiltonian matrix.
-    """
-    raise NotImplementedError
-
-
-def set_zero_state(reg: Register):
-    """
-    Set the quantum state to the zero state.
-
-    Args:
-        reg (Register): Quantum state storage.
-    """
-    raise NotImplementedError
-
-
-def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
+def apply_layer(layer: DetuningLayer, detuning_waveform: Waveform) -> np.ndarray:
     """
     Simulate quantum evolution and record output for a given set of PCA values (x).
+
+    Note: Frequency omega is not a input for rydberg_h python function, instead amplitude is there.
+    For detuning we use x.
 
     Args:
         layer (DetuningLayer): Configuration and quantum state of the layer.
@@ -118,37 +71,5 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: Output values from the simulation.
 
-    TODO: Implement the actual simulation using suitable quantum simulation libraries.
     """
-    h = rydberg_h(layer.atoms, x, layer.omega)
-
-    reg = layer.reg
-    reg = set_zero_state(reg)
-
-    t_start = layer.t_start
-    t_end = layer.t_end
-    t_step = layer.step
-    start_clock = NotImplemented
-
-    # initialize output vector
-    steps = math.floor((t_end - t_start) / t_step)
-    out = np.zeros(steps * len(layer.readouts))
-
-    # Numerically simulate the quantum evolution with Krylov methods and store the readouts
-    i = 1
-
-    prob = AnalogEvolution(
-        reg, start_clock=start_clock, durations=[t_step] * steps, hamiltonian=h, options=None
-    )
-    for i in range(steps):
-        # ignore first time step, this is just the initial state
-        if i == 0:
-            continue
-
-        # TODO: Implement the emulation step function.
-        # NOTE: The following lines are placehoders. They are not correct, and should be replaced.
-        prob.emulate_step(i, t_start + i * t_step, t_step)
-        for j, readout in enumerate(layer.readouts):
-            out[i * len(layer.readouts) + j] = readout(prob)
-
-    return out
+    pass
