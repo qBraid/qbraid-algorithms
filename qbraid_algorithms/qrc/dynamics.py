@@ -47,4 +47,5 @@ class DetuningLayer:
 
 
     def apply_layer(self, program):
+        print(f"{program}\n")
         return self.detuning.piecewise_linear(program.durations, program.amplitudes)
