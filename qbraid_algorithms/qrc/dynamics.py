@@ -22,7 +22,7 @@ from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
 from bloqade.emulate.ir.state_vector import RydbergHamiltonian
 
-from .krylov import KrylovEvolution
+from .time_evolution import AnalogEvolution
 
 
 @dataclass
@@ -110,7 +110,7 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
 
     # Numerically simulate the quantum evolution with Krylov methods and store the readouts
     i = 1
-    prob = KrylovEvolution(
+    prob = AnalogEvolution(
         reg, start_clock=start_clock, durations=[t_step] * steps, hamiltonian=h, options=None
     )
     for i in range(steps):
