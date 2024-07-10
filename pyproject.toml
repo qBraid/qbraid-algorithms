@@ -74,6 +74,15 @@ ignore-paths = [
   "^.*\\_version.py$",
 ]
 
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 100
+disable = "W0108, W0511, W0401, R0902"
+
+[tool.pylint.MASTER]
+ignore-paths = [
+  "^.*\\_version.py$",
+]
+
 [tool.pytest.ini_options]
 addopts = "-ra"
 testpaths = ["tests"]
