@@ -21,11 +21,9 @@ import pytest
 from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
 from bloqade.emulate.ir.space import Space, SpaceType
-from bloqade.emulate.ir.state_vector import StateVector
 from numpy.typing import NDArray
 
-from qbraid_algorithms.qrc.time_evolution import AnalogEvolution, EvolveOptions
-from qbraid_algorithms.qrc.magnus import MagnusExpansion
+from qbraid_algorithms.qrc.magnus_expansion import MagnusExpansion
 
 
 @pytest.fixture
@@ -61,30 +59,6 @@ def space(program_register, atom_type, configurations, space_type) -> Space:
         program_register=program_register,
         configurations=configurations,
     )
-
-
-@pytest.mark.skip(reason="Not implemented yet")
-def test_rbh(space):
-    """Test the Rydberg Blockade Hamiltonian (RBH)"""
-    initial_state = np.array([1, 0, 0, 0], dtype=complex)
-
-    # Create a KrylovEvolution instance
-    krylov_options = EvolveOptions()
-    krylov_evolution = AnalogEvolution(
-        reg=StateVector(data=initial_state, space=space),
-        start_clock=0.0,
-        durations=[0.1, 0.2, 0.3],
-        hamiltonian=None,  # This will be initialized in __post_init__
-        options=krylov_options,
-    )
-
-    # Simulate the evolution (example step)
-    krylov_evolution.emulate_step(step=0, clock=0.0, duration=0.1)
-
-    final_state = np.array([], dtype=complex)  # dummy value
-    expected_value = StateVector(data=final_state, space=space)
-
-    assert krylov_evolution.reg == expected_value
 
 
 @pytest.mark.skip(reason="Not completed yet")

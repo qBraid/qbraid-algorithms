@@ -22,7 +22,7 @@ from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
 from bloqade.emulate.ir.state_vector import RydbergHamiltonian
 
-from .time_evolution import AnalogEvolution
+from .time_evolution import AnalogProgramEvolver
 
 
 @dataclass
@@ -108,20 +108,6 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     steps = math.floor((t_end - t_start) / t_step)
     out = np.zeros(steps * len(layer.readouts))
 
-    # Numerically simulate the quantum evolution with Krylov methods and store the readouts
-    i = 1
-    prob = AnalogEvolution(
-        reg, start_clock=start_clock, durations=[t_step] * steps, hamiltonian=h, options=None
-    )
-    for i in range(steps):
-        # ignore first time step, this is just the initial state
-        if i == 0:
-            continue
+    evolver = AnalogProgramEvolver(num_atoms=len(layer.atoms), rabi_amplitudes=[layer.omega], durations=[t_step], geometric_configuration=layer.atoms)
 
-        # TODO: Implement the emulation step function.
-        # NOTE: The following lines are placehoders. They are not correct, and should be replaced.
-        prob.emulate_step(i, t_start + i * t_step, t_step)
-        for j, readout in enumerate(layer.readouts):
-            out[i * len(layer.readouts) + j] = readout(prob)
-
-    return out
+    return evolver.evolve(backend="local_simulator")
