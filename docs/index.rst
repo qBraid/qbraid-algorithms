@@ -1,6 +1,3 @@
-Documentation
-==============
-   
 .. raw:: html
 
    <html>
@@ -49,44 +46,54 @@ Documentation
    </head>
    <body>
    <h1 style="text-align: center">
-      <img src="_static/logo.png" alt="qbraid logo" style="width:50px;height:50px;">
+      <img src="_static/logo.png" alt="qbraid logo" style="width:60px;height:60px;">
       <span> qBraid</span>
-      <span style="color:#808080"></span>
+      <span style="color:#808080"> | algorithms</span>
    </h1>
    <p style="text-align:center;font-style:italic;color:#808080">
-      A cloud-based platform for quantum computing.
+      Build hybrid quantum-classical algorithms with qBraid.
    </p>
-   <div class="row">
-   <div class="column">
-      <a href="https://docs.qbraid.com/projects/lab/en/latest/lab/overview.html">
-         <div class="card">
-            <h3>Lab</h3>
-            <img src="_static/cards/jupyter.png" alt="terminal" style="width:60px;height:60px;">
-         </div>
-      </a>
-   </div>
-   
-   <div class="column">
-      <a href="https://docs.qbraid.com/projects/cli/en/latest/guide/overview.html">
-         <div class="card">
-            <h3>CLI</h3>
-            <img src="_static/cards/terminal.png" alt="terminal" style="width:60px;height:60px;">
-         </div>
-      </a>
-   </div>
-   
-   <div class="column">
-      <a href="https://docs.qbraid.com/en/latest/sdk/overview.html">
-         <div class="card">
-            <h3>SDK</h3>
-            <img src="_static/cards/python.png" alt="terminal" style="width:60px;height:60px;">
-         </div>
-      </a>
-   </div>
-   </div>
-
    </body>
    </html>
+
+|
+
+:Release: |release|
+
+Overview
+---------
+
+Python package for building, simulating, and benchmarking hybrid quantum-classical algorithms.
+
+
+Installation
+-------------
+
+qbraid-algorithms requires Python 3.9 or greater, and can be installed with pip as follows:
+
+.. code-block:: bash
+
+   pip install qbraid-algorithms
+
+
+Install from Source
+^^^^^^^^^^^^^^^^^^^^
+
+You can also install from source by cloning this repository and running a pip install command in the root directory of the repository:
+
+.. code-block:: bash
+
+   git clone https://github.com/qBraid/qbraid-algorithms.git
+   cd qbraid-algorithms
+   pip3 install .
+
+
+Resources
+----------
+
+- `User Guide <https://docs.qbraid.com/algorithms/user-guide>`_
+- `Example Notebooks <https://github.com/qBraid/qbraid-algorithms/tree/main/examples>`_
+- `API Reference <https://sdk.qbraid.com/projects/algorithms/en/stable/api/qbraid_algorithms.html>`_
 
 |
 

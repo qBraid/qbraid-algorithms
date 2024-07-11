@@ -14,8 +14,6 @@ Module for encoding of classical data.
 """
 import numpy as np
 import torch
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import OneHotEncoder
 
 
 def one_hot_encoding(labels: np.ndarray, train: bool = True) -> torch.Tensor:
@@ -29,6 +27,9 @@ def one_hot_encoding(labels: np.ndarray, train: bool = True) -> torch.Tensor:
         torch.Tensor: The one-hot encoded matrix where each row corresponds to a label.
 
     """
+    # pylint: disable-next=import-outside-toplevel
+    from sklearn.preprocessing import OneHotEncoder
+
     encoder = OneHotEncoder(sparse_output=False)
     reshaped_data = labels.reshape(-1, 1)
     if train:
@@ -59,6 +60,9 @@ def pca_reduction(
     Returns:
         torch.Tensor: The transformed data
     """
+    # pylint: disable-next=import-outside-toplevel
+    from sklearn.decomposition import PCA
+
     # Perform PCA on training data
     pca = PCA(n_components=n_components)
     data_array: np.ndarray = data.data.numpy()
