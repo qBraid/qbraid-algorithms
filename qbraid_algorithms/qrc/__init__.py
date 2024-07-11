@@ -19,10 +19,31 @@ Classes
 
     QRCModel
     MagnusExpansion
+    DetuningLayer
+    MagnusExpansion
+    AnalogProgramEvolver
+
+Functions
+----------
+
+.. autosummary::
+    :toctree: ../stubs/
+
+    one_hot_encoding
+    pca_reduction
 
 """
 
-from .magnus import MagnusExpansion
-from .model import QRCModel
+from .encoding import one_hot_encoding, pca_reduction
+from .magnus_expansion import MagnusExpansion
+from .qrc_model import DetuningLayer, QRCModel
+from .time_evolution import AnalogProgramEvolver
 
-__all__ = ["QRCModel", "MagnusExpansion"]
+__all__ = [
+    "QRCModel",
+    "MagnusExpansion",
+    "DetuningLayer",
+    "AnalogProgramEvolver",
+    "one_hot_encoding",
+    "pca_reduction",
+]

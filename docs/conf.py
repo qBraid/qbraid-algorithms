@@ -8,7 +8,7 @@
 
 import qbraid_algorithms
 
-project = "qbraid-algorithms"
+project = "qBraid"
 copyright = "2024, qBraid Development Team"
 author = "qBraid Development Team"
 
@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinx.ext.autosummary",
+    "sphinx_copybutton"
 ]
 
 autodoc_mock_imports = ["torchvision"]

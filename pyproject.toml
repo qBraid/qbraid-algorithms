@@ -29,7 +29,7 @@ dependencies = ["torch>=2.3.0,<3.0", "numpy>=1.17,<2.1", "scipy~=1.13.1", "bloqa
 
 [project.urls]
 Homepage = "https://github.com/qBraid/qbraid-algorithms"
-Documentation = "https://docs.qbraid.com/en/stable/"
+Documentation = "https://docs.qbraid.com"
 "Bug Tracker" = "https://github.com/qBraid/qbraid-algorithms/issues"
 Discord = "https://discord.gg/TPBU2sa8Et"
 "Launch on Lab" = "https://account.qbraid.com/?gitHubUrl=https://github.com/qBraid/qbraid-algorithms.git"
@@ -38,7 +38,7 @@ Discord = "https://discord.gg/TPBU2sa8Et"
 visualization = ["matplotlib"]
 test = ["pytest", "pytest-cov"]
 lint = ["isort", "ruff", "qbraid-cli"]
-docs = ["sphinx~=7.3.7", "sphinx-autodoc-typehints>=1.24,<2.3", "sphinx-rtd-theme~=2.0.0", "docutils<0.22"]
+docs = ["sphinx~=7.3.7", "sphinx-autodoc-typehints>=1.24,<2.3", "sphinx-rtd-theme~=2.0.0", "docutils<0.22", "sphinx-copybutton"]
 
 [tool.setuptools_scm]
 write_to = "qbraid_algorithms/_version.py"
@@ -67,7 +67,7 @@ exclude = '''
 
 [tool.pylint.'MESSAGES CONTROL']
 max-line-length = 100
-disable = "W0108, W0511, W0401, R0902"
+disable = "W0108,W0511,W0401,R0902,R0903,R0913"
 
 [tool.pylint.MASTER]
 ignore-paths = [
