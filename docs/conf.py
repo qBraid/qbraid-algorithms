@@ -25,7 +25,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinx.ext.autosummary",
-    "sphinx-copybutton"
+    "sphinx_copybutton"
 ]
 
 autodoc_mock_imports = ["torchvision"]
