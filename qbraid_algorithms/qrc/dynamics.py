@@ -21,19 +21,48 @@ from bloqade.emulate.ir.atom_type import AtomType
 from bloqade.emulate.ir.emulator import Register
 from bloqade.atom_arrangement import Chain
 
+from bloqade import (
+    waveform,
+    rydberg_h,
+    piecewise_linear,
+    piecewise_constant,
+    constant,
+    linear,
+    var,
+    cast,
+    start,
+    get_capabilities,
+)
+
 @dataclass
 class DetuningLayer:
     """Class representing a detuning layer in a quantum reservoir."""
-
-    atoms: list[AtomType]  # Atom positions
-    readouts: list[Any]  # Readout observables
-    omega: float  # Rabi frequency
-    t_start: float  # Evolution starting time
-    t_end: float  # Evolution ending time
-    step: float  # Readout time step
+    def __init__(
+        self,
+    atoms: list[AtomType],  # Atom positions
+    readouts: list[Any],  # Readout observables
+    omega: float,  # Rabi frequency
+    t_start: float,  # Evolution starting time
+    t_end: float,  # Evolution ending time
+    step: float,  # Readout time step
     reg: Register = field(
         default_factory=lambda *args, **kwargs: Register(*args, **kwargs)
     )  # Quantum state storage
+    ):
+        self.atoms = atoms
+        self.readouts = readouts
+        self.amplitudes = omega
+        self.t_start = t_start
+        self.t_end = t_end
+        self.t_step = t_step
+        steps = (t_end - t_start)/t_step + 1
+        
+        durations = []
+        for i in range(int(steps)):
+            durations.append(t_start + i * t_step)
+            
+        self.durations = durations
+        self.time_steps = self._get_time_steps(durations)
 
 
 def generate_sites(lattice_type, dimension, scale):
@@ -54,6 +83,8 @@ def generate_sites(lattice_type, dimension, scale):
     """
     return Chain(dimension, lattice_spacing=scale)
 
+def create_detuning_format()
+
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
     Simulate quantum evolution and record output for a given set of PCA values (x).
@@ -72,18 +103,22 @@ def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
     # using omega as amplitude for now, since other things don't make sense. 
     #detuning has to be of form wave so need to get back to it
+    #conversion of detuning layer
+    # something like this should be provided 
+    # x= x_test_pca[:, 1:num_examples].reshape(x_test_pca[:, 1:num_examples].size).tolist()
+
+    local_detuning_wf = piecewise_linear(self.durations.tolist(), values = x)
+
+    # this have to check
+    detuning: Detuning = self.atoms.rydberg.rabi.amplitude
+    amp_waveform = detuning.uniform.constant(max(self.amplitudes), sum(self.durations))
+    
     hamiltonian = rydberg_h(
-          layer.atoms, detuning = x, amplitude = layer.omega,
+          layer.atoms, detuning = local_detuning_wf, amplitude = amp_waveform,
       )
     
-    t_start = layer.t_start
-    t_end = layer.t_end
-    t_step = layer.t_step
-    steps = (t_end - t_start)/t_step + 1
-    times = []
-    
-    for i in range(int(steps)):
-        times.append(t_start + i * t_step)
+
+
     
     # something like should be the chronological order
-    hamiltonian.evolve(times=times)
+    hamiltonian.evolve(times=self.durations)
