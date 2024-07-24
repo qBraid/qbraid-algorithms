@@ -83,7 +83,12 @@ def generate_sites(lattice_type, dimension, scale):
     """
     return Chain(dimension, lattice_spacing=scale)
 
-def create_detuning_format()
+def create_detuning_format(x: np.ndarray, num_examples: int) -> np.ndarray:
+    x_size = x[:, 1:num_examples].size
+    formatted_x= x[:, 1:num_examples].reshape(x_size).tolist()
+
+    return formatted_x
+    
 
 def apply_layer(layer: DetuningLayer, x: np.ndarray) -> np.ndarray:
     """
