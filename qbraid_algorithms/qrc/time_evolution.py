@@ -18,43 +18,34 @@ from decimal import Decimal
 import numpy as np
 from bloqade.atom_arrangement import Chain
 from bloqade.builder.field import Detuning
+from dataclasses import dataclass, field
+from typing import Any
+from bloqade.emulate.ir.atom_type import AtomType
+from bloqade.emulate.ir.emulator import Register
+
+from bloqade import (
+    waveform,
+    rydberg_h,
+    piecewise_linear,
+    piecewise_constant,
+    constant,
+    linear,
+    var,
+    cast,
+    start,
+    get_capabilities,
+)
+
 
 
 class AnalogProgramEvolver:
     """Class for evolving program over discrete list of time steps.
-
-    Attributes:
-        atoms (Chain): Chain lattice.
-        amplitudes (List[float]): List of Rabi oscillation amplitudes.
-        durations (List[Decimal]): List of pulse durations.
-        time_steps (list[float]): The times to evaluate the state vector.
+       Changed into requiring dynamics.py for compatability and equivalency to julia code
     """
 
     SUPPORTED_BACKENDS = ["emulator", "qpu"]
 
-    def __init__(
-        self,
-        atoms: Chain,
-        rabi_amplitudes: list[float],
-        durations: list[Decimal],
-    ):
-        """Initializes the AnalogEvolution with provided parameters.
-
-        Args:
-            atoms (Chain): Chain lattice.
-            rabi_amplitudes (list[float]): Rabi amplitudes for each pulse.
-            durations (list[Decimal]): Duration of each pulse.
-
-        """
-        self.atoms = atoms
-        self.amplitudes = rabi_amplitudes
-        self.durations = durations
-        self.time_steps = self._get_time_steps(durations)
-
-    @staticmethod
-    def _get_time_steps(durations: list[Decimal]) -> list[float]:
-        """Generate time steps from list of pulse durations."""
-        return list(np.cumsum([0.0] + [float(d) for d in durations]))
+    
 
     @staticmethod
     def compute_rydberg_probs(num_sites: int, counts: OrderedDict) -> np.ndarray:
@@ -78,16 +69,31 @@ class AnalogProgramEvolver:
         prob /= total_shots
         return prob
 
-    def evolve(self, backend: str) -> np.ndarray:
+    def evolve(self, layer: DetuningLayer, x: numpy.array backend: str) -> np.ndarray:
         """Evolves program over discrete list of time steps"""
+
+        # pre-processing
+        local_detuning_wf = piecewise_linear(layer.durations.tolist(), values = x)
+
+        # this I have to check
         detuning: Detuning = self.atoms.rydberg.rabi.amplitude
-        amp_waveform = detuning.uniform.constant(max(self.amplitudes), sum(self.durations))
-        program = amp_waveform.detuning.uniform.piecewise_linear(self.durations, self.amplitudes)
+
+        amp_waveform = detuning.uniform.constant(max(layer.amplitudes), sum(layer.durations))
 
         if backend == "emulator":
-            [emulation] = program.bloqade.python().hamiltonian()
-            emulation.evolve(times=self.time_steps)
-            return emulation.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
+            if emu_option == None:
+                [emulation] = program.bloqade.python().hamiltonian()
+                emulation.evolve(times=self.time_steps)
+                return emulation.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
+
+            # the only problem is getting that program layout...have to ask Trenten
+            if emu_option == "rydberg_h":
+                emulation = rydberg_h(
+                  layer.atoms, detuning = local_detuning_wf, amplitude = amp_waveform,
+                  )
+                # something like should be the chronological order
+                emulation.evolve(times=layer.durations)
+                return emulation.hamiltonian.tocsr(time=layer.durations[-1]).toarray()
 
         if backend == "qpu":
             # TODO: Revise for async task handling to avoid blocking while waiting for results.
