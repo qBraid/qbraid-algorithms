@@ -14,10 +14,12 @@ Module for quantum time evolution using emulator or QPU.
 """
 from collections import OrderedDict
 from decimal import Decimal
+from typing import Optional
 
 import numpy as np
 from bloqade.atom_arrangement import Chain
 from bloqade.builder.field import Detuning
+from bloqade.emulate.ir.state_vector import StateVector
 
 
 class AnalogProgramEvolver:
@@ -78,7 +80,7 @@ class AnalogProgramEvolver:
         prob /= total_shots
         return prob
 
-    def evolve(self, backend: str) -> np.ndarray:
+    def evolve(self, backend: str, state: Optional[StateVector] = None) -> np.ndarray:
         """Evolves program over discrete list of time steps"""
         detuning: Detuning = self.atoms.rydberg.rabi.amplitude
         amp_waveform = detuning.uniform.constant(max(self.amplitudes), sum(self.durations))
@@ -86,7 +88,7 @@ class AnalogProgramEvolver:
 
         if backend == "emulator":
             [emulation] = program.bloqade.python().hamiltonian()
-            emulation.evolve(times=self.time_steps)
+            emulation.evolve(state=state, times=self.time_steps)
             return emulation.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
 
         if backend == "qpu":
