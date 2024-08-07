@@ -22,6 +22,7 @@ Classes
     DetuningLayer
     MagnusExpansion
     AnalogProgramEvolver
+    PCA
 
 Functions
 ----------
@@ -30,11 +31,10 @@ Functions
     :toctree: ../stubs/
 
     one_hot_encoding
-    pca_reduction
 
 """
 
-from .encoding import one_hot_encoding, pca_reduction
+from .encoding import PCA, one_hot_encoding
 from .magnus_expansion import MagnusExpansion
 from .qrc_model import DetuningLayer, QRCModel
 from .time_evolution import AnalogProgramEvolver
@@ -44,6 +44,6 @@ __all__ = [
     "MagnusExpansion",
     "DetuningLayer",
     "AnalogProgramEvolver",
+    "PCA",
     "one_hot_encoding",
-    "pca_reduction",
 ]

@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics"
 ]
-dependencies = ["torch>=2.3.0,<3.0", "numpy>=1.17,<2.1", "scipy~=1.13.1", "bloqade>=0.15.12,<0.16"]
+dependencies = ["torch>=2.3.0,<3.0", "numpy>=1.17,<2.1", "scipy~=1.13.1", "bloqade>=0.15.12,<0.16", "scikit-learn"]
 
 [project.urls]
 Homepage = "https://github.com/qBraid/qbraid-algorithms"

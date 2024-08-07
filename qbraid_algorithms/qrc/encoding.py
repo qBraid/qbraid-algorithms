@@ -12,7 +12,11 @@
 Module for encoding of classical data.
 
 """
+from __future__ import annotations
+
 import numpy as np
+import sklearn.decomposition
+import sklearn.preprocessing
 import torch
 
 
@@ -27,10 +31,7 @@ def one_hot_encoding(labels: np.ndarray, train: bool = True) -> torch.Tensor:
         torch.Tensor: The one-hot encoded matrix where each row corresponds to a label.
 
     """
-    # pylint: disable-next=import-outside-toplevel
-    from sklearn.preprocessing import OneHotEncoder
-
-    encoder = OneHotEncoder(sparse_output=False)
+    encoder = sklearn.preprocessing.OneHotEncoder(sparse_output=False)
     reshaped_data = labels.reshape(-1, 1)
     if train:
         encoded_data = encoder.fit_transform(reshaped_data)
@@ -39,40 +40,57 @@ def one_hot_encoding(labels: np.ndarray, train: bool = True) -> torch.Tensor:
     return encoded_data
 
 
-def pca_reduction(
-    data: torch.Tensor,
-    n_components: int,
-    data_dim: int,
-    delta_max: int,
-    train: bool = True,
-) -> torch.Tensor:
-    """
-    Perform PCA reduction on the provided data using PyTorch's pca_lowrank to
-    reduce its dimensionality.
+class PCA:
+    """Principal Component Analysis (PCA) for dimensionality reduction."""
 
-    Args:
-        data (torch.Tensor): The input data tensor where each row represents a sample.
-        n_components (int): The number of principal components to retain.
-        data_dim (int): The dimension of the input data required for doing PCA.
-        delta_max (int): Scaling factor to bring PCA vals into a feasible range for local detuning.
-        train (bool, optional): Whether the data is training data. Defaults to True.
+    def __init__(self, n_components: int):
+        """
+        Initialize the PCA class with the number of principal components to retain.
 
-    Returns:
-        torch.Tensor: The transformed data
-    """
-    # pylint: disable-next=import-outside-toplevel
-    from sklearn.decomposition import PCA
+        Args:
+            n_components (int): The number of principal components to retain.
+        """
+        self.n_components = n_components
+        self.pca = sklearn.decomposition.PCA(n_components=self.n_components)
 
-    # Perform PCA on training data
-    pca = PCA(n_components=n_components)
-    data_array: np.ndarray = data.data.numpy()
-    data_reshaped = data_array.reshape(-1, data_dim)
-    if train:
-        data_pca = pca.fit_transform(data_reshaped)
-    else:
-        data_pca = pca.transform(data_reshaped)
+    def reduce(
+        self, data: np.ndarray, data_dim: int, delta_max: int, train: bool = True
+    ) -> np.ndarray:
+        """
+        Perform PCA reduction on the provided data to reduce its dimensionality.
 
-    # Scale PCA values to feasible range of local detuning
-    scaled_data_pca = data_pca / np.max(np.abs(data_pca)) * delta_max
+        Args:
+            data (np.ndarray): The input data tensor where each row represents a sample.
+            data_dim (int): The dimension of the input data required for doing PCA.
+            delta_max (int): Scaling factor to bring PCA values into a feasible range
+                for local detuning.
+            train (bool, optional): Whether the data is training data. Defaults to True.
 
-    return scaled_data_pca
+        Returns:
+            np.ndarray: The transformed data.
+
+        Raises:
+            ValueError: If `data_dim` is not compatible with `data` shape or
+                if `n_components` is larger than `data_dim`.
+        """
+        if data.shape[1] != data_dim:
+            raise ValueError("data_dim does not match the number of columns in data.")
+        if self.n_components > data_dim:
+            raise ValueError("n_components cannot be greater than data_dim.")
+
+        data_reshaped = data.reshape(-1, data_dim)
+        if train:
+            data_pca = self.pca.fit_transform(data_reshaped)
+        else:
+            data_pca = self.pca.transform(data_reshaped)
+
+        # Avoid division by zero if all elements are the same
+        max_abs_val = np.max(np.abs(data_pca))
+        if max_abs_val == 0:
+            raise ValueError(
+                "All input data are identical; PCA transformation is "
+                "undefined with delta_max scaling."
+            )
+
+        scaled_data_pca = data_pca / max_abs_val * delta_max
+        return scaled_data_pca
