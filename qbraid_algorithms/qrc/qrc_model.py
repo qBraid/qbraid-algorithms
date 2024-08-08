@@ -12,7 +12,6 @@
 Module for assembling QRC model components and computing prediction.
 
 """
-
 from dataclasses import dataclass
 from decimal import Decimal
 
