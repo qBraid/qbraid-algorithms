@@ -92,8 +92,9 @@ class AnalogProgramEvolver:
                   layer.atoms, detuning = local_detuning_wf, amplitude = amp_waveform,
                   )
                 # something like should be the chronological order
-                emulation.evolve(times=layer.durations)
-                return emulation.hamiltonian.tocsr(time=layer.durations[-1]).toarray()
+                output_evolution = emulation.evolve(times=layer.durations)
+                return output_evolution
+                # return emulation.hamiltonian.tocsr(time=layer.durations[-1]).toarray()
 
         if backend == "qpu":
             # TODO: Revise for async task handling to avoid blocking while waiting for results.
