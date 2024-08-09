@@ -112,7 +112,7 @@ class AnalogProgramEvolver:
             return emulation.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
 
         # the only problem is getting that program layout...have to ask Trenten
-        if emu_option == "rydberg_h":
+        if backend == "rydberg_h":
             emulation = rydberg_h(
               layer.atoms, detuning = local_detuning_wf, amplitude = amp_waveform,
               )
