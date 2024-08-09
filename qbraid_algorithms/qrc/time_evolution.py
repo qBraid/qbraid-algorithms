@@ -23,6 +23,18 @@ from bloqade.atom_arrangement import Chain
 from bloqade.builder.field import Detuning, RabiAmplitude
 from bloqade.emulate.ir.state_vector import StateVector
 
+from bloqade import (
+    waveform,
+    rydberg_h,
+    piecewise_linear,
+    piecewise_constant,
+    constant,
+    linear,
+    var,
+    cast,
+    start,
+    get_capabilities,
+)
 
 class AnalogProgramEvolver:
     """Class for evolving program over discrete list of time steps.
@@ -82,7 +94,7 @@ class AnalogProgramEvolver:
         prob /= total_shots
         return prob
 
-    def evolve(self, backend: str, x: List, state: Optional[StateVector] = None) -> np.ndarray:
+    def evolve(self, backend: str, x: Optional[List] = None, state: Optional[StateVector] = None) -> np.ndarray:
         """Evolves program over discrete list of time steps"""
         rabi_amp: RabiAmplitude = self.atoms.rydberg.rabi.amplitude
 
@@ -106,6 +118,7 @@ class AnalogProgramEvolver:
               )
             # something like should be the chronological order
             output_evolution = emulation.evolve(times=layer.durations)
+            # or even output_evolution could be returned.
             return output_evolution.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
 
         if backend == "qpu":
