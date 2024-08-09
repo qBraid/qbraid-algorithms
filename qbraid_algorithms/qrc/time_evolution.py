@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 from bloqade.atom_arrangement import Chain
@@ -82,9 +82,12 @@ class AnalogProgramEvolver:
         prob /= total_shots
         return prob
 
-    def evolve(self, backend: str, state: Optional[StateVector] = None) -> np.ndarray:
+    def evolve(self, backend: str, x: List, state: Optional[StateVector] = None) -> np.ndarray:
         """Evolves program over discrete list of time steps"""
         rabi_amp: RabiAmplitude = self.atoms.rydberg.rabi.amplitude
+
+        # pre-processing
+        local_detuning_wf = piecewise_linear(layer.durations.tolist(), values = x)
 
         value = max(self.amplitudes)
         duration = sum(self.durations)
@@ -95,6 +98,15 @@ class AnalogProgramEvolver:
             [emulation] = program.bloqade.python().hamiltonian()
             emulation.evolve(state=state, times=self.time_steps)
             return emulation.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
+
+        # the only problem is getting that program layout...have to ask Trenten
+        if emu_option == "rydberg_h":
+            emulation = rydberg_h(
+              layer.atoms, detuning = local_detuning_wf, amplitude = amp_waveform,
+              )
+            # something like should be the chronological order
+            output_evolution = emulation.evolve(times=layer.durations)
+            return output_evolution.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
 
         if backend == "qpu":
             # TODO: Revise for async task handling to avoid blocking while waiting for results.
