@@ -92,7 +92,7 @@ class QRCModel:
         """
         return self.pca.reduce(xs, data_dim, self.delta_max, train)
 
-    def apply_detuning(self, x: np.ndarray) -> np.ndarray:
+    def apply_detuning(self, x: np.ndarray, backend: Optional[Str] = None) -> np.ndarray:
         """
         Simulate quantum evolution and record output for a given set of values (x).
 
@@ -115,7 +115,12 @@ class QRCModel:
         evolver = AnalogProgramEvolver(atoms=atoms, rabi_amplitudes=amplitudes, durations=durations)
 
         state = StateVector(self.space, x)
-        output_vector = evolver.evolve(backend="emulator", state=state)
+
+        if backend != None:
+            # this can be rydberg_h or even an actual Aquila device
+            output_vector = evolver.evolve(backend=backend, state=state)
+        else:
+            output_vector = evolver.evolve(backend="emulator", state=state)
 
         return output_vector
 
