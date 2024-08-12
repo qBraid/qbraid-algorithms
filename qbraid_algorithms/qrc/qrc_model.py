@@ -14,6 +14,7 @@ Module for assembling QRC model components and computing prediction.
 """
 from dataclasses import dataclass
 from decimal import Decimal
+from typing import Optional
 
 import numpy as np
 from bloqade.emulate.ir.atom_type import ThreeLevelAtomType
@@ -92,7 +93,7 @@ class QRCModel:
         """
         return self.pca.reduce(xs, data_dim, self.delta_max, train)
 
-    def apply_detuning(self, x: np.ndarray, backend: Optional[Str] = None) -> np.ndarray:
+    def apply_detuning(self, x: np.ndarray, backend: Optional[str] = None) -> np.ndarray:
         """
         Simulate quantum evolution and record output for a given set of values (x).
 
@@ -116,11 +117,10 @@ class QRCModel:
 
         state = StateVector(self.space, x)
 
-        if backend != None:
-            # this can be rydberg_h or even an actual Aquila device
-            output_vector = evolver.evolve(backend=backend, state=state)
-        else:
-            output_vector = evolver.evolve(backend="emulator", state=state)
+        backend = backend or "emulator"
+
+        # this can be rydberg_h or even an actual Aquila device
+        output_vector = evolver.evolve(backend=backend, state=state)
 
         return output_vector
 
