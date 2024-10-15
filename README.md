@@ -13,9 +13,6 @@
   <a href="https://pypi.org/project/qbraid-algorithms/">
     <img src="https://img.shields.io/pypi/pyversions/qbraid-algorithms.svg?color=blue" alt="PyPI version"/>
   </a>
-  <!-- <a href="https://pepy.tech/project/qbraid-algorithms">
-    <img src="https://static.pepy.tech/badge/qbraid-algorithms" alt="Downloads"/>
-  </a> -->
   <a href="https://www.gnu.org/licenses/gpl-3.0.html">
     <img src="https://img.shields.io/github/license/qBraid/qbraid.svg" alt="License"/>
   </a>
