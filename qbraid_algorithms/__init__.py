@@ -23,7 +23,7 @@ try:
     # Injected in _version.py during the build process.
     from ._version import __version__  # type: ignore
 except ImportError:
-    __version__ = ""
+    __version__ = "dev"
 
 
 __all__ = ["datasets", "esn", "qrc"]
