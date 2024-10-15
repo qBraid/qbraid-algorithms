@@ -12,14 +12,17 @@
 Module for assembling QRC model components and computing prediction.
 
 """
-
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any
 
 import numpy as np
+from bloqade.emulate.ir.atom_type import ThreeLevelAtomType
+from bloqade.emulate.ir.emulator import Register
+from bloqade.emulate.ir.space import Space
+from bloqade.emulate.ir.state_vector import StateVector
 from bloqade.ir.location import Chain
 
+from .encoding import PCA
 from .time_evolution import AnalogProgramEvolver
 
 
@@ -28,7 +31,7 @@ class DetuningLayer:
     """Class representing a detuning layer in a quantum reservoir."""
 
     num_sites: int  # Number of sites in the chain lattice
-    lattice_spacing: float  # Lattice spacing ()
+    lattice_spacing: float  # Lattice spacing
     omega: float  # Rabi frequency
     step_size: float  # Time evolution duration
     num_steps: int  # Number of time steps
@@ -37,18 +40,57 @@ class DetuningLayer:
 class QRCModel:
     """Quantum Reservoir Computing (QRC) model."""
 
-    def __init__(self, model_pca: Any, delta_max: float, detuning_layer: DetuningLayer):
+    def __init__(self, pca: PCA, delta_max: float, detuning_layer: DetuningLayer):
         """
         Initialize the Quantum Reservoir Computing model with necessary components.
 
-        Args:
-            model_pca (Any): PCA model component.
-            delta_max (float): Maximum delta parameter.
-            detuning_layer (DetuningLayer): Detuning layer for the model.
         """
-        self.model_pca = model_pca
+        self.pca = pca
         self.delta_max = delta_max
         self.detuning_layer = detuning_layer
+        self.space = self.compute_space()
+
+        if self.detuning_layer.num_sites != self.pca.n_components:
+            raise ValueError("PCA and detuning layer dimensions do not match.")
+
+    @staticmethod
+    def generate_sites(num_sites: int, lattice_spacing: float) -> list[tuple[Decimal, Decimal]]:
+        """
+        Generate a list of lattice positions as tuples with Decimal precision.
+
+        Args:
+            num_sites (int): The number of lattice sites.
+            lattice_spacing (float): The spacing between each lattice site.
+
+        Returns:
+            list: A list of tuples, each representing the x-coordinate of a lattice site.
+        """
+        lattice_spacing = Decimal(str(lattice_spacing))
+        return [(Decimal(0), Decimal(0) + i * lattice_spacing) for i in range(num_sites)]
+
+    def compute_space(self) -> Space:
+        """Compute Space object based on the detuning layer parameters."""
+        atom_type = ThreeLevelAtomType()
+        sites = self.generate_sites(
+            self.detuning_layer.num_sites, self.detuning_layer.lattice_spacing
+        )
+        blockade_radius = Decimal("0")  # TODO: Calculate blockade radius based on detuning params
+        register = Register(atom_type=atom_type, sites=sites, blockade_radius=blockade_radius)
+        return Space.create(register)
+
+    def apply_pca(self, xs: np.ndarray, data_dim: int, train: bool = True) -> np.ndarray:
+        """
+        Apply PCA transformation to the input data.
+
+        Args:
+            xs (np.ndarray): Input data.
+            data_dim (int): The dimension of the input data required for doing PCA.
+            train (bool, optional): Whether the data is training data. Defaults to True.
+
+        Returns:
+            np.ndarray: Transformed data.
+        """
+        return self.pca.reduce(xs, data_dim, self.delta_max, train)
 
     def apply_detuning(self, x: np.ndarray) -> np.ndarray:
         """
@@ -71,10 +113,9 @@ class QRCModel:
         atoms = Chain(layer.num_sites, lattice_spacing=layer.lattice_spacing)
 
         evolver = AnalogProgramEvolver(atoms=atoms, rabi_amplitudes=amplitudes, durations=durations)
-        probabilities = evolver.evolve(backend="emulator")
 
-        # TODO: added dot as placeholder, will need to revisit
-        output_vector = np.dot(probabilities, x)
+        state = StateVector(self.space, x)
+        output_vector = evolver.evolve(backend="emulator", state=state)
 
         return output_vector
 
@@ -92,7 +133,7 @@ class QRCModel:
         """
         raise NotImplementedError
 
-    def predict(self, xs: np.ndarray) -> list[int]:
+    def predict(self, xs: np.ndarray, data_dim: int, train: bool = True) -> list[int]:
         """
         Compute predictions for input images or data using quantum reservoir computing.
 

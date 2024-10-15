@@ -12,12 +12,16 @@
 Module for quantum time evolution using emulator or QPU.
 
 """
+from __future__ import annotations
+
 from collections import OrderedDict
 from decimal import Decimal
+from typing import Optional
 
 import numpy as np
 from bloqade.atom_arrangement import Chain
-from bloqade.builder.field import Detuning
+from bloqade.builder.field import Detuning, RabiAmplitude
+from bloqade.emulate.ir.state_vector import StateVector
 
 
 class AnalogProgramEvolver:
@@ -78,15 +82,18 @@ class AnalogProgramEvolver:
         prob /= total_shots
         return prob
 
-    def evolve(self, backend: str) -> np.ndarray:
+    def evolve(self, backend: str, state: Optional[StateVector] = None) -> np.ndarray:
         """Evolves program over discrete list of time steps"""
-        detuning: Detuning = self.atoms.rydberg.rabi.amplitude
-        amp_waveform = detuning.uniform.constant(max(self.amplitudes), sum(self.durations))
-        program = amp_waveform.detuning.uniform.piecewise_linear(self.durations, self.amplitudes)
+        rabi_amp: RabiAmplitude = self.atoms.rydberg.rabi.amplitude
+
+        value = max(self.amplitudes)
+        duration = sum(self.durations)
+        detuning: Detuning = rabi_amp.uniform.constant(value, duration).detuning
+        program = detuning.uniform.piecewise_linear(self.durations, self.amplitudes)
 
         if backend == "emulator":
             [emulation] = program.bloqade.python().hamiltonian()
-            emulation.evolve(times=self.time_steps)
+            emulation.evolve(state=state, times=self.time_steps)
             return emulation.hamiltonian.tocsr(time=self.time_steps[-1]).toarray()
 
         if backend == "qpu":
