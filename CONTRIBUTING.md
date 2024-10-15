@@ -98,7 +98,7 @@ pip install isort ruff qbraid-cli
 Run the following and make changes as needed to satisfy format checks:
 
 ```bash
-isort qbraid_algorithms tests tools
-ruff format qbraid_algorithms examples tests tools
-qbraid admin headers qbraid_algorithms tests tools --type=gpl --fix
+isort qbraid_algorithms tests bin
+ruff format qbraid_algorithms examples tests bin
+qbraid admin headers qbraid_algorithms tests bin --type=gpl --fix
 ```
