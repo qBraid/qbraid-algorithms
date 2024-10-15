@@ -27,4 +27,4 @@ jobs:
           isort --check-only qbraid_algorithms tests bin
           black --check qbraid_algorithms tests bin examples --line-length 100
           pylint qbraid_algorithms tests bin examples --disable=W0108,W0511,W0401,R0902,E0401 --ignore=qbraid_algorithms/_version.py
-          qbraid admin headers qbraid_algorithms tests tools --type gpl
+          qbraid admin headers qbraid_algorithms tests bin --type gpl
