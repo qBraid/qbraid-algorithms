@@ -22,8 +22,8 @@ from bloqade.emulate.ir.space import Space
 from bloqade.emulate.ir.state_vector import StateVector
 from bloqade.ir.location import Chain
 
-from .encoding import PCA
-from .time_evolution import AnalogProgramEvolver
+from ..encoding.encoding import PCA
+from ..dynamics.time_evolution import AnalogProgramEvolver
 
 
 @dataclass

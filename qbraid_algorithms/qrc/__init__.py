@@ -34,10 +34,10 @@ Functions
 
 """
 
-from .encoding import PCA, one_hot_encoding
-from .magnus_expansion import MagnusExpansion
-from .qrc_model import DetuningLayer, QRCModel
-from .time_evolution import AnalogProgramEvolver
+from .encoding.encoding import PCA, one_hot_encoding
+from .dynamics.magnus_expansion import MagnusExpansion
+from .model.qrc_model import DetuningLayer, QRCModel
+from .dynamics.time_evolution import AnalogProgramEvolver
 
 __all__ = [
     "QRCModel",
