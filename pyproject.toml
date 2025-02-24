@@ -44,7 +44,7 @@ Discord = "https://discord.gg/TPBU2sa8Et"
 visualization = ["matplotlib"]
 test = ["pytest", "pytest-cov"]
 lint = ["isort", "ruff", "qbraid-cli"]
-docs = ["sphinx>=7.4,<8.2", "sphinx-autodoc-typehints>=1.24,<3.1", "sphinx-rtd-theme>=2.0.0,<3.0.3", "docutils<0.22", "sphinx-copybutton"]
+docs = ["sphinx>=7.4,<8.3", "sphinx-autodoc-typehints>=1.24,<3.1", "sphinx-rtd-theme>=2.0.0,<3.0.3", "docutils<0.22", "sphinx-copybutton"]
 
 [tool.setuptools_scm]
 write_to = "qbraid_algorithms/_version.py"
