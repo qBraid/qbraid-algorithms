@@ -9,7 +9,7 @@
 import qbraid_algorithms
 
 project = "qBraid"
-copyright = "2024, qBraid Development Team"
+copyright = "2025, qBraid Development Team"
 author = "qBraid Development Team"
 
 # Set the version
@@ -28,7 +28,7 @@ extensions = [
     "sphinx_copybutton"
 ]
 
-autodoc_mock_imports = ["torchvision"]
+autodoc_mock_imports = ["qbraid", "pyqasm"]
 
 # The master toctree document.
 master_doc = "index"

@@ -13,7 +13,10 @@
 # limitations under the License.
 
 """
-Fixtures imported/defined in this file can be used by any test in this directory
-without needing to import them (pytest will automatically discover them).
+Module containing version information
+
+Version number (major.minor.patch[-label])
 
 """
+
+__version__ = "0.1.0.dev"

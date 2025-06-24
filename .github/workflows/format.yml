@@ -1,3 +1,17 @@
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: Format
 
 on:
@@ -16,15 +30,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install isort 'black[jupyter]' pylint ruff pylint qbraid-cli
-      - name: Check isort, ruff, headers
+          pip install --upgrade pip
+          pip install tox
+      - name: Check isort, ruff, mypy, headers
         run: |
-          ruff check qbraid_algorithms examples tests bin
-          isort --check-only qbraid_algorithms tests bin
-          black --check qbraid_algorithms tests bin examples --line-length 100
-          pylint qbraid_algorithms tests bin examples --disable=W0108,W0511,W0401,R0902,E0401 --ignore=qbraid_algorithms/_version.py
-          qbraid admin headers qbraid_algorithms tests bin --type gpl
+          tox -e format-check

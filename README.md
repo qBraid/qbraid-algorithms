@@ -13,8 +13,8 @@
   <a href="https://pypi.org/project/qbraid-algorithms/">
     <img src="https://img.shields.io/pypi/pyversions/qbraid-algorithms.svg?color=blue" alt="PyPI version"/>
   </a>
-  <a href="https://www.gnu.org/licenses/gpl-3.0.html">
-    <img src="https://img.shields.io/github/license/qBraid/qbraid.svg" alt="License"/>
+  <a href='http://www.apache.org/licenses/LICENSE-2.0'>
+    <img src='https://img.shields.io/github/license/qBraid/qbraid-qir.svg' alt='License'/>
   </a>
   <a href="https://discord.gg/TPBU2sa8Et">
     <img src="https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white" alt="Discord"/>
@@ -27,7 +27,7 @@ Python package for building, simulating, and benchmarking hybrid quantum-classic
 
 ## Installation
 
-qbraid-algorithms requires Python 3.10 or greater, and can be installed with pip as follows:
+qbraid-algorithms requires Python 3.11 or greater, and can be installed with pip as follows:
 
 ```bash
 pip install qbraid-algorithms
@@ -76,4 +76,4 @@ This project was conceived in cooperation with the Quantum Open Source Foundatio
 
 ## License
 
-[GNU General Public License v3.0](LICENSE)
+[Apache-2.0 License](LICENSE)

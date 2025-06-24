@@ -1,16 +1,16 @@
 [build-system]
-requires = ["setuptools>=61.0", "setuptools_scm"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "qbraid-algorithms"
-version = "0.0.0"
+dynamic = ["version", "dependencies"]
 authors = [{name = "qBraid Development Team"}, {email = "contact@qbraid.com"}]
 description = "Python package for building, simulating, and benchmarking hybrid quantum-classical algorithms."
 readme = "README.md"
-requires-python = ">=3.10"
-keywords = ["qbraid", "quantum", "algorithms", "qml"]
-license = {text = "GNU General Public License v3.0"}
+requires-python = ">=3.11"
+keywords = ["qbraid", "quantum", "algorithms", "openqasm"]
+license = "Apache-2.0"
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
@@ -18,7 +18,6 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -31,7 +30,10 @@ classifiers = [
     "Operating System :: Unix",
     "Operating System :: MacOS",
 ]
-dependencies = ["torch>=2.3,<3.0", "numpy>=1.17,<2.3", "scipy>=1.13.1,<1.16.0", "bloqade>=0.15.12,<0.16", "scikit-learn>=1.5.0,<1.7.0"]
+
+[tool.setuptools.dynamic]
+version = {attr = "qbraid_algorithms._version.__version__"}
+dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
 Homepage = "https://github.com/qBraid/qbraid-algorithms"
@@ -39,15 +41,6 @@ Documentation = "https://docs.qbraid.com"
 "Bug Tracker" = "https://github.com/qBraid/qbraid-algorithms/issues"
 Discord = "https://discord.gg/TPBU2sa8Et"
 "Launch on Lab" = "https://account.qbraid.com/?gitHubUrl=https://github.com/qBraid/qbraid-algorithms.git"
-
-[project.optional-dependencies]
-visualization = ["matplotlib"]
-test = ["pytest", "pytest-cov"]
-lint = ["isort", "ruff", "qbraid-cli"]
-docs = ["sphinx>=7.4,<8.2", "sphinx-autodoc-typehints>=1.24,<3.1", "sphinx-rtd-theme>=2.0.0,<3.0.3", "docutils<0.22", "sphinx-copybutton"]
-
-[tool.setuptools_scm]
-write_to = "qbraid_algorithms/_version.py"
 
 [tool.isort]
 profile = "black"
@@ -57,23 +50,9 @@ force_grid_wrap = 0
 use_parentheses = true
 line_length = 100
 
-[tool.black]
-line-length = 100
-target-version = ['py310', 'py311']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.__pycache__
-  | \.tox
-  | \.venv
-  | dist
-)/
-'''
-
 [tool.pylint.'MESSAGES CONTROL']
 max-line-length = 100
-disable = "W0108,W0511,W0401,R0902,R0903,R0913"
+disable = "W0108,W0511,W0401,R0902,R0903,R0913,E0401"
 
 [tool.pylint.MASTER]
 ignore-paths = [
@@ -83,6 +62,22 @@ ignore-paths = [
 [tool.pytest.ini_options]
 addopts = "-ra"
 testpaths = ["tests"]
-filterwarnings = [
-    "ignore::DeprecationWarning",
+
+[tool.coverage.report]
+exclude_lines = [
+  "pass",
+  "raise NotImplementedError",
+  "return NotImplemented",
+  "def __repr__",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "logger.debug",
+  "# pragma: no cover"
+]
+
+[tool.coverage.run]
+parallel = true
+source = ["qbraid_algorithms"]
+omit = [
+  "**/qbraid_algorithms/__init__.py"
 ]

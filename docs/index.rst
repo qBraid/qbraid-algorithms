@@ -69,7 +69,7 @@ Python package for building, simulating, and benchmarking hybrid quantum-classic
 Installation
 -------------
 
-qbraid-algorithms requires Python 3.9 or greater, and can be installed with pip as follows:
+qbraid-algorithms requires Python 3.11 or greater, and can be installed with pip as follows:
 
 .. code-block:: bash
 
@@ -91,15 +91,49 @@ You can also install from source by cloning this repository and running a pip in
 Resources
 ----------
 
-- `User Guide <https://docs.qbraid.com/algorithms/user-guide>`_
-- `Example Notebooks <https://github.com/qBraid/qbraid-algorithms/tree/main/examples>`_
-- `API Reference <https://sdk.qbraid.com/projects/algorithms/en/stable/api/qbraid_algorithms.html>`_
-
-|
+- `User Guide <https://docs.qbraid.com/sdk/user-guide>`_
+- `Example Notebooks <https://github.com/qBraid/qbraid-lab-demo>`_
+- `API Reference <https://qbraid.github.io/qBraid/api/qbraid_algorithms.html>`_
+- `Source Code <https://github.com/qBraid/qbraid-algorithms>`_
 
 .. toctree::
    :maxdepth: 1
-   :caption: API Reference
+   :caption: SDK API Reference
+   :hidden:
+
+   qbraid <https://qbraid.github.io/qBraid/api/qbraid.html>
+   qbraid.programs <https://qbraid.github.io/qBraid/api/qbraid.programs.html>
+   qbraid.interface <https://qbraid.github.io/qBraid/api/qbraid.interface.html>
+   qbraid.transpiler <https://qbraid.github.io/qBraid/api/qbraid.transpiler.html>
+   qbraid.passes <https://qbraid.github.io/qBraid/api/qbraid.passes.html>
+   qbraid.runtime <https://qbraid.github.io/qBraid/api/qbraid.runtime.html>
+   qbraid.visualization <https://qbraid.github.io/qBraid/api/qbraid.visualization.html>
+
+.. toctree::
+   :caption: QIR API Reference
+   :hidden:
+
+   qbraid_qir <https://qbraid.github.io/qbraid-qir/api/qbraid_qir.html>
+   qbraid_qir.cirq <https://qbraid.github.io/qbraid-qir/api/qbraid_qir.cirq.html>
+   qbraid_qir.qasm3 <https://qbraid.github.io/qbraid-qir/api/qbraid_qir.qasm3.html>
+
+.. toctree::
+   :caption: CORE API Reference
+   :hidden:
+
+   qbraid_core <https://qbraid.github.io/qbraid-core/api/qbraid_core.html>
+   qbraid_core.services <https://qbraid.github.io/qbraid-core/api/qbraid_core.services.html>
+
+.. toctree::
+   :caption: PYQASM API Reference
+   :hidden:
+
+   pyqasm <https://qbraid.github.io/pyqasm/api/pyqasm.html>
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: ALGOS API Reference
    :hidden:
 
    api/qbraid_algorithms

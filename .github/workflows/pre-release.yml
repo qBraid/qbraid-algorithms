@@ -1,13 +1,27 @@
-name: Pre-release to PyPI
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Pre-release qbraid to PyPi
 
 on:
   workflow_dispatch:
 
 jobs:
   pypi-publish:
-    name: Build pre-release dist & upload to PyPI
+    name: Build dist & upload to PyPI
     runs-on: ubuntu-latest
-    environment: release
+    if: ${{ github.actor == 'github-actions[bot]' || github.actor == 'ryanhill1' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,16 +32,23 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install build dependencies
-        run: python -m pip install -U pip wheel build toml-cli qbraid-core
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install build
 
       - name: Build binary wheel + source tarball
         id: build-dev
         run: |
-            export PRE_RELEASE_VERSION=$(python tools/stamp_pre_release.py)
-            [[ "$PRE_RELEASE_VERSION" =~ .*(-a\.|-b\.|-rc\.).* ]] && echo "Deploying pre-release version '$PRE_RELEASE_VERSION'" || (echo "not pre-release version"; exit 0)
+            export QBRAID_PRE_RELEASE_VERSION=$(bin/stamp_dev_version.sh)
+            if [[ "$QBRAID_PRE_RELEASE_VERSION" =~ .*dev.* ]]; then
+              echo "Deploying dev version '$QBRAID_PRE_RELEASE_VERSION'"
+            else
+              echo "Not dev version"
+              exit 0
+            fi
             out_dir="${PWD}/dist"
-            bin/create_dev_build.sh $PRE_RELEASE_VERSION "${out_dir}"
+            bin/create_dev_build.sh $QBRAID_PRE_RELEASE_VERSION "${out_dir}"
             echo "dir=$out_dir" >> $GITHUB_OUTPUT
 
       - name: Publish package to PyPI
@@ -35,3 +56,4 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: ${{ steps.build-dev.outputs.dir }}
