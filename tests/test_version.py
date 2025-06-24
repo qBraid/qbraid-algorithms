@@ -13,7 +13,15 @@
 # limitations under the License.
 
 """
-Fixtures imported/defined in this file can be used by any test in this directory
-without needing to import them (pytest will automatically discover them).
+Test to verify that the version number is correctly set in the package.
 
 """
+
+from qbraid_algorithms import __version__
+
+
+def test_version():
+    """Test to verify that the version number is correctly set in the package."""
+    assert __version__ is not None, "Version number should not be None"
+    assert isinstance(__version__, str), "Version number should be a string"
+    assert len(__version__) > 0, "Version number should not be an empty string"

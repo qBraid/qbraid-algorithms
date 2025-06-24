@@ -1,12 +1,23 @@
 #!/bin/bash
 
-# Copyright (c) 2024, qBraid Development Team
-# All rights reserved.
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 ################################################################################
 # Description:
 # Script for creating development package builds. It temporarily checks out
-# a new branch, modifies the `package.json` file to reflect the provided
+# a new branch, modifies the `_version.py` file to reflect the provided
 # development version, and then triggers the build process.
 #
 # Usage:
@@ -17,7 +28,7 @@
 #   OUT_DIR: The directory where the built packages will be stored.
 #
 # Example:
-#   ./create_dev_build.sh "1.0.0-a1" "/path/to/output_directory"
+#   ./create_dev_build.sh "1.0.0.dev" "/path/to/output_directory"
 ################################################################################
 
 set -e
@@ -31,10 +42,9 @@ fi
 DEV_VERSION="${1}"
 OUT_DIR="${2}"
 
-
 # Constants
 REPO_DIR=$(git rev-parse --show-toplevel)
-PYPROJECT_TOML_PATH="${REPO_DIR}/pyproject.toml"
+VERSION_FILE="${REPO_DIR}/qbraid_algorithms/_version.py"
 TMP_BRANCH="tmp_build_branch_$(date "+%Y%m%d%H%M%S")"
 
 # Cleanup function
@@ -43,11 +53,11 @@ cleanup() {
 
     # If the TMP_BRANCH exists, checkout the original branch and delete TMP_BRANCH
     if git rev-parse --verify "${TMP_BRANCH}" >/dev/null 2>&1; then
-        git checkout HEAD -- "${PYPROJECT_TOML_PATH}" 2>/dev/null
+        git checkout HEAD -- "${VERSION_FILE}" 2>/dev/null
         git checkout - 2>/dev/null
         git branch -D "${TMP_BRANCH}" 2>/dev/null
     else
-        git checkout HEAD -- "${PYPROJECT_TOML_PATH}" 2>/dev/null
+        git checkout HEAD -- "${VERSION_FILE}" 2>/dev/null
     fi
 }
 
@@ -64,16 +74,9 @@ fi
 echo "Creating and checking out temporary branch: ${TMP_BRANCH}"
 git checkout -b "${TMP_BRANCH}"
 
-# Check if toml-cli is installed
-if ! command -v toml &> /dev/null
-then
-    echo "toml-cli could not be found. Please install toml-cli to use this script."
-    exit 1
-fi
-
 # Update the version in the version file
 echo "Setting version to ${DEV_VERSION}"
-toml set "$PYPROJECT_TOML_PATH" "project.version" "$DEV_VERSION" > tmp.$$.toml && mv tmp.$$.toml "$PYPROJECT_TOML_PATH"
+echo '__version__ = "'"${DEV_VERSION}"'"' > "${VERSION_FILE}"
 
 # Check if `build` module is installed
 if ! python -c "import build" 2>/dev/null; then

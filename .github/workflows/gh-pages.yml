@@ -12,34 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Publish to PyPI
+name: Deploy to GitHub Pages
 
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  pypi-publish:
-    name: Build dist & upload to PyPI
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'github-actions[bot]' || github.actor == 'ryanhill1' }}
-    environment: release
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.x'
 
-      - name: Build binary wheel + source tarball
+      - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip build
-          python3 -m build
+          pip install --upgrade pip
+          pip install tox
 
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Build Sphinx documentation
+        run: |
+          tox -e docs
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          path: 'docs/build/html'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
