@@ -21,15 +21,6 @@ domains on simulators and near-term real quantum devices using shallow circuits.
 
 """
 
-import warnings
-from importlib.metadata import version
-
-try:
-    # Injected in _version.py during the build process.
-    from ._version import __version__  # type: ignore
-except (ImportError, ModuleNotFoundError):  # pragma: no cover
-    warnings.warn("Importing 'qbraid_algorithms' outside a proper installation.", UserWarning)
-    __version__ = version("qbraid_algorithms")
-
+from ._version import __version__
 
 __all__ = ["__version__"]

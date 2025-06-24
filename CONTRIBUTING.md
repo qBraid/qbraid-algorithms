@@ -64,7 +64,7 @@ to specify attributes, arguments, exceptions, returns, and other related info. T
 Install sphinx and other docs requirements:
 
 ```bash
-pip install -e '.[docs]'
+pip install -r docs/requirements.txt
 ```
 
 Then, build docs with:
@@ -89,17 +89,21 @@ Workflow: [`format.yml`](.github/workflows/format.yml)
 
 For code style, our project uses a combination of [isort](https://github.com/PyCQA/isort), [ruff](https://github.com/astral-sh/ruff), and [mypy](https://github.com/python/mypy). Specific configurations for these tools should be added to [`pyproject.toml`](pyproject.toml).
 
-Install linters:
+To ensure consistency, we use `tox` to run linters and format checks.
 
 ```bash
-pip install isort ruff mypy qbraid-cli
+pip install tox
 ```
 
-Run the following and make changes as needed to satisfy format checks:
+Run linters:
 
 ```bash
-isort qbraid_algorithms tests bin
-ruff format qbraid_algorithms examples tests bin
-mypy qbraid_algorithms examples
-qbraid admin headers qbraid_algorithms tests bin --type=apache --fix
+tox -e linters
 ```
+
+Check formatting (non-destructive):
+
+```bash
+tox -e format-check
+```
+
