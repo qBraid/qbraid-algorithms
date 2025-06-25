@@ -11,14 +11,15 @@ qubit[2] q1;
 qubit[2] q2;
 
 
+// Create 3 2-bit classical registries for measurment 
+bit[2] c0;
+bit[2] c1;
+bit[2] c2;
+
 // Initialize all qubits to 0
 reset q0;
 reset q1;
 reset q2;
-
-angle angle_A = 0;
-angle angle_B = pi / 3;
-angle angle_C = 2 * pi / 3;
 
 /*
 Prepare bell singlet states between each of the qubit pairs
@@ -43,14 +44,27 @@ Apply the rotations (angle A = 0 = no rotation)
 */
 
 // Circuit AB
-rx(angle_B) q0[1];
+rx(pi / 3) q0[1];
 
 // Circuit AC
-rx(angle_C) q1[1];
+rx(2 * pi / 3) q1[1];
 
 // Circuit BC
-rx(angle_B) q2[0];
-rx(angle_C) q2[1];
+rx(pi / 3) q2[0];
+rx(2 * pi / 3) q2[1];
+
+// Perform measurements for each of the three circuits
+measure q0[0] -> c0[0];
+measure q0[1] -> c0[1];
+
+measure q1[0] -> c1[0];
+measure q1[1] -> c1[1];
+
+measure q2[0] -> c2[0];
+measure q2[1] -> c2[1];
+
+
+
 
 
 
