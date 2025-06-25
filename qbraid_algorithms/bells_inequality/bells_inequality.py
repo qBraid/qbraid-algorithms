@@ -3,7 +3,7 @@ import pyqasm
 from collections import Counter
 
 # Configure QBraid provider
-provider = QbraidProvider(api_key="6c009jivcyw")
+provider = QbraidProvider(api_key="YOUR_API_KEY")
 device = provider.get_device('qbraid_qir_simulator')
 shots = 10
 
