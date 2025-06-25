@@ -1,18 +1,19 @@
 from qbraid import QbraidProvider
 from collections import Counter
+import pyqasm
 
 """
 Bernstein-Vazirani Algorithm Implementation for String '1001'
 """
 # Configure QBraid provider
-provider = QbraidProvider(api_key="6c009jivcyw",)
+provider = QbraidProvider(api_key="YOUR_API_KEY",)
 device = provider.get_device('qbraid_qir_simulator')
 shots = 10
 
-with open("bernstein_vazirani.qasm", "r") as f:
-    qasm = f.read()
+module = pyqasm.load("bernstein_vazirani.qasm")
+ir = str(module)
 
-job = device.run(qasm, shots=shots)
+job = device.run(ir, shots=shots)
 result = job.result()
 data = result.data
 
