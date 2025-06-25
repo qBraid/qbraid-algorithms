@@ -1,13 +1,14 @@
-from qbraid import transpile, QbraidProvider
+from qbraid import QbraidProvider
+import pyqasm
 from collections import Counter
 
 # Configure QBraid provider
-provider = QbraidProvider(api_key="YOUR_API_KEY_HERE",)
+provider = QbraidProvider(api_key="6c009jivcyw")
 device = provider.get_device('qbraid_qir_simulator')
 shots = 10
 
-with open("bells_inequality.qasm", "r") as f:
-    qasm = f.read()
+module = pyqasm.load("bells_inequality.qasm")
+qasm = str(module)
 
 job = device.run(qasm, shots=shots)
 result = job.result()
