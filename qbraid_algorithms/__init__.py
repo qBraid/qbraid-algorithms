@@ -19,8 +19,25 @@ domains on simulators and near-term real quantum devices using shallow circuits.
 
 .. currentmodule:: qbraid_algorithms
 
+Modules
+-------
+
+.. autosummary::
+    :toctree: ../stubs/
+
+    bells_inequality
+
+Functions
+----------
+
+.. autosummary::
+    :toctree: ../stubs/
+
+    bells_inequality.load_circuit
+
 """
 
+from . import bells_inequality
 from ._version import __version__
 
-__all__ = ["__version__"]
+__all__ = ["__version__", "bells_inequality"]
