@@ -27,14 +27,6 @@ Modules
 
     bells_inequality
 
-Functions
-----------
-
-.. autosummary::
-    :toctree: ../stubs/
-
-    bells_inequality.load_circuit
-
 """
 
 from . import bells_inequality

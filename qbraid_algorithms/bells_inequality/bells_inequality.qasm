@@ -54,14 +54,6 @@ rx(pi / 3) q2[0];
 rx(2 * pi / 3) q2[1];
 
 // Perform measurements for each of the three circuits
-// AB
-measure q0[0] -> c0[0];
-measure q0[1] -> c0[1];
-
-// AC
-measure q1[0] -> c1[0];
-measure q1[1] -> c1[1];
-
-// BC
-measure q2[0] -> c2[0];
-measure q2[1] -> c2[1];
+c0 = measure q0;
+c1 = measure q1;
+c2 = measure q2;
