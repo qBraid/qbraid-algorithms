@@ -13,23 +13,17 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
-
-.. currentmodule:: qbraid_algorithms
-
-Modules
--------
-
-.. autosummary::
-    :toctree: ../stubs/
-
-    bells_inequality
-
+Tests for Bell's inequality module.
 """
 
-from . import bells_inequality
-from ._version import __version__
+import pyqasm
 
-__all__ = ["__version__", "bells_inequality"]
+from qbraid_algorithms.bells_inequality import load_circuit
+
+QASM3Module = pyqasm.modules.qasm3.Qasm3Module
+
+def test_load_circuit_returns_correct_type():
+    """Test that load_circuit returns a pyqasm module object."""
+    circuit = load_circuit()
+    # Check that it returns a valid Qasm# module module
+    assert isinstance(circuit, QASM3Module), f"Expected Qasm3Module, got {type(circuit)}"
