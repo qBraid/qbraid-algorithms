@@ -21,12 +21,12 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    load_circuit
+    load_program
 
 """
 
-from .bells_inequality import load_circuit
+from .bells_inequality import load_program
 
 __all__ = [
-    "load_circuit",
+    "load_program",
 ]

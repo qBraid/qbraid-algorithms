@@ -25,7 +25,7 @@ import pyqasm
 Qasm3Module = pyqasm.modules.qasm3.Qasm3Module
 
 
-def load_circuit():
+def load_program() -> Qasm3Module:
     """
     Load the Bell's inequality circuit as a pyqasm module.
     
