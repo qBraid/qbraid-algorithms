@@ -1,7 +1,21 @@
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import autoqasm as aq
-from autoqasm.instructions import cnot, h, measure, x
-#from qbraid.transpiler.conversions.qasm3 import autoqasm_to_qasm3
 import pyqasm
+from autoqasm.instructions import cnot, h, measure, x
+from qbraid.transpiler.conversions.qasm3 import autoqasm_to_qasm3
 
 Qasm3Module = pyqasm.modules.qasm3.Qasm3Module
 
@@ -61,6 +75,5 @@ def load_program() -> Qasm3Module:
         pyqasm module containing the Bernstein-Vazirani circuit
     """
     program = bernstein_vazirani.build()
-    return program.to_ir()
-    #qasm_str = autoqasm_to_qasm3(program)
-   # return pyqasm.loads(qasm_str)
+    qasm_str = autoqasm_to_qasm3(program)
+    return pyqasm.loads(qasm_str)
