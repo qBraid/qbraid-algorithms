@@ -22,10 +22,10 @@ from pathlib import Path
 
 import pyqasm
 
-Qasm3Module = pyqasm.modules.qasm3.Qasm3Module
+QasmModule = pyqasm.modules.qasm.QasmModule
 
 
-def load_program() -> Qasm3Module:
+def load_program() -> QasmModule:
     """
     Load the Bell's inequality circuit as a pyqasm module.
     
