@@ -21,7 +21,6 @@ Simple functions for loading and running Bell's inequality circuits.
 from pathlib import Path
 
 import pyqasm
-
 from pyqasm.modules.base import QasmModule
 
 
