@@ -22,8 +22,7 @@ from pathlib import Path
 
 import pyqasm
 
-QasmModule = pyqasm.modules.qasm.QasmModule
-
+from pyqasm.modules.base import QasmModule
 
 def load_program() -> QasmModule:
     """
