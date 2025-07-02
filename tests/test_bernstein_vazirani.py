@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests for Bell's inequality module.
+Tests for Bernstein-Vazirani module.
 """
 
 import pyqasm
