@@ -18,11 +18,11 @@ Tests for Bell's inequality module.
 
 from pyqasm.modules.base import QasmModule
 
-from qbraid_algorithms.bells_inequality import load_program
+from qbraid_algorithms import bells_inequality
 
 
 def test_load_program_returns_correct_type():
     """Test that load_program returns a pyqasm module object."""
-    circuit = load_program()
+    circuit = bells_inequality.load_program()
     # Check that it returns a valid Qasm# module module
     assert isinstance(circuit, QasmModule), f"Expected QasmModule, got {type(circuit)}"
