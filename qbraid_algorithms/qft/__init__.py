@@ -13,24 +13,20 @@
 # limitations under the License.
 
 """
-Bell's Inequality Experiment Implementation
+Module providing Quantum Fourier Transform (QFT) algorithm implementation.
 
-Simple functions for loading and running Bell's inequality circuits.
+Functions
+----------
+
+.. autosummary::
+    :toctree: ../stubs/
+
+    load_program
+
 """
 
-from pathlib import Path
+from .qft import load_program
 
-import pyqasm
-
-from pyqasm.modules.base import QasmModule
-
-
-def load_program() -> QasmModule:
-    """
-    Load the Bell's inequality circuit as a pyqasm module.
-    
-    Returns:
-        pyqasm module containing the Bell's inequality circuit
-    """
-    qasm_path = Path(__file__).parent / "bells_inequality.qasm"
-    return pyqasm.load(str(qasm_path))
+__all__ = [
+    "load_program",
+]
