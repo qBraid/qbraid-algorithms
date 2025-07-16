@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Fourier Transform (QFT) algorithm implementation.
+Module providing Inverse Quantum Fourier Transform (QFT) algorithm implementation.
 
 Functions
 ----------
@@ -22,13 +22,12 @@ Functions
     :toctree: ../stubs/
 
     load_program
-    run_program
 
 """
 
-from .qft import load_program, run_program
+from .inverse_qft import load_program, run_program
 
 __all__ = [
     "load_program",
-    "run_program",
+    "run_program"
 ]

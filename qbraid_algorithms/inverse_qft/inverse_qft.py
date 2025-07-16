@@ -20,37 +20,40 @@ import pyqasm
 # TODO: REPLACE WITH QBRAID LOCALSIM
 from braket.devices import LocalSimulator
 
-AutoQASM_Module = aq.program.MainProgram
+AQProgram = aq.program.MainProgram
 
-def load_program(num_qubits: int):
-    """Load the AutoQASM QFT Program with a specified number of qubits"""
+def load_program(num_qubits: int) -> AQProgram:
+    """Load the AutoQASM Inverse QFT Program with a specified number of qubits"""
     
     @aq.main(num_qubits=num_qubits)
-    def qft():
-        """Quantum Fourier Transform"""
+    def iqft():
+        """Inverse Quantum Fourier Transform"""
         result = aq.BitVar(size=num_qubits)
-
-        for i in aq.range(num_qubits):
-            ins.h(i)
-            for j in aq.range(i+1, num_qubits):
-                k = j - i
-                ins.cphaseshift(j, i, (2 * math.pi) / (2 ** (k + 1)))
-
+        
         for i in aq.range(num_qubits // 2):
             ins.swap(i, num_qubits - i - 1)
-
+            
+        for i in aq.range(num_qubits):
+            target = n - 1 - i
+            
+            for j in aq.range(num_qubits - target - 1):
+                ctrl = num_qubits - j - 1
+                k = ctrl - target - 1
+                ins.cphaseshift(ctrl, target, (-math.pi * 2)/(2 ** (k + 2)))
+            
+            ins.h(target)
+        
         result = ins.measure(range(num_qubits))
-    
-    return qft
+        
+    return iqft
 
 
-
-def run_program(program: AutoQASM_Module, plot=True, device=None, shots=100):
+def run_program(program: AQProgram, plot=True, device=None, shots=100):
     """
-    Run the QFT circuit on a specified device.
+    Run the Inverse QFT circuit on a specified device.
     
     Args:
-        program (QasmModule): The QFT circuit to run.
+        program (QasmModule): The Inverse QFT circuit to run.
         device: The quantum device to run the circuit on.
         shots (int): Number of shots for the execution.
     
@@ -58,6 +61,7 @@ def run_program(program: AutoQASM_Module, plot=True, device=None, shots=100):
         Result of the execution.
     """
     if device is None:
+        # TODO: Replace with qBraid LocalSimulator
         device = LocalSimulator()
     result = device.run(program, shots=1000).result()
 
@@ -68,3 +72,5 @@ def run_program(program: AutoQASM_Module, plot=True, device=None, shots=100):
         plt.xlabel("bitstrings")
         plt.ylabel("counts")
         plt.show()
+
+    return result
