@@ -13,9 +13,9 @@
 # limitations under the License.
 
 """
-Quantum fourier transform implementation
+Quantum Fourier Transform (QFT) implementation using AutoQASM.
 
-Paramterized by number of qubits and outputting as a qasm3Module
+This implementation is parameterized by the number of qubits and outputs the circuit as a Qasm3Module.
 """
 
 import autoqasm as aq
@@ -58,8 +58,8 @@ def QFT(n_qubits: int)->Qasm3Module:
         for i in aq.Range(n_qubits//2):
             swap(i,n_qubits-i-1)
 
-    qft = qft_module.build()
-    return autoqasm_to_qasm3(qft)
+    qft = qft_module.build().to_ir()
+    return pyqasm(qft)
 
 
     
