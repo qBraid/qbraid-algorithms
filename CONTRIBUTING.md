@@ -44,7 +44,7 @@ pytest tests
 Generate a coverage report and verify that project and diff ``codecov`` are both upheld:
 
 ```bash
-pytest --cov=qbraid --cov-report=term tests/
+pytest --cov=qbraid_algorithms --cov-report=term tests/
 ```
 
 ### Build docs

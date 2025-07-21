@@ -13,23 +13,20 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
+Module providing Bell's Inequality experiment implementation.
 
-.. currentmodule:: qbraid_algorithms
-
-Modules
--------
+Functions
+----------
 
 .. autosummary::
     :toctree: ../stubs/
 
-    bells_inequality
+    load_program
 
 """
 
-from . import bells_inequality
-from ._version import __version__
+from .bells_inequality import load_program
 
-__all__ = ["__version__", "bells_inequality"]
+__all__ = [
+    "load_program",
+]
