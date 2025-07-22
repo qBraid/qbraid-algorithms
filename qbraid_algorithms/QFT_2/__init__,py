@@ -13,23 +13,22 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
+Module providing QFT algorithmic primitive implementation.
 
-.. currentmodule:: qbraid_algorithms
-
-Modules
--------
+Functions
+----------
 
 .. autosummary::
     :toctree: ../stubs/
 
-    bells_inequality
+    QFT
+    QFT_Demo
 
 """
 
-from . import QFT_2, bells_inequality
-from ._version import __version__
+from .QFT import QFT, QFT_Demo
 
-__all__ = ["__version__", "bells_inequality","QFT_2",]
+__all__ = [
+    "QFT",
+    "QFT_Demo",
+]

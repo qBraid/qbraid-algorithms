@@ -23,8 +23,8 @@ Returns the circuit as a Qasm3Module
 """
 
 import autoqasm as aq
-import pyqasm
 import numpy as np
+import pyqasm
 from autoqasm.instructions import cphaseshift, h, x
 
 # Qasm3Module: A container for representing OpenQASM 3 circuits using pyqasm

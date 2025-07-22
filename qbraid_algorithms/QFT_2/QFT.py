@@ -18,16 +18,19 @@ Quantum Fourier Transform (QFT) implementation using AutoQASM.
 This implementation is parameterized by the number of qubits and outputs the circuit as a Qasm3Module.
 """
 
+from typing import Union
+
 import autoqasm as aq
-import pyqasm
 import numpy as np
+import pyqasm
 from autoqasm.instructions import cphaseshift, h, swap
-from qbraid.transpiler.conversions.qasm3 import autoqasm_to_qasm3
+
+# from qbraid.transpiler.conversions.qasm3 import autoqasm_to_qasm3
 
 Qasm3Module = pyqasm.modules.qasm3.Qasm3Module
 
 
-def QFT(n_qubits: int)->Qasm3Module:
+def QFT(n_qubits: Union[int,list[int]]):
     """
     AutoQASM closure wrapper to create n-qubit QFT circuit.
     Note: implementation currently expects little endian qubit order
@@ -36,7 +39,7 @@ def QFT(n_qubits: int)->Qasm3Module:
         n_qubits (int): Number of qubits for the QFT circuit.
 
     Returns:
-        Qasm3Module: qBraid native representation of OpenQASM3 circuits
+        autoqasm closure applying qft on provided qubits
     """
     if n_qubits is None or n_qubits <1:
         raise ValueError(f"n_qubits {n_qubits} is not a valid positive integer")
@@ -58,8 +61,11 @@ def QFT(n_qubits: int)->Qasm3Module:
         for i in aq.Range(n_qubits//2):
             swap(i,n_qubits-i-1)
 
-    qft = qft_module.build().to_ir()
-    return pyqasm(qft)
+    return qft_module
+
+def QFT_Demo(n_qubits: int)->Qasm3Module:
+    return QFT(n_qubits).build().to_ir()
+
 
 
     
