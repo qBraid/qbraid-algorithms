@@ -26,10 +26,11 @@ Modules
     :toctree: ../stubs/
 
     bells_inequality
+    QFT_2
 
 """
 
 from . import QFT_2, bells_inequality
 from ._version import __version__
 
-__all__ = ["__version__", "bells_inequality","QFT_2",]
+__all__ = ["__version__", "bells_inequality", "QFT_2"]

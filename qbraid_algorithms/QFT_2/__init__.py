@@ -25,10 +25,7 @@ Functions
     QFT_Demo
 
 """
-
 from .QFT import QFT, QFT_Demo
 
-__all__ = [
-    "QFT",
-    "QFT_Demo",
-]
+__all__ = ['QFT', 'QFT_Demo']
+

@@ -28,10 +28,10 @@ import pyqasm
 from autoqasm.instructions import cphaseshift, h, x
 
 # Qasm3Module: A container for representing OpenQASM 3 circuits using pyqasm
-Qasm3Module = pyqasm.modules.qasm3.Qasm3Module
+QasmModule = pyqasm.modules.QasmModule
 
 
-def Amplification(n_qubits: int = 2, depth: int = 2, oracle=None) -> Qasm3Module:
+def Amplification(n_qubits: int = 2, depth: int = 2, oracle=None) -> QasmModule:
     """
     Creates an amplitude amplification circuit using AutoQASM.
 
