@@ -1,70 +1,40 @@
-# Copyright 2025 qBraid
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+import os
+import tempfile
+import shutil
+import pyqasm 
 
-import math
-import autoqasm as aq
-import matplotlib.pyplot as plt
-import pyqasm
+from utils import build_gate
 
-# TODO: REPLACE WITH QBRAID LOCALSIM
-from braket.devices import LocalSimulator
-
-AutoQASM_Module = aq.program.MainProgram
-
-def load_program(num_qubits: int):
-    """Load the AutoQASM QFT Program with a specified number of qubits"""
-    
-    @aq.main(num_qubits=num_qubits)
-    def qft():
-        """Quantum Fourier Transform"""
-        result = aq.BitVar(size=num_qubits)
-
-        for i in aq.range(num_qubits):
-            ins.h(i)
-            for j in aq.range(i+1, num_qubits):
-                k = j - i
-                ins.cphaseshift(j, i, (2 * math.pi) / (2 ** (k + 1)))
-
-        for i in aq.range(num_qubits // 2):
-            ins.swap(i, num_qubits - i - 1)
-
-        result = ins.measure(range(num_qubits))
-    
-    return qft
+PyQASMModule = pyqasm.modules.qasm3.Qasm3Module
 
 
+def load_program(num_qubits: int) -> PyQASMModule:
+    # Copy source qasm3 file to temp directory
+    temp_dir = tempfile.mkdtemp()
+    qft_src = "qft.qasm" 
+    qft_dst = os.path.join(temp_dir, "qft.qasm")
+    shutil.copy(qft_src, qft_dst)
+    # Create include file in temp directory to pass variables
+    with open(os.path.join(temp_dir, "qft.inc"), 'w') as file:
+        file.write(f'const int[16] n = {num_qubits};')
 
-def run_program(program: AutoQASM_Module, plot=True, device=None, shots=100):
+    # load the algorithm
+    module = pyqasm.load(qft_dst)
+
+    # delete the created files
+    shutil.rmtree(temp_dir)
+
+    return module
+
+
+def generate_gate(num_qubits: int, gate_name: str = None, filename:str = "qft.inc"):
+    """Generate a gate-version of QFT circuit, and return the name of the include file
+    and gate for use in other programs
     """
-    Run the QFT circuit on a specified device.
+    program = load_program(num_qubits)
+    program.unroll()
+    gate_def, gate_name = build_gate(program, gate_name)
+    with open(filename, "w") as f:
+        f.write(gate_def)
     
-    Args:
-        program (QasmModule): The QFT circuit to run.
-        device: The quantum device to run the circuit on.
-        shots (int): Number of shots for the execution.
-    
-    Returns:
-        Result of the execution.
-    """
-    if device is None:
-        device = LocalSimulator()
-    result = device.run(program, shots=1000).result()
-
-    print("Measurement Counts: ", counts)
-
-    if plot:
-        plt.bar(counts.keys(), counts.values())
-        plt.xlabel("bitstrings")
-        plt.ylabel("counts")
-        plt.show()
+    print(f"Gate '{gate_name}' has been added to {os.path.join(os.getcwd(), filename)}")
