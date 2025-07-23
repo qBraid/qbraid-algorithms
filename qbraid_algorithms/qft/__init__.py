@@ -22,13 +22,13 @@ Functions
     :toctree: ../stubs/
 
     load_program
-    run_program
+    generate_subroutine
 
 """
 
-from .qft import load_program, run_program
+from .qft import load_program, generate_subroutine
 
 __all__ = [
     "load_program",
-    "run_program",
+    "generate_subroutine",
 ]

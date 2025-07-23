@@ -12,15 +12,15 @@ PyQASMModule = pyqasm.modules.qasm3.Qasm3Module
 def load_program(num_qubits: int) -> PyQASMModule:
     # Copy source qasm3 file to temp directory
     temp_dir = tempfile.mkdtemp()
-    qft_src = Path(__file__).parent / "qft.qasm"
-    qft_dst = os.path.join(temp_dir, "qft.qasm")
-    shutil.copy(qft_src, qft_dst)
+    iqft_src = Path(__file__).parent / "iqft.qasm"
+    iqft_dst = os.path.join(temp_dir, "iqft.qasm")
+    shutil.copy(iqft_src, iqft_dst)
     # Create include file in temp directory to pass variables
-    with open(os.path.join(temp_dir, "qft.inc"), 'w') as file:
+    with open(os.path.join(temp_dir, "iqft.inc"), 'w') as file:
         file.write(f'const int[16] n = {num_qubits};')
 
     # load the algorithm
-    module = pyqasm.load(qft_dst)
+    module = pyqasm.load(iqft_dst)
 
     # delete the created files
     shutil.rmtree(temp_dir)
@@ -28,8 +28,8 @@ def load_program(num_qubits: int) -> PyQASMModule:
     return module
 
 
-def generate_subroutine(num_qubits: int, subroutine_name: str = "qft", filename:str = "qft.inc"):
-    """Generate a subroutine-version of QFT circuit, and return the name of the include file
+def generate_subroutine(num_qubits: int, subroutine_name: str = "iqft", filename:str = "iqft.inc"):
+    """Generate a subroutine-version of IQFT circuit, and return the name of the include file
     and subroutine for use in other programs
     """
     program = load_program(num_qubits)
