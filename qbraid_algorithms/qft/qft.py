@@ -4,8 +4,6 @@ import shutil
 from pathlib import Path
 import pyqasm 
 
-from ..utils import build_subroutine
-
 PyQASMModule = pyqasm.modules.qasm3.Qasm3Module
 
 def load_program(num_qubits: int) -> PyQASMModule:
@@ -18,9 +16,7 @@ def load_program(num_qubits: int) -> PyQASMModule:
     shutil.copy(qft_src, qft_dst)
     shutil.copy(qft_sub_src, qft_sub_dst)
     # Create temporary include file for algorithm-specific variables
-    with open(os.path.join(temp_dir, "inputs.inc"), 'w') as file:
-        file.write(f'const int[16] qft_size = {num_qubits};')
-
+    _generate_inputs(num_qubits)
 
     # Load the algorithm
     module = pyqasm.load(qft_dst)
@@ -39,7 +35,14 @@ def generate_subroutine(num_qubits) -> None:
     qft_sub_src = Path(__file__).parent / "qft_subroutine.qasm"
     shutil.copy(qft_sub_src, os.path.join(os.getcwd(), f"qft.qasm"))
     # Create include file for variable definition
-    with open(os.path.join(os.getcwd(), f"inputs.inc"), 'w') as file:
-        file.write(f'const int[16] qft_size = {num_qubits};')
+    _generate_inputs(num_qubits)
 
     print(f"Subroutine 'qft' has been added to {os.path.join(os.getcwd(), 'qft.qasm')}")
+
+
+def _generate_inputs(num_qubits: int) -> None:
+    """
+    Creates an input file for the QFT subroutine with user-defined number of qubits.
+    """
+    with open(os.path.join(os.getcwd(), f"inputs.inc"), 'w') as file:
+        file.write(f'const int[16] qft_size = {num_qubits};')
