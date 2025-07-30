@@ -8,33 +8,38 @@ from ..utils import build_subroutine
 
 PyQASMModule = pyqasm.modules.qasm3.Qasm3Module
 
-
 def load_program(num_qubits: int) -> PyQASMModule:
-    # Copy source qasm3 file to temp directory
+    # Load the QFT subroutine and measurement circuits
     temp_dir = tempfile.mkdtemp()
     qft_src = Path(__file__).parent / "qft.qasm"
+    qft_sub_src = Path(__file__).parent / "qft_subroutine.qasm"
     qft_dst = os.path.join(temp_dir, "qft.qasm")
+    qft_sub_dst = os.path.join(temp_dir, "qft_subroutine.qasm")
     shutil.copy(qft_src, qft_dst)
-    # Create include file in temp directory to pass variables
-    with open(os.path.join(temp_dir, "qft.inc"), 'w') as file:
-        file.write(f'const int[16] n = {num_qubits};')
+    shutil.copy(qft_sub_src, qft_sub_dst)
+    # Create temporary include file for algorithm-specific variables
+    with open(os.path.join(temp_dir, "inputs.inc"), 'w') as file:
+        file.write(f'const int[16] qft_size = {num_qubits};')
 
-    # load the algorithm
+
+    # Load the algorithm
     module = pyqasm.load(qft_dst)
 
-    # delete the created files
+    # Delete the created files
     shutil.rmtree(temp_dir)
 
     return module
 
 
-def generate_subroutine(num_qubits: int, subroutine_name: str = "qft", filename:str = "qft.inc"):
-    """Generate a subroutine-version of QFT circuit, and return the name of the include file
-    and subroutine for use in other programs
+def generate_subroutine(num_qubits) -> None:
     """
-    program = load_program(num_qubits)
-    subroutine_def, subroutine_name = build_subroutine(program, num_qubits, f'{subroutine_name}_{num_qubits}')
-    with open(filename, "w") as f:
-        f.write(subroutine_def)
-    
-    print(f"Subroutine '{subroutine_name}' has been added to {os.path.join(os.getcwd(), filename)}")
+    Creates a QFT subroutine module with user-defined number of qubits 
+    within user's current working directory.
+    """
+    qft_sub_src = Path(__file__).parent / "qft_subroutine.qasm"
+    shutil.copy(qft_sub_src, os.path.join(os.getcwd(), f"qft.qasm"))
+    # Create include file for variable definition
+    with open(os.path.join(os.getcwd(), f"inputs.inc"), 'w') as file:
+        file.write(f'const int[16] qft_size = {num_qubits};')
+
+    print(f"Subroutine 'qft' has been added to {os.path.join(os.getcwd(), 'qft.qasm')}")
