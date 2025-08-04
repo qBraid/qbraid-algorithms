@@ -26,12 +26,13 @@ Modules
     :toctree: ../stubs/
 
     bells_inequality
+    bernstein_vazirani
     qft
     iqft
 
 """
 
-from . import bells_inequality, qft, iqft
+from . import bells_inequality, qft, iqft, bernstein_vazirani
 from ._version import __version__
 
-__all__ = ["__version__", "bells_inequality", "qft", "iqft"]
+__all__ = ["__version__", "bells_inequality", "qft", "iqft", "bernstein_vazirani"]

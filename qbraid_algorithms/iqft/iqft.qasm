@@ -1,9 +1,8 @@
 OPENQASM 3.0;
-include "inputs.inc";
 include "iqft_subroutine.qasm";
 
-qubit[qft_size] q;
-bit[qft_size] b;
+qubit[IQFT_SIZE] q;
+bit[IQFT_SIZE] b;
 
-iqft(q, qft_size);
+iqft(q);
 b = measure q;
