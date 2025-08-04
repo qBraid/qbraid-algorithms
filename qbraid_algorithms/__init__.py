@@ -36,3 +36,4 @@ from . import bells_inequality, qft, iqft, bernstein_vazirani
 from ._version import __version__
 
 __all__ = ["__version__", "bells_inequality", "qft", "iqft", "bernstein_vazirani"]
+

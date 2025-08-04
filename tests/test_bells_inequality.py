@@ -17,9 +17,11 @@ Tests for Bell's inequality module.
 """
 
 
+from pyqasm.modules.base import QasmModule
+
 from qbraid_algorithms import bells_inequality
 
-from pyqasm.modules.base import QasmModule
+
 
 def test_load_program_returns_correct_type():
     """Test that load_program returns a pyqasm module object."""
