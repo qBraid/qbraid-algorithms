@@ -60,50 +60,62 @@ def load_program(bitstring: str | list[int]) -> QasmModule:
     return module
 
 
-def generate_subroutine(bitstring: str | list[int]) -> None:
+def generate_subroutine(bitstring: str | list[int], quiet: bool = False, path: str = None) -> None:
     """
-    Creates a Bernstein-Vazirani subroutine module with user-defined hidden bitstring
-    within user's current working directory.
+    Creates a Bernstein-Vazirani subroutine module with user-defined hidden bitstring.
+
     Args:
-        bitstring (str | list[int]): The hidden bitstring `s` as a string of
-        '0's and '1's
+        bitstring (str | list[int]): The hidden bitstring.
+        quiet (bool): If True, suppresses output messages.
+        path (str): The directory path where the Bernstein-Vazirani subroutine will be created.
+                   If None, creates in the current working directory.
+
     Returns:
         None
     """
-    # Copy the B-V subroutine QASM file to the current working directory
+    # Copy the B-V subroutine QASM file to the specified or current working directory
     bernvaz_src = Path(__file__).parent / "bernvaz_subroutine.qasm"
-    bernvaz_dst = os.path.join(os.getcwd(), "bernvaz.qasm")
+    if path is None:
+        bernvaz_dst = os.path.join(os.getcwd(), "bernvaz.qasm")
+    else:
+        bernvaz_dst = os.path.join(path, "bernvaz.qasm")
     shutil.copy(bernvaz_src, bernvaz_dst)
 
     # Replace variable placeholders with user-defined parameters
     replacements = _generate_replacements(bitstring)
     _prep_qasm_file(bernvaz_dst, replacements)
 
-    print(f"Subroutine 'bernvaz' has been added to {bernvaz_dst}")
+    if not quiet:
+        print(f"Subroutine 'bernvaz' has been added to {bernvaz_dst}")
 
-
-def generate_oracle(bitstring: list[int]) -> None:
+def generate_oracle(bitstring: list[int], quiet: bool = False, path: str = None) -> None:
     """
-    Creates an Bernstein-Vazirani oracle encoded with user-defined hidden bitstring
-    within user's current working directory.
+    Creates a Bernstein-Vazirani oracle encoded with user-defined hidden bitstring.
 
     Args:
         bitstring (list[int] | str): The hidden bitstring `s` as a string
-        of '0's and '1's
+                                   of '0's and '1's
+        quiet (bool): If True, suppresses output messages.
+        path (str): The directory path where the Bernstein-Vazirani oracle will be created.
+                   If None, creates in the current working directory.
 
     Returns:
         None
     """
-    # Copy the oracle QASM file to the current working directory
+    # Copy the oracle QASM file to the specified or current working directory
     oracle_src = Path(__file__).parent / "oracle.qasm"
-    oracle_dst = os.path.join(os.getcwd(), "oracle.qasm")
+    if path is None:
+        oracle_dst = os.path.join(os.getcwd(), "oracle.qasm")
+    else:
+        oracle_dst = os.path.join(path, "oracle.qasm")
     shutil.copy(oracle_src, oracle_dst)
 
     # Replace variable placeholders with user-defined parameters
     replacements = _generate_replacements(bitstring)
     _prep_qasm_file(oracle_dst, replacements)
 
-    print(f"Oracle 'oracle' has been added to {oracle_dst}")
+    if not quiet:
+        print(f"Oracle 'oracle' has been added to {oracle_dst}")
 
 
 def _convert_bitstring_decimal(bitstring: str | list[int]) -> int:

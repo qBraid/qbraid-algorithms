@@ -57,24 +57,30 @@ def load_program(num_qubits: int) -> QasmModule:
     return module
 
 
-def generate_subroutine(num_qubits) -> None:
+def generate_subroutine(num_qubits: int, quiet: bool = False, path: str = None) -> None:
     """
-    Creates a QFT subroutine module with user-defined number of qubits
-    within user's current working directory.
+    Creates a QFT subroutine module with user-defined number of qubits.
 
     Args:
         num_qubits (int): The number of qubits for the QFT.
+        quiet (bool): If True, suppresses output messages.
+        path (str): The directory path where the QFT subroutine will be created.
+                   If None, creates in the current working directory.
 
     Returns:
         None
     """
-    # Copy the QFT subroutine QASM file to the current working directory
+    # Copy the QFT subroutine QASM file to the specified or current working directory
     qft_src = Path(__file__).parent / "qft_subroutine.qasm"
-    qft_dst = os.path.join(os.getcwd(), "qft.qasm")
+    if path is None:
+        qft_dst = os.path.join(os.getcwd(), "qft.qasm")
+    else:
+        qft_dst = os.path.join(path, "qft.qasm")
     shutil.copy(qft_src, qft_dst)
 
     # Replace variable placeholders with user-defined parameters
     replacements = {"QFT_SIZE": str(num_qubits)}
     _prep_qasm_file(qft_dst, replacements)
 
-    print(f"Subroutine 'qft' has been added to {qft_dst}")
+    if not quiet:
+        print(f"Subroutine 'qft' has been added to {qft_dst}")
