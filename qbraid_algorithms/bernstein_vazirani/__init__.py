@@ -29,8 +29,4 @@ Functions
 
 from .bernvaz import load_program, generate_subroutine, generate_oracle
 
-__all__ = [
-    "load_program",
-    "generate_subroutine",
-    "generate_oracle"
-]
+__all__ = ["load_program", "generate_subroutine", "generate_oracle"]

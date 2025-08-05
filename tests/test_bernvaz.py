@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Tests for Quantum Fourier Transform (QFT) algorithm implementation.
+Tests for Bernstein-Vazirani algorithm implementation.
 """
 
 from pyqasm.modules.base import QasmModule
-from qbraid_algorithms import qft
+from qbraid_algorithms import bernstein_vazirani as bv
 
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
-    qft_module = qft.load_program(3)
-    assert isinstance(qft_module, QasmModule)
-    assert qft_module.num_qubits == 3
+    bv_module = bv.load_program("101")
+    assert isinstance(bv_module, QasmModule)
+    assert bv_module.num_qubits == 4 # 3 data qubits + 1 ancilla qubit

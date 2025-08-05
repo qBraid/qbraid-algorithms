@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright 2025 qBraid
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,15 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
-Tests for Quantum Fourier Transform (QFT) algorithm implementation.
+Entry point script for qbraid-algorithms CLI.
 """
 
-from pyqasm.modules.base import QasmModule
-from qbraid_algorithms import qft
+from qbraid_algorithms.cli.main import app
 
-def test_load_program():
-    """Test that load_program correctly returns a pyqasm module object."""
-    qft_module = qft.load_program(3)
-    assert isinstance(qft_module, QasmModule)
-    assert qft_module.num_qubits == 3
+if __name__ == "__main__":
+    app()

@@ -28,7 +28,4 @@ Functions
 
 from .iqft import load_program, generate_subroutine
 
-__all__ = [
-    "load_program",
-    "generate_subroutine"
-]
+__all__ = ["load_program", "generate_subroutine"]

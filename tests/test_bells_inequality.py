@@ -11,20 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Tests for Bell's inequality module.
 """
 
-
 from pyqasm.modules.base import QasmModule
+from qbraid_algorithms import bells_inequality as bells
 
-from qbraid_algorithms import bells_inequality
-
-
-
-def test_load_program_returns_correct_type():
-    """Test that load_program returns a pyqasm module object."""
-    circuit = bells_inequality.load_program()
-    # Check that it returns a valid Qasm# module module
-    assert isinstance(circuit, QasmModule), f"Expected QasmModule, got {type(circuit)}"
+def test_load_program():
+    """Test that load_program correctly returns a pyqasm module object."""
+    bells_module = bells.load_program()
+    assert isinstance(bells_module, QasmModule)
+    assert bells_module.num_qubits == 6 # test involves 6 qubits

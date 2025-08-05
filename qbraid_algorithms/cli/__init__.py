@@ -12,12 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qbraid_algorithms import bernstein_vazirani
-
-from pyqasm.modules.base import QasmModule
-
-def test_load_program_returns_correct_type():
-    """Test that load_program returns a pyqasm module object."""
-    circuit = bernstein_vazirani.load_program()
-    # Check that it returns a valid Qasm# module module
-    assert isinstance(circuit, QasmModule), f"Expected QasmModule, got {type(circuit)}"
+"""
+CLI package for qbraid-algorithms.
+"""

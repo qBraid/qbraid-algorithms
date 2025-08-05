@@ -33,8 +33,7 @@ qbraid-algorithms requires Python 3.11 or greater, and can be installed with pip
 pip install qbraid-algorithms
 ```
 
->[!WARNING]
-> **This project is "pre-alpha", and is not yet stable or fully realized. Use with caution, as the API and functionality are subject to significant changes.**
+> [!WARNING] > **This project is "pre-alpha", and is not yet stable or fully realized. Use with caution, as the API and functionality are subject to significant changes.**
 
 ### Install from source
 
@@ -57,6 +56,77 @@ import qbraid_algorithms
 qbraid_algorithms.__version__
 ```
 
+## CLI Usage
+
+qbraid-algorithms includes a command-line interface (CLI) for generating quantum algorithm subroutines.
+
+### Installation
+
+To use the CLI, install with CLI dependencies:
+
+```bash
+pip install "qbraid-algorithms[cli]"
+```
+
+Or install from source:
+
+```bash
+pip install -e ".[cli]"
+```
+
+### Generate Subroutines
+
+Generate quantum algorithm subroutines that can be included in other circuits:
+
+```bash
+# Generate QFT subroutine for 4 qubits
+qbraid-algorithms generate qft --qubits 4
+
+# Generate IQFT subroutine for 3 qubits with custom name and show the circuit
+qbraid-algorithms generate iqft -q 3 -o my_iqft.qasm --gate-name my_iqft --show
+
+# Generate Bernstein-Vazirani circuit for secret "101" and display it
+qbraid-algorithms generate bernvaz --secret "101" --show
+
+# Generate only the oracle for Bernstein-Vazirani
+qbraid-algorithms generate bernvaz -s "1001" --oracle-only --show
+```
+
+### Help
+
+Get help for any command:
+
+```bash
+qbraid-algorithms --help
+qbraid-algorithms generate --help
+qbraid-algorithms generate qft --help
+qbraid-algorithms generate iqft --help
+qbraid-algorithms generate bernvaz --help
+```
+
+### Examples
+
+#### Complete Workflow
+
+1. Generate a QFT subroutine:
+
+   ```bash
+   qbraid-algorithms generate qft --qubits 3
+   ```
+
+2. Generate a Bernstein-Vazirani oracle and view it:
+
+   ```bash
+   qbraid-algorithms generate bernvaz --secret "101" --oracle-only --show
+   ```
+
+3. Generate an IQFT circuit with custom output:
+   ```bash
+   qbraid-algorithms generate iqft --qubits 4 --output my_iqft_4.qasm --show
+   ```
+
+```
+
 ## Community
 
 **We are actively looking for new contributors!**
@@ -77,3 +147,4 @@ This project was conceived in cooperation with the Quantum Open Source Foundatio
 ## License
 
 [Apache-2.0 License](LICENSE)
+```

@@ -27,7 +27,7 @@ from pyqasm.modules.base import QasmModule
 def load_program() -> QasmModule:
     """
     Load the Bell's inequality circuit as a pyqasm module.
-    
+
     Returns:
         pyqasm module containing the Bell's inequality circuit
     """

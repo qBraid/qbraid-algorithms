@@ -1,19 +1,36 @@
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Module providing Inverse Quantum Fourier Transform (IQFT) algorithm implementation.
+
+"""
 import os
 import tempfile
 import shutil
 from pathlib import Path
 import pyqasm
+from pyqasm.modules.base import QasmModule
 from qbraid_algorithms.utils import _prep_qasm_file
 
-PyQASMModule = pyqasm.modules.qasm3.Qasm3Module
 
-def load_program(num_qubits: int) -> PyQASMModule:
+def load_program(num_qubits: int) -> QasmModule:
     """
     Load the Inverse Quantum Fourier Transform circuit as a pyqasm module.
 
     Args:
         num_qubits (int): The number of qubits for the IQFT.
-    
+
     Returns:
         (PyQasm Module) pyqasm module containing the IQFT circuit
     """
@@ -27,7 +44,7 @@ def load_program(num_qubits: int) -> PyQASMModule:
     shutil.copy(iqft_sub_src, iqft_sub_dst)
 
     # Replace variable placeholders with user-defined parameters
-    replacements = { "IQFT_SIZE": str(num_qubits) }
+    replacements = {"IQFT_SIZE": str(num_qubits)}
     _prep_qasm_file(iqft_sub_dst, replacements)
     _prep_qasm_file(iqft_dst, replacements)
 
@@ -42,7 +59,7 @@ def load_program(num_qubits: int) -> PyQASMModule:
 
 def generate_subroutine(num_qubits: int) -> None:
     """
-    Creates a QFT subroutine module with user-defined number of qubits 
+    Creates a QFT subroutine module with user-defined number of qubits
     within user's current working directory.
 
     Args:
@@ -53,12 +70,11 @@ def generate_subroutine(num_qubits: int) -> None:
     """
     # Copy the IQFT subroutine QASM file to the current working directory
     iqft_src = Path(__file__).parent / "iqft_subroutine.qasm"
-    iqft_dst = os.path.join(os.getcwd(), f"iqft.qasm")
+    iqft_dst = os.path.join(os.getcwd(), "iqft.qasm")
     shutil.copy(iqft_src, iqft_dst)
 
     # Replace variable placeholders with user-defined parameters
-    replacements = { "IQFT_SIZE": str(num_qubits) }
+    replacements = {"IQFT_SIZE": str(num_qubits)}
     _prep_qasm_file(iqft_dst, replacements)
 
     print(f"Subroutine 'iqft' has been added to {iqft_dst}")
-

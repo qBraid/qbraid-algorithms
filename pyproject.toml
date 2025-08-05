@@ -10,7 +10,7 @@ description = "Python package for building, simulating, and benchmarking hybrid 
 readme = "README.md"
 requires-python = ">=3.11"
 keywords = ["qbraid", "quantum", "algorithms", "openqasm"]
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
@@ -30,6 +30,15 @@ classifiers = [
     "Operating System :: Unix",
     "Operating System :: MacOS",
 ]
+
+[project.optional-dependencies]
+cli = [
+    "typer>=0.9.0,<0.15.0",
+    "typing-extensions>=4.0.0"
+]
+
+[project.scripts]
+qbraid-algorithms = "qbraid_algorithms.cli.main:app"
 
 [tool.setuptools.dynamic]
 version = {attr = "qbraid_algorithms._version.__version__"}

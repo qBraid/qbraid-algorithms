@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Tests for Quantum Fourier Transform (QFT) algorithm implementation.
+Tests for Inverse Quantum Fourier Transform (IQFT) algorithm implementation.
 """
 
 from pyqasm.modules.base import QasmModule
-from qbraid_algorithms import qft
+from qbraid_algorithms import iqft
 
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
-    qft_module = qft.load_program(3)
-    assert isinstance(qft_module, QasmModule)
-    assert qft_module.num_qubits == 3
+    iqft_module = iqft.load_program(3)
+    assert isinstance(iqft_module, QasmModule)
+    assert iqft_module.num_qubits == 3
