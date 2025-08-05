@@ -11,25 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
-Bell's Inequality Experiment Implementation
-
-Simple functions for loading and running Bell's inequality circuits.
+Tests for Bernstein-Vazirani algorithm implementation.
 """
 
-from pathlib import Path
-
-import pyqasm
 from pyqasm.modules.base import QasmModule
+from qbraid_algorithms import bernstein_vazirani as bv
 
-
-def load_program() -> QasmModule:
-    """
-    Load the Bell's inequality circuit as a pyqasm module.
-
-    Returns:
-        pyqasm module containing the Bell's inequality circuit
-    """
-    qasm_path = Path(__file__).parent / "bells_inequality.qasm"
-    return pyqasm.load(str(qasm_path))
+def test_load_program():
+    """Test that load_program correctly returns a pyqasm module object."""
+    bv_module = bv.load_program("101")
+    assert isinstance(bv_module, QasmModule)
+    assert bv_module.num_qubits == 4 # 3 data qubits + 1 ancilla qubit
