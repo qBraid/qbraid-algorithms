@@ -60,7 +60,9 @@ def load_program(bitstring: str | list[int]) -> QasmModule:
     return module
 
 
-def generate_subroutine(bitstring: str | list[int], quiet: bool = False, path: str = None) -> None:
+def generate_subroutine(
+    bitstring: str | list[int], quiet: bool = False, path: str = None
+) -> None:
     """
     Creates a Bernstein-Vazirani subroutine module with user-defined hidden bitstring.
 
@@ -88,7 +90,10 @@ def generate_subroutine(bitstring: str | list[int], quiet: bool = False, path: s
     if not quiet:
         print(f"Subroutine 'bernvaz' has been added to {bernvaz_dst}")
 
-def generate_oracle(bitstring: list[int], quiet: bool = False, path: str = None) -> None:
+
+def generate_oracle(
+    bitstring: list[int], quiet: bool = False, path: str = None
+) -> None:
     """
     Creates a Bernstein-Vazirani oracle encoded with user-defined hidden bitstring.
 

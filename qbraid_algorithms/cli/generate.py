@@ -23,7 +23,7 @@ from typing_extensions import Annotated
 
 # Import modules with error handling
 try:
-    from qbraid_algorithms import qft, iqft
+    from qbraid_algorithms import qft, iqft, qpe
     from qbraid_algorithms import bernstein_vazirani as bv
 except ImportError as e:
     typer.echo(f"Missing required module: {e}", err=True)
@@ -54,7 +54,11 @@ def generate_qft(
     ] = "qft.qasm",
     path: Annotated[
         str,
-        typer.Option("--path", "-p", help="Directory path where the QFT subroutine will be created."),
+        typer.Option(
+            "--path",
+            "-p",
+            help="Directory path where the QFT subroutine will be created.",
+        ),
     ] = None,
     show_circuit: Annotated[
         bool, typer.Option("--show", help="Display the generated circuit QASM code.")
@@ -73,10 +77,10 @@ def generate_qft(
         # Determine the target directory and filename
         target_dir = path if path else os.getcwd()
         target_file = os.path.join(target_dir, output)
-        
+
         # Generate the subroutine using the path parameter
         qft.generate_subroutine(qubits, quiet=True, path=target_dir)
-        
+
         # Rename to custom output if needed
         generated_file = os.path.join(target_dir, "qft.qasm")
         if output != "qft.qasm":
@@ -84,7 +88,7 @@ def generate_qft(
             final_file = target_file
         else:
             final_file = generated_file
-            
+
         typer.echo(f"QFT subroutine for {qubits} qubits generated successfully.")
         typer.echo(f"Output: {os.path.abspath(final_file)}")
 
@@ -120,7 +124,11 @@ def generate_iqft(
     ] = "iqft.qasm",
     path: Annotated[
         str,
-        typer.Option("--path", "-p", help="Directory path where the IQFT subroutine will be created."),
+        typer.Option(
+            "--path",
+            "-p",
+            help="Directory path where the IQFT subroutine will be created.",
+        ),
     ] = None,
     show_circuit: Annotated[
         bool, typer.Option("--show", help="Display the generated circuit QASM code.")
@@ -139,10 +147,10 @@ def generate_iqft(
         # Determine the target directory and filename
         target_dir = path if path else os.getcwd()
         target_file = os.path.join(target_dir, output)
-        
+
         # Generate the subroutine using the path parameter
         iqft.generate_subroutine(qubits, quiet=True, path=target_dir)
-        
+
         # Rename to custom output if needed
         generated_file = os.path.join(target_dir, "iqft.qasm")
         if output != "iqft.qasm":
@@ -150,7 +158,7 @@ def generate_iqft(
             final_file = target_file
         else:
             final_file = generated_file
-            
+
         typer.echo(f"IQFT subroutine for {qubits} qubits generated successfully.")
         typer.echo(f"Output: {os.path.abspath(final_file)}")
 
@@ -189,7 +197,11 @@ def generate_bernvaz(
     ] = None,
     path: Annotated[
         str,
-        typer.Option("--path", "-p", help="Directory path where the Bernstein-Vazirani files will be created."),
+        typer.Option(
+            "--path",
+            "-p",
+            help="Directory path where the Bernstein-Vazirani files will be created.",
+        ),
     ] = None,
     gate_name: Annotated[
         str, typer.Option("--gate-name", "-g", help="Name for the gate.")
@@ -233,7 +245,7 @@ def generate_bernvaz(
         # Determine the target directory and filename
         target_dir = path if path else os.getcwd()
         target_file = os.path.join(target_dir, output)
-        
+
         if oracle_only:
             # Generate oracle only
             bv.generate_oracle(secret, quiet=True, path=target_dir)
@@ -270,6 +282,91 @@ def generate_bernvaz(
             f"Error generating Bernstein-Vazirani {'oracle' if oracle_only else 'circuit'}: {e}",
             err=True,
         )
+        raise typer.Exit(1)
+
+
+@app.command(name="qpe")
+def generate_qpe(
+    unitary_file: Annotated[
+        str,
+        typer.Option(
+            "--unitary-file",
+            "-u",
+            help="Path to QASM file defining the unitary gate U for phase estimation.",
+        ),
+    ],
+    qubits: Annotated[
+        int,
+        typer.Option(
+            "--qubits",
+            "-q",
+            help="Number of qubits for the phase estimation register.",
+            min=1,
+            max=20,
+        ),
+    ] = 4,
+    output: Annotated[
+        str,
+        typer.Option("--output", "-o", help="Output filename for the QPE subroutine."),
+    ] = "qpe.qasm",
+    path: Annotated[
+        str,
+        typer.Option(
+            "--path",
+            "-p",
+            help="Directory path where the QPE subroutine will be created.",
+        ),
+    ] = None,
+    show_circuit: Annotated[
+        bool, typer.Option("--show", help="Display the generated circuit QASM code.")
+    ] = False,
+):
+    """
+    Generate a QPE (Quantum Phase Estimation) subroutine.
+
+    Creates a QASM file containing a QPE subroutine that estimates the phase of
+    a given unitary operator. Requires a QASM file defining the unitary gate.
+
+    Examples:
+        qbraid-algorithms generate qpe --unitary-file my_gate.qasm --qubits 4
+        qbraid-algorithms generate qpe -u gate.qasm -q 3 -o my_qpe.qasm --path /tmp --show
+    """
+    # Validate unitary file exists
+    if not os.path.exists(unitary_file):
+        typer.echo(f"Error: Unitary file '{unitary_file}' not found.", err=True)
+        raise typer.Exit(1)
+
+    try:
+        # Determine the target directory and filename
+        target_dir = path if path else os.getcwd()
+        target_file = os.path.join(target_dir, output)
+
+        # Generate the subroutine using the path parameter
+        qpe.generate_subroutine(unitary_file, qubits, quiet=True, path=target_dir)
+
+        # Rename to custom output if needed
+        generated_file = os.path.join(target_dir, "qpe.qasm")
+        if output != "qpe.qasm":
+            os.rename(generated_file, target_file)
+            final_file = target_file
+        else:
+            final_file = generated_file
+
+        typer.echo(f"QPE subroutine for {qubits} qubits generated successfully.")
+        typer.echo(f"Unitary file: {os.path.abspath(unitary_file)}")
+        typer.echo(f"Output: {os.path.abspath(final_file)}")
+
+        # Show circuit if requested
+        if show_circuit:
+            with open(final_file, "r", encoding="utf-8") as f:
+                qasm_content = f.read()
+            typer.echo("Generated QASM:")
+            typer.echo("-" * 50)
+            typer.echo(qasm_content)
+            typer.echo("-" * 50)
+
+    except Exception as e:
+        typer.echo(f"Error generating QPE subroutine: {e}", err=True)
         raise typer.Exit(1)
 
 
