@@ -20,6 +20,7 @@ class QFTLibrary(GateLibrary):
     name = "QFT"
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
+        self.call_space = "{},"
 
     def QFT(self, qubits:list, swap=True):
         name = f'QFT{len(qubits)}{'S' if swap else ''}'
@@ -30,14 +31,34 @@ class QFTLibrary(GateLibrary):
         std = sys.import_library(std_gates)
         names = " " + string.ascii_letters
         qargs = [names[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits))]
+
         std.begin_gate(name,qargs)
-        std.begin_loop(len(qubits))
-        std.h("i")
-        std.begin_loop(f"j in [i+1:{len(qubits)}]")
-        std.call_gate("cp","j",controls="i",phases="pi>>(j-i)")
-        std.end_loop()
-        std.end_loop()
+        std.call_space = " {} "
+        for i in range(len(qubits)):
+            std.h(names[i+1])
+
+            for j in range(i+1,len(qubits)):
+                std.call_gate("cphase",names[j+1],controls=names[i+1],phases=f"pi>>({j-i})")
+    
         std.end_gate()
+
+        # std.begin_gate(name,qargs)
+        # std.begin_loop(len(qubits))
+        # std.h("i")
+        # std.begin_loop(f"j in [i+1:{len(qubits)}]")
+        # std.call_gate("cp","j",controls="i",phases="pi>>(j-i)")
+        # std.end_loop()
+        # std.end_loop()
+        # std.end_gate()
+
+        # std.begin_subroutine(name,[f'qubit[{len(qubits)}] a'])
+        # std.begin_loop(len(qubits))
+        # std.h("i")
+        # std.begin_loop(f"j in [i+1:{len(qubits)}]")
+        # std.call_gate("cp","j",controls="i",phases="pi>>(j-i)")
+        # std.end_loop()
+        # std.end_loop()
+        # std.end_subroutine()
         p, i, d = sys.build()
         for imps in i:
             if imps not in self.gate_import:

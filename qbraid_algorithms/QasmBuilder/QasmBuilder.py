@@ -70,7 +70,7 @@ class QasmBuilder(FileBuilder):
             print("Warning (QasmBuilder): built qasm has unclosed scope, string will fail compile in native")
         qasm_code = self.qasm_header
         for import_line in self.imports:
-            qasm_code += f"include {import_line};\n"
+            qasm_code += f"include \"{import_line}\";\n"
         
         circuit_def = f"qubit[{int(self.qubits)}] qb;\n"
         if self.clbits > 0:

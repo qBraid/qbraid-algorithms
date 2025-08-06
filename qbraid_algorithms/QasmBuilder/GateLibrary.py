@@ -20,7 +20,8 @@ class GateLibrary:
         self.program = program_append
         self.builder = builder
         self.annotated = annotated
-        self.gate_mod = ""
+        self.prefix = ""
+        self.call_space = "qb[{}]"
         self.name = "GATE_LIB"
 
     def call_gate(self,gate,target,controls=None,phases=None,prefix =""):
@@ -40,12 +41,12 @@ class GateLibrary:
         if controls is not None:
             if isinstance(controls,list):
                 for control in controls:
-                    call += f" qb[{control}],"
+                    call += self.call_space.format(control)
             else:
-                call += f" qb[{controls}],"
+                call += self.call_space.format(controls)
             
-        call += f" qb[{target}];"
-        self.program(self.gate_mod + call)
+        call += self.call_space.format(target) + ";"
+        self.program(self.prefix + call)
 
         
     def measure(self,qubits:list,clbits:list):
@@ -102,14 +103,14 @@ class GateLibrary:
     def begin_gate(self, name, qargs, params=None):
         if name in self.gate_ref:
             print(f"warning: gate {name} replacing existing namespace")
-        call = f"gate {name}{"("+str(params)[1:-1]+")" if params is not None else ""} {str(qargs)[1:-1]}" +"{"
+        call = f"gate {name}{"("+str(params)[1:-1]+")" if params is not None else ""} {",".join(qargs)}" +"{"
         self.program(call)
         self.builder.scope += 1
     
     def begin_subroutine(self,name, parameters:list[str], return_type=None):
         if name in self.gate_ref:
             print(f"warning:  gate {name} replacing existing namespace")
-        call = f"def {name}({str(parameters)[1:-1]}) -> {return_type if return_type is not None else ""}" + "{"
+        call = f"def {name}({",".join(parameters)}) -> {return_type if return_type is not None else ""}" + "{"
         self.program(call)
         self.builder.scope += 1
 
@@ -130,9 +131,9 @@ class GateLibrary:
         if isinstance(gate_call,str):
             self.call_gate(gate_call,*params,prefix=f"ctrl{'' if n==0 else f'({n})'} @")
         else:
-            self.gate_mod = f"ctrl{'' if n<2 else f'({n})'} @ "
+            self.prefix = f"ctrl{'' if n<2 else f'({n})'} @ "
             gate_call(*params)
-            self.gate_mod = ""
+            self.prefix = ""
     def add_gate(self,name: str,gate_def: str):
         self.gate_defs[name] = gate_def
         self.gate_ref.append(name)
@@ -140,9 +141,9 @@ class GateLibrary:
 
 class std_gates(GateLibrary):
     gates = ["phase","x","y","z","h","s","sdg","sx",'cx','cy','cz','cphase','crx','cry','crz','swap','ccx','cswap']
-    name = 'std_gates.inc'
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
+        self.name = 'std_gates.inc'
         if self.name not in self.gate_import:
             self.gate_import.append(self.name)
         for gate in std_gates.gates:
