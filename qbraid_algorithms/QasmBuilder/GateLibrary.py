@@ -1,169 +1,367 @@
-# Copyright 2025 qBraid
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+"""
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           QUANTUM GATE LIBRARY                               ║
+║                                                                              ║
+║  A comprehensive library for building quantum circuits using OpenQASM 3.0    ║
+║  syntax. Provides high-level interfaces for quantum gates, measurements,     ║
+║  control flow, and circuit composition.                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+"""
 
 class GateLibrary:
-    def __init__(self, gate_import, gate_ref, gate_defs, program_append,builder,annotated=False):
-        self.gate_import = gate_import
-        self.gate_ref = gate_ref
-        self.gate_defs = gate_defs
-        self.program = program_append
-        self.builder = builder
-        self.annotated = annotated
-        self.prefix = ""
+    """
+                                BASE GATE LIBRARY                            
+                                                                              
+     Core class for quantum gate operations and circuit building.            
+     Provides fundamental operations for:                                     
+     • Gate application with controls and phases                             
+     • Measurements and classical bit operations                             
+     • Control flow (loops, conditionals)                                    
+     • Gate and subroutine definitions                                       
+     • Code generation and scope management                                  
+    
+    """
+    
+    def __init__(self, gate_import, gate_ref, gate_defs, program_append, builder, annotated=False):
+        """
+        Initialize the gate library with necessary components.
+        
+        Args:
+            gate_import: List of imported gate libraries
+            gate_ref: List of available gate names
+            gate_defs: Dictionary of gate definitions
+            program_append: Function to append code to the program
+            builder: Reference to the circuit builder
+            annotated: Whether to use annotated syntax
+        """
+        self.gate_import = gate_import      # Libraries to import
+        self.gate_ref = gate_ref           # Available gate names
+        self.gate_defs = gate_defs         # Gate definitions dictionary
+        self.program = program_append      # Function to append code
+        self.builder = builder             # Circuit builder reference
+        self.annotated = annotated         # Annotation flag
+        self.prefix = ""                   # Gate modifier (e.g., "ctrl @")
         self.call_space = "qb[{}]"
-        self.name = "GATE_LIB"
+        self.name = "GATE_LIB"            # Library identifier
 
-    def call_gate(self,gate,target,controls=None,phases=None,prefix =""):
+    def call_gate(self, gate, target, controls=None, phases=None, prefix=""):
+        """
+                                   GATE APPLICATION                           
+                                                                              
+         Apply a quantum gate with optional controls and phase parameters.    
+                                                                              
+         Format: [prefix][gate]([phases]) [controls...] [target];            
+        
+        
+        Args:
+            gate: Name of the gate to apply
+            target: Target qubit index
+            controls: Control qubit(s) - single int or list
+            phases: Phase parameter(s) - single value or list
+            prefix: Optional prefix (e.g., for controlled gates)
+        """
+        # Validate gate exists in current scope
         if gate not in self.gate_ref:
-            print(f"stdgates: gate {gate} is not part of visible scope, make sure that this isn't a floating reference / malformed statement, or is at least previously defined within untracked environment definitions")
-        call = prefix+str(gate) + ' '
+            print(f"stdgates: gate {gate} is not part of visible scope, "
+                  f"make sure that this isn't a floating reference / malformed statement, "
+                  f"or is at least previously defined within untracked environment definitions")
+        
+        # Build gate call string
+        call = prefix + str(gate)
+        
+        # Add phase parameters if provided
         if phases is not None:
             call += '('
-            if isinstance(phases,list):
-                call += phase[0]
+            if isinstance(phases, list):
+                call += str(phases[0])  # Fixed: was phase[0]
                 for phase in phases[1:]:
                     call += f",{phase}"
             else:
                 call += str(phases)
             call += ')'
-        
+        call += " "
+        # Add control qubits if provided
         if controls is not None:
-            if isinstance(controls,list):
+            if isinstance(controls, list):
                 for control in controls:
-                    call += self.call_space.format(control)
+                    call += self.call_space.format(control) + ","
+                    
             else:
-                call += self.call_space.format(controls)
-            
+                call += self.call_space.format(controls) + ','
+        
+        # Add target qubit and complete the statement
         call += self.call_space.format(target) + ";"
         self.program(self.prefix + call)
 
+    def measure(self, qubits: list, clbits: list):
+        """
+                                   MEASUREMENT                                
+                                                                              
+         Measure quantum bits and store results in classical bits.            
+                                                                              
+         Format: cb[{clbit_indices}] = measure qb[{qubit_indices}];           
         
-    def measure(self,qubits:list,clbits:list):
+        
+        Args:
+            qubits: List of qubit indices to measure
+            clbits: List of classical bit indices for storing results
+        """
+        # Format classical and quantum bit indices
         cindex = "cb[{" + str(clbits)[1:-1] + "}]"
         qindex = "qb[{" + str(qubits)[1:-1] + "}]"
         call = f"{cindex} = measure {qindex};"
         self.program(call)
 
-    def comment(self,line:str):
+    def comment(self, line: str):
+        """
+                                    COMMENTS                                  
+                                                                              
+         Add comments to the generated code for documentation.                
+         Supports both single-line (//) and multi-line (/* */) comments.     
+        
+        
+        Args:
+            line: Comment text (can contain newlines for multi-line)
+        """
         call = ""
         if "\n" in line:
-            call += "/*\n" + line +"\n*/"
+            # Multi-line comment
+            call += "/*\n" + line + "\n*/"
         else:
+            # Single-line comment
             call += "//" + line
         self.program(call)
-    
-    def begin_if(self,conditional: str):
-        call = f"if ({conditional})" +"{"
-        self.builder.scope += 1
+
+    def begin_if(self, conditional: str):
+        """
+                                 CONDITIONAL BLOCK                           
+                                                                              
+         Start a conditional execution block.                                 
+                                                                              
+         Format: if (condition) { ... }                                      
+        
+        
+        Args:
+            conditional: Boolean expression string
+        """
+        call = f"if ({conditional})" + "{"
+        self.builder.scope += 1  # Increase indentation level
         self.program(call)
 
-    def begin_loop(self, iter, id: str="i"):
-        if isinstance(iter,int):
+    def begin_loop(self, iter, id: str = "i"):
+        """
+                                     LOOPS                                    
+                                                                              
+         Start a loop block with various iteration patterns:                  
+         - int: for int i in [0:n]                                           
+         - (start, end): for int i in [start:end]                            
+         - (start, step, end): for int i in [start:end:step]                 
+         - string: custom loop syntax                                        
+        
+        Args:
+            iter: Loop specification (int, tuple, or string)
+            id: Loop variable identifier
+        """
+        if isinstance(iter, int):
+            # Simple range from 0 to iter
             base = "int"
-            dom = f"[0:{int(iter)}]"
-        elif isinstance(iter,tuple):
-            if len(iter) ==2:
-                if isinstance(iter[0],str):
+            dom = f"[0:{int(iter)-1}]"
+        elif isinstance(iter, tuple):
+            if len(iter) == 2:
+                if isinstance(iter[0], str):
+                    # Custom type and domain
                     base = iter[0]
                     dom = iter[1]
                 else:
+                    # Range from start to end
                     base = "int"
                     dom = f"[{int(iter[0])}:{int(iter[1])}]"
             else:
-                if isinstance(iter[1],int):
+                # Range with step or custom float range
+                if isinstance(iter[1], int):
+                    # Integer range with step
                     base = "int"
                     dom = f"[{int(iter[0])}:{int(iter[2])}:{int(iter[1])}]"
                 else:
+                    # Float range with explicit values
                     base = "float"
                     r = int(iter[2])
-                    dom = "{" + str([iter[0]+float(i)/(r-1) for i in range(r)])[1:-1] + "}"
+                    dom = "{" + str([iter[0] + float(i)/(r-1) for i in range(r)])[1:-1] + "}"
         elif isinstance(iter, str):
-            call  = "for " + iter + "{"
+            # Custom loop syntax
+            call = "for " + iter + "{"
             self.program(call)
             self.builder.scope += 1
-            return 
+            return
         else:
             print(f"loop has improper parameterization with: {iter}")
             return
+        
         call = f"for {base} {id} in {dom} " + "{"
         self.program(call)
         self.builder.scope += 1
 
     def begin_gate(self, name, qargs, params=None):
+        """
+                                GATE DEFINITION                               
+                                                                              
+         Define a custom quantum gate.                                        
+                                                                              
+         Format: gate name(params) qargs { ... }                             
+        
+        Args:
+            name: Gate name
+            qargs: Quantum arguments (qubit parameters)
+            params: Optional classical parameters
+        """
         if name in self.gate_ref:
             print(f"warning: gate {name} replacing existing namespace")
         call = f"gate {name}{"("+str(params)[1:-1]+")" if params is not None else ""} {",".join(qargs)}" +"{"
         self.program(call)
         self.builder.scope += 1
-    
-    def begin_subroutine(self,name, parameters:list[str], return_type=None):
+
+
+    def begin_subroutine(self, name, parameters: list[str], return_type=None):
+        """
+                              SUBROUTINE DEFINITION                           
+                                                                              
+         Define a classical subroutine with optional return type.             
+                                                                              
+         Format: def name(parameters) -> return_type { ... }                  
+        
+        
+        Args:
+            name: Subroutine name
+            parameters: List of parameter names
+            return_type: Optional return type specification
+        """
         if name in self.gate_ref:
             print(f"warning:  gate {name} replacing existing namespace")
         call = f"def {name}({",".join(parameters)}) -> {return_type if return_type is not None else ""}" + "{"
         self.program(call)
         self.builder.scope += 1
 
-
     def close_scope(self):
+        """Close the current scope block and decrease indentation level."""
         self.builder.scope -= 1
         self.program("}")
 
     def end_if(self):
+        """End conditional block."""
         self.close_scope()
+
     def end_loop(self):
+        """End loop block."""
         self.close_scope()
+
     def end_gate(self):
+        """End gate definition block."""
         self.close_scope()
+
     def end_subroutine(self):
+        """End subroutine definition block."""
         self.close_scope()
-    def controlled_op(self,gate_call,params,n=1):
-        if isinstance(gate_call,str):
-            self.call_gate(gate_call,*params,prefix=f"ctrl{'' if n==0 else f'({n})'} @")
+
+    def controlled_op(self, gate_call, params, n=1):
+        """
+                                CONTROLLED OPERATIONS                         
+                                                                              
+         Apply gates with control qubits using the ctrl modifier.             
+                                                                              
+         Format: ctrl(n) @ gate_operation                                     
+        
+        
+        Args:
+            gate_call: Gate name (string) or gate function
+            params: Gate parameters
+            n: Number of control qubits
+        """
+        if isinstance(gate_call, str):
+            # Direct gate name - call with control prefix
+            self.call_gate(gate_call, *params, prefix=f"ctrl{'' if n == 0 else f'({n})'} @")
         else:
+            # Gate function - set modifier and call
             self.prefix = f"ctrl{'' if n<2 else f'({n})'} @ "
             gate_call(*params)
             self.prefix = ""
-    def add_gate(self,name: str,gate_def: str):
+
+    def add_gate(self, name: str, gate_def: str):
+        """
+        Add a custom gate definition to the library.
+        
+        Args:
+            name: Gate name
+            gate_def: Gate definition string
+        """
         self.gate_defs[name] = gate_def
         self.gate_ref.append(name)
 
 
 class std_gates(GateLibrary):
-    gates = ["phase","x","y","z","h","s","sdg","sx",'cx','cy','cz','cphase','crx','cry','crz','swap','ccx','cswap']
-    def __init__(self, *args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.name = 'std_gates.inc'
-        if self.name not in self.gate_import:
-            self.gate_import.append(self.name)
+    """
+    ╔══════════════════════════════════════════════════════════════════════════════╗
+    ║                           STANDARD GATES LIBRARY                             ║
+    ║                                                                              ║
+    ║  Implementation of std_lib quantum gates following OpenQASM 3.0 standards.   ║
+    ║                                                                              ║
+    ║  Available Gates:                                                            ║
+    ║  • Single-qubit: phase, x, y, z, h, s, sdg, sx                               ║
+    ║  • Two-qubit: cx, cy, cz, cp, crx, cry, crz, swap                        ║
+    ║  • Multi-qubit: ccx (Toffoli), cswap (Fredkin)                               ║
+    ╚══════════════════════════════════════════════════════════════════════════════╝
+    """
+    
+    # Standard gate set from OpenQASM 3.0 specification
+    gates = ["phase", "x", "y", "z", "h", "s", "sdg", "sx", 
+             'cx', 'cy', 'cz', 'cp', 'crx', 'cry', 'crz', 
+             'swap', 'ccx', 'cswap']
+    
+    name = 'std_gates.inc'  # Standard library file name
+    
+    def __init__(self, *args, **kwargs):
+        """Initialize standard gates library and register all gates."""
+        super().__init__(*args, **kwargs)
+        # Import standard gates library if not already imported
+        if std_gates.name not in self.gate_import:
+            self.gate_import.append(std_gates.name)
+        
+        # Register all standard gates
         for gate in std_gates.gates:
             if gate not in self.gate_ref:
                 self.gate_ref.append(gate)
 
+    # ═══════════════════════════════════════════════════════════════════════════
+    #                           SINGLE-QUBIT GATES
+    # ═══════════════════════════════════════════════════════════════════════════
 
-    def phase(self,theta,targ: int):
-        self.call_gate("phase",targ,phases=theta)
-    def x(self,targ: int):
-        self.call_gate('x',targ)
-    def y(self,targ: int):
-        self.call_gate('y',targ)
-    def z(self,targ: int):
-        self.call_gate('z',targ)
-    def h(self,targ: int):
-        self.call_gate('h',targ)
-    def s(self,targ: int):
-        self.call_gate('s',targ)
-    def sdg(self,targ: int):
-        self.call_gate('sdg',targ)
-    def sx(self,targ: int):
-        self.call_gate('sx',targ)
+    def phase(self, theta, targ: int):
+        """Apply phase gate: |0⟩→|0⟩, |1⟩→e^(iθ)|1⟩"""
+        self.call_gate("phase", targ, phases=theta)
+
+    def x(self, targ: int):
+        """Apply Pauli-X gate (bit flip): |0⟩→|1⟩, |1⟩→|0⟩"""
+        self.call_gate('x', targ)
+
+    def y(self, targ: int):
+        """Apply Pauli-Y gate: |0⟩→i|1⟩, |1⟩→-i|0⟩"""
+        self.call_gate('y', targ)
+
+    def z(self, targ: int):
+        """Apply Pauli-Z gate (phase flip): |0⟩→|0⟩, |1⟩→-|1⟩"""
+        self.call_gate('z', targ)
+
+    def h(self, targ: int):
+        """Apply Hadamard gate: creates superposition"""
+        self.call_gate('h', targ)
+
+    def s(self, targ: int):
+        """Apply S gate (phase): |1⟩→i|1⟩"""
+        self.call_gate('s', targ)
+
+    def sdg(self, targ: int):
+        """Apply S-dagger gate (inverse phase): |1⟩→-i|1⟩"""
+        self.call_gate('sdg', targ)
+
+    def sx(self, targ: int):
+        """Apply square root of X gate"""
+        self.call_gate('sx', targ)

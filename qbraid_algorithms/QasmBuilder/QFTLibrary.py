@@ -20,7 +20,7 @@ class QFTLibrary(GateLibrary):
     name = "QFT"
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.call_space = "{},"
+        # self.call_space = "{}"
 
     def QFT(self, qubits:list, swap=True):
         name = f'QFT{len(qubits)}{'S' if swap else ''}'
@@ -33,12 +33,11 @@ class QFTLibrary(GateLibrary):
         qargs = [names[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits))]
 
         std.begin_gate(name,qargs)
-        std.call_space = " {} "
+        std.call_space = "{}"
         for i in range(len(qubits)):
             std.h(names[i+1])
-
             for j in range(i+1,len(qubits)):
-                std.call_gate("cphase",names[j+1],controls=names[i+1],phases=f"pi>>({j-i})")
+                std.call_gate("cp",names[j+1],controls=names[i+1],phases=f"pi/{2**(j-i)}")
     
         std.end_gate()
 

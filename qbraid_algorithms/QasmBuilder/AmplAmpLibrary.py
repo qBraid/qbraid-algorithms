@@ -48,5 +48,18 @@ class AALibrary(GateLibrary):
             [sys.h(i) for i in name[1:len(qubits)+1]]
         std.end_gate()
 
+        
+        p, i, d = sys.build()
+        for imps in i:
+            if imps not in self.gate_import:
+                self.gate_import.append(imps)
+            
+        for defs in d:
+            if defs[0] not in self.gate_defs:
+                self.gate_defs[defs[0]] = defs[1]
+        self.gate_defs[name] = p
+        self.gate_ref.append(name)
+        self.call_gate(name,qubits[-1],qubits[:-1])
+
 
 
