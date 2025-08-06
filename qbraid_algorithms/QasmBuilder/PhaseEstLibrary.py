@@ -35,7 +35,7 @@ class PhaseEstimationLibrary(GateLibrary):
         std.begin_subroutine(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
         for i in range(len(spectra)):
             for _ in range(2**i):
-                qft.controlled_op(ham.QFT,[qubits,spectra[i]])
+                qft.controlled_op(ham.apply,[qubits,spectra[i]])
         qft.QFT(spectra)
         std.end_subroutine()
         p, i, d = sys.build()
