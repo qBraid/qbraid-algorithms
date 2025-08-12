@@ -56,9 +56,70 @@ import qbraid_algorithms
 qbraid_algorithms.__version__
 ```
 
+## Key Features: Load algorithms as PyQASM modules and QASM files
+
+qBraid Algorithms provides a collection of quantum algorithms that can be loaded
+as [PyQASM](https://docs.qbraid.com/pyqasm/user-guide/overview) modules, or
+you can generate .qasm files to use them as subroutines in your own circuits.
+
+### Loading Algorithms as PyQASM Modules
+
+To load an algorithm as a PyQASM module, use the `load_algorithm` function from the `qbraid_algorithms` package, passing algorithm-specific parameters. For example, to load the Quantum Fourier Transform (QFT) algorithm:
+
+```python
+from qbraid_algorithms import qft
+
+qft_module = qft.load_algorithm(3) # Load QFT for 3 qubits
+```
+
+Now, you can perform operations with the PyQASM module, such as unrolling, and
+converting back to a QASM string:
+
+```python
+qft_module.unroll()
+qasm_str = pyqasm.dumps(qft_module)
+```
+
+### Loading Algorithms as .qasm Files
+
+In order to utilize algorithms as subroutines in your own circuits, use the
+`generate_subroutine` function for your desired algorithm. By passing algorithm-specific parameters, and optionally a desired output path, you can
+generate a .qasm file containing a subroutine for the paramterized circuit. For
+example, to generate a QFT subroutine for 4 qubits:
+
+```python
+from qbraid_algorithms import qft, iqft
+path = "path/to/output" # Specify your desired output path
+qft.generate_subroutine(4) # Generate 4-qubit QFT in the current directory
+iqft.generate_subroutine(4, path=path) # Generate 4-qubit IQFT in specified path
+
+```
+
+To utilize the generated subroutine in your own circuit, include the generated
+.qasm file, and call the subroutine on an qubit register of the size specified
+when generating the subroutine. For example, after running
+
+```python
+qft.generate_subroutine(4)
+```
+
+you can append `include "qft.qasm";` to your OpenQASM file, and call the
+subroutine. For example:
+
+```qasm
+OPENQASM 3.0;
+include "qft.qasm";
+
+qubit[4] q;
+bit[4] c;
+
+qft(q);
+measure q -> c;
+```
+
 ## CLI Usage
 
-qbraid-algorithms includes a command-line interface (CLI) for generating quantum algorithm subroutines.
+qBraid Algorithms includes a command-line interface (CLI) for generating quantum algorithm subroutines.
 
 ### Installation
 
@@ -125,8 +186,6 @@ qbraid-algorithms generate bernvaz --help
    qbraid-algorithms generate iqft --qubits 4 --output my_iqft_4.qasm --show
    ```
 
-```
-
 ## Community
 
 **We are actively looking for new contributors!**
@@ -138,13 +197,4 @@ qbraid-algorithms generate bernvaz --help
 - For questions that are more suited for a forum, post to [Stack Exchange](https://quantumcomputing.stackexchange.com/) with the [`qbraid`](https://quantumcomputing.stackexchange.com/questions/tagged/qbraid) tag.
 - By participating, you are expected to uphold our [code of conduct](CODE_OF_CONDUCT).
 
-## Acknowledgements
-
-This project was conceived in cooperation with the Quantum Open Source Foundation ([QOSF](https://qosf.org/)).
-
-<a href="https://qosf.org/"><img src="https://qbraid-static.s3.amazonaws.com/logos/qosf.png" width="100px" style="vertical-align: middle;" /></a>
-
-## License
-
 [Apache-2.0 License](LICENSE)
-```

@@ -51,7 +51,7 @@
       <span style="color:#808080"> | algorithms</span>
    </h1>
    <p style="text-align:center;font-style:italic;color:#808080">
-      Build hybrid quantum-classical algorithms with qBraid.
+      Use and build quantum algorithms with qBraid.
    </p>
    </body>
    </html>
@@ -63,7 +63,7 @@
 Overview
 ---------
 
-Python package for building, simulating, and benchmarking hybrid quantum-classical algorithms.
+Python package for utilizing, implementing, and building quantum algorithms in OpenQASM 3.
 
 
 Installation
@@ -91,8 +91,8 @@ You can also install from source by cloning this repository and running a pip in
 Resources
 ----------
 
-- `User Guide <https://docs.qbraid.com/sdk/user-guide>`_
-- `Example Notebooks <https://github.com/qBraid/qbraid-lab-demo>`_
+- `User Guide <https://docs.qbraid.com/qbraid-algorithms/user-guide/overview>`_
+- `Example Notebooks <https://github.com/qBraid/qbraid-algorithms/tree/main/examples>`_
 - `API Reference <https://qbraid.github.io/qBraid/api/qbraid_algorithms.html>`_
 - `Source Code <https://github.com/qBraid/qbraid-algorithms>`_
 
