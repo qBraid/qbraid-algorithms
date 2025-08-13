@@ -15,4 +15,17 @@
 from GateLibrary import GateLibrary, std_gates
 from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
 from QFTLibrary import QFTLibrary
+from PhaseEstLibrary import PhaseEstimationLibrary
 import string
+
+def HHLLibrary(PhaseEstimation):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+    def HHL(self,a,b,clock):
+        sys = self.builder
+        A = sys.import_library(a)
+        P = sys.import_library(PhaseEstimationLibrary)
+        P.phase_estimation(b,clock,a)
+        # todo: make the lambda scaling/ U invert
+        P.inverse_op(P.namem)

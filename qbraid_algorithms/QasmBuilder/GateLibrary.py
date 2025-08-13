@@ -284,6 +284,29 @@ class GateLibrary:
             self.prefix = f"ctrl{'' if n<2 else f'({n})'} @ "
             gate_call(*params)
             self.prefix = ""
+    
+    def inverse_op(self, gate_call, params):
+        """
+                                INVERSE OPERATIONS                         
+                                                                              
+         Apply gates with control qubits using the ctrl modifier.             
+                                                                              
+         Format: inv @ gate_operation                                     
+        
+        
+        Args:
+            gate_call: Gate name (string) or gate function
+            params: Gate parameters
+            n: Number of control qubits
+        """
+        if isinstance(gate_call, str):
+            # Direct gate name - call with control prefix
+            self.call_gate(gate_call, *params, prefix=f"inv @")
+        else:
+            # Gate function - set modifier and call
+            self.prefix = f"inv @ "
+            gate_call(*params)
+            self.prefix = ""
 
     def add_gate(self, name: str, gate_def: str):
         """
