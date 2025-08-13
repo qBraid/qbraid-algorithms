@@ -17,7 +17,9 @@ Module containing utility functions for algorithm implementation.
 
 """
 import re
+import pyqasm
 from pathlib import Path
+from pyqasm.modules.base import QasmModule
 
 
 def _replace_vars(qasm_str: str, replacements: dict[str, str]) -> str:

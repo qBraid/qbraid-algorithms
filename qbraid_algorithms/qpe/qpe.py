@@ -24,6 +24,7 @@ from pathlib import Path
 
 
 from openqasm3 import dumps
+from qbraid_algorithms import iqft
 from openqasm3.ast import QuantumGateDefinition
 from pyqasm.modules.base import QasmModule
 from qbraid_algorithms.utils import _prep_qasm_file
@@ -52,8 +53,9 @@ def load_program(
     qpe_sub_dst = os.path.join(temp_dir, "qpe_subroutine.qasm")
     shutil.copy(qpe_src, qpe_dst)
     shutil.copy(qpe_sub_src, qpe_sub_dst)
+    iqft.generate_subroutine(num_qubits, quiet=True, path=temp_dir)
     # Get the string defining the custom gate and its controlled version
-    custom_gate_str = get_unitary(unitary_filepath)
+    custom_gate_str = _get_unitary(unitary_filepath)
     # do the temporary file thing
     replacements = {"QPE_SIZE": str(num_qubits), "CUSTOM_GATE_DEFS": custom_gate_str}
     if not include_measurement:
@@ -94,9 +96,9 @@ def generate_subroutine(
     else:
         qpe_dst = os.path.join(path, "qpe.qasm")
     shutil.copy(qpe_src, qpe_dst)
-
+    iqft.generate_subroutine(num_qubits, quiet=True, path=path)
     # Get the string defining the custom gate and its controlled version
-    custom_gate_str = get_unitary(unitary_filepath)
+    custom_gate_str = _get_unitary(unitary_filepath)
     # Replace variable placeholders with user-defined parameters
     replacements = {"QPE_SIZE": str(num_qubits), "CUSTOM_GATE_DEFS": custom_gate_str}
     _prep_qasm_file(qpe_dst, replacements)
@@ -104,7 +106,32 @@ def generate_subroutine(
         print(f"Subroutine 'qpe' has been added to {qpe_dst}")
 
 
-def get_unitary(filepath: str) -> None:
+def get_eigenvalue(counts: dict[str, int]) -> float:
+    """
+    Extract the eigenvalue from Quantum Phase Estimation measurement counts.
+
+    This function processes the measurement results from a QPE circuit to extract
+    the estimated eigenvalue. It finds the most frequently measured bitstring,
+    converts it to a decimal value, and normalizes it to get the eigenvalue estimate.
+
+    Args:
+        counts (dict[str, int]): Dictionary mapping measurement outcomes (bitstrings)
+                                to their occurrence counts from the QPE circuit.
+
+    Returns:
+        float: The estimated eigenvalue as a fraction between 0 and 1.
+               This represents the phase φ where the eigenvalue is e^(2πiφ).
+    """
+    # Get most frequent bitstring from counts
+    bitstring = max(counts, key=counts.get)
+    # Convert the result bitstring into a decimal integer
+    decimal = int(bitstring, 2)
+    # Divide by 2^n to get the fractional phase estimate
+    result = decimal / (2 ** len(bitstring))
+    return result
+
+
+def _get_unitary(filepath: str) -> str:
     """
     Given a filepath to a qasm file defining a custom gate, create a controlled
     version of that gate, and return the combined string defing both the original gate

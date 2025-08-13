@@ -14,6 +14,14 @@
 """
 Tests for Inverse Quantum Fourier Transform (IQFT) algorithm implementation.
 """
+import pyqasm
+
+from pyqasm.modules.base import QasmModule
+from qbraid_algorithms import iqft
+from pathlib import Path
+from .local_device import LocalDevice
+
+RESOURCES_DIR = Path(__file__).parent / "resources" / "iqft"
 
 from pyqasm.modules.base import QasmModule
 from qbraid_algorithms import iqft
@@ -23,3 +31,247 @@ def test_load_program():
     iqft_module = iqft.load_program(3)
     assert isinstance(iqft_module, QasmModule)
     assert iqft_module.num_qubits == 3
+
+
+def test_valid_circuit_0():
+    # Single qubit QFT circuit should just be H gate
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate single qubit QFT circuit
+    iqft.generate_subroutine(1, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_0.qasm")
+    # delete the created subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+
+    expected_counts = { '0': 500, '1': 500 }
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
+
+def test_valid_circuit_1():
+    # Single qubit QFT circuit should just be H gate
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate single qubit QFT circuit
+    iqft.generate_subroutine(1, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_1.qasm")
+    # delete the created subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+
+    expected_counts = { '0': 500, '1': 500 }
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
+
+def test_valid_circuit_00():
+    # we want to take in some binary number as a state - ie |00>
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate two qubit QFT circuit
+    iqft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_00.qasm")
+    # delete the created subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+
+    expected_counts = { '00': 250, '01': 250, '10': 250,  '11': 250 }
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
+
+def test_valid_circuit_2qubit_superposition():
+    # we want to take in some binary number as a state - ie 2 = |10>
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate two qubit QFT circuit
+    iqft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_2qubit_superposn.qasm")
+    # delete the created subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+
+    expected_counts = { '00': 1000, '01': 10, '10': 10,  '11': 10 }
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
+
+
+
+def test_valid_circuit_000():
+    # we want to take in some binary number as a state - ie |000>
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate three qubit QFT circuit
+    iqft.generate_subroutine(3, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_000.qasm")
+    # delete the created subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+    value = shots / 8
+    expected_counts = { 
+        '000': value,
+        '001': value,
+        '010': value,
+        '011': value,
+        '100': value,
+        '101': value,
+        '110': value,
+        '111': value
+    }
+
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
+
+def test_valid_circuit_010():
+    # we want to take in some binary number as a state - ie |010>
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate three qubit QFT circuit
+    iqft.generate_subroutine(3, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_010.qasm")
+    # delete the create
+    # d subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+    value = shots / 8
+    expected_counts = { 
+        '000': value,
+        '001': value,
+        '010': value,
+        '011': value,
+        '100': value,
+        '101': value,
+        '110': value,
+        '111': value
+    }
+
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
+
+def test_valid_circuit_001():
+    # we want to take in some binary number as a state - ie |001>
+    device = LocalDevice()
+    
+    # Clean up any existing iqft.qasm file from previous tests
+    iqft_file = RESOURCES_DIR / "iqft.qasm"
+    if iqft_file.exists():
+        iqft_file.unlink()
+    
+    # generate three qubit QFT circuit
+    iqft.generate_subroutine(3, path=RESOURCES_DIR, quiet=True)
+    program = pyqasm.load(f"{RESOURCES_DIR}/iqft_001.qasm")
+    # delete the created subroutine file
+    (RESOURCES_DIR / "iqft.qasm").unlink()
+    # Unrolling is necessary for proper execution
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    shots = 1000
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+    value = shots / 8
+    expected_counts = { 
+        '000': value,
+        '001': value,
+        '010': value,
+        '011': value,
+        '100': value,
+        '101': value,
+        '110': value,
+        '111': value
+    }
+
+    tolerance = 0.1
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper

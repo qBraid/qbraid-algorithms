@@ -23,10 +23,11 @@ Functions
 
     load_program
     generate_subroutine
+    get_eigenvalue
 
 
 """
 
-from .qpe import load_program, generate_subroutine
+from .qpe import load_program, generate_subroutine, get_eigenvalue
 
-__all__ = ["load_program", "generate_subroutine"]
+__all__ = ["load_program", "generate_subroutine", "get_eigenvalue"]
