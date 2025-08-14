@@ -19,19 +19,22 @@ Module providing Quantum Phase Estimation algorithm implementation.
 import os
 import tempfile
 import shutil
-import pyqasm
 from pathlib import Path
 
-
+import pyqasm
 from openqasm3 import dumps
-from qbraid_algorithms import iqft
 from openqasm3.ast import QuantumGateDefinition
 from pyqasm.modules.base import QasmModule
+
+from qbraid_algorithms import iqft
 from qbraid_algorithms.utils import _prep_qasm_file
 
 
 def load_program(
-    unitary_filepath: str, num_qubits: int = 4, include_measurement=True
+    unitary_filepath: str,
+    psi_filepath: str,
+    num_qubits: int = 4,
+    include_measurement=True,
 ) -> QasmModule:
     """
     Load the Quantum Phase Estimation (QPE) program as a pyqasm module.
@@ -41,6 +44,10 @@ def load_program(
             Number of qubits to use for the phase estimation register.
         unitary_filepath : str
             Path to a qasm file defining the unitary gate U.
+        psi_filepath : str
+            Path to a qasm file defining the eigenstate preparation gate.
+        include_measurement : bool
+            If True, includes measurement operations in the returned QPE circuit.
 
     Returns:
         (PyQasm Module) pyqasm module containing the QPE circuit
@@ -56,8 +63,13 @@ def load_program(
     iqft.generate_subroutine(num_qubits, quiet=True, path=temp_dir)
     # Get the string defining the custom gate and its controlled version
     custom_gate_str = _get_unitary(unitary_filepath)
-    # do the temporary file thing
-    replacements = {"QPE_SIZE": str(num_qubits), "CUSTOM_GATE_DEFS": custom_gate_str}
+    # Get the string defining the eigenstate preparation gate
+    psi = "" if psi_filepath is None else _get_psi(psi_filepath)
+    replacements = {
+        "QPE_SIZE": str(num_qubits),
+        "CUSTOM_GATE_DEFS": custom_gate_str,
+        "PREP_EIGENSTATE": psi,
+    }
     if not include_measurement:
         replacements["b = measure q;"] = ""  # remove measurement line
 
@@ -75,7 +87,6 @@ def generate_subroutine(
 ) -> None:
     """
     Creates a QPE subroutine module with user-defined unitary and number of qubits.
-
 
     Args:
         unitary_filepath : str
@@ -106,7 +117,7 @@ def generate_subroutine(
         print(f"Subroutine 'qpe' has been added to {qpe_dst}")
 
 
-def get_eigenvalue(counts: dict[str, int]) -> float:
+def get_result(counts: dict[str, int]) -> float:
     """
     Extract the eigenvalue from Quantum Phase Estimation measurement counts.
 
@@ -148,7 +159,7 @@ def _get_unitary(filepath: str) -> str:
     """
     module = pyqasm.load(filepath)
     # We assume the first custom gate definition is U
-    statements = module._statements
+    statements = module._statements  # pylint: disable=protected-access
     gate_defs = [s for s in statements if isinstance(s, QuantumGateDefinition)]
     if not gate_defs:
         raise ValueError("No gate definitions found in the provided QASM file.")
@@ -162,3 +173,29 @@ def _get_unitary(filepath: str) -> str:
     combined = gate_str + "\n" + c_u
 
     return combined
+
+
+def _get_psi(filepath: str) -> str:
+    """
+    Given a filepath to a qasm file defining a custom gate to prepare the eigenstate,
+    return the string defining that gate.
+
+    Parameters:
+    filepath : str
+        Path to the qasm file defining the custom gate.
+
+    Returns: str
+        QASM string defining the eigenstate preparation gate.
+    """
+    module = pyqasm.load(filepath)
+    # We assume the first custom gate definition is the eigenstate prep gate
+    statements = module._statements  # pylint: disable=protected-access
+    gate_defs = [s for s in statements if isinstance(s, QuantumGateDefinition)]
+    if not gate_defs:
+        raise ValueError("No gate definitions found in the provided QASM file.")
+    # Assume the first gate definition is the eigenstate prep gate
+    prep_gate = gate_defs[0]
+    # replace gate name with "prep_eigenstate"
+    prep_gate.name.name = "prep_eigenstate"
+    gate_str = dumps(prep_gate)
+    return gate_str

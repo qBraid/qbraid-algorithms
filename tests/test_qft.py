@@ -14,14 +14,32 @@
 """
 Tests for Quantum Fourier Transform (QFT) algorithm implementation.
 """
-import pyqasm
-
-from pyqasm.modules.base import QasmModule
-from qbraid_algorithms import qft, iqft
+# pylint: disable=missing-function-docstring,too-many-locals,duplicate-code
 from pathlib import Path
+
+import pyqasm
+from pyqasm.modules.base import QasmModule
+
+from qbraid_algorithms import qft, iqft
 from .local_device import LocalDevice
 
 RESOURCES_DIR = Path(__file__).parent / "resources" / "qft"
+
+
+def _run_circuit_and_check_counts(device, program_path, expected_counts, shots=1000, tolerance=0.1):
+    """Helper function to run a circuit and check the measurement counts."""
+    program = pyqasm.load(program_path)
+    program.unroll()
+    program_str = pyqasm.dumps(program)
+    result = device.run(program_str, shots=shots)
+    counts = result.data.get_counts()
+
+    error = tolerance * shots
+    for state, count in counts.items():
+        expected = expected_counts[state]
+        lower = expected - error
+        upper = expected + error
+        assert lower <= count <= upper
 
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
@@ -31,7 +49,8 @@ def test_load_program():
 
 def test_generate_subroutine():
     """Placeholder test for QFT generate_subroutine (to be implemented)."""
-    pass
+    # TODO: Implement this test
+    assert True  # Placeholder assertion
 
 
 def test_valid_circuit_0():
@@ -40,7 +59,7 @@ def test_valid_circuit_0():
     qft_file = RESOURCES_DIR / "qft.qasm"
     if qft_file.exists():
         qft_file.unlink()
-        
+
     # Single qubit QFT circuit should just be H gate
     device = LocalDevice()
     # generate single qubit QFT circuit
@@ -70,7 +89,7 @@ def test_valid_circuit_1():
     qft_file = RESOURCES_DIR / "qft.qasm"
     if qft_file.exists():
         qft_file.unlink()
-        
+
     # Single qubit QFT circuit should just be H gate
     device = LocalDevice()
     # generate single qubit QFT circuit
@@ -145,8 +164,6 @@ def test_valid_circuit_2qubit_superposition():
         assert lower <= count <= upper
 
 
-
-
 def test_valid_circuit_01():
     """Test 2-qubit QFT on |01> gives ~uniform distribution after transform."""
     # we want to take in some binary number as a state - ie |01>
@@ -188,7 +205,7 @@ def test_valid_circuit_000():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
     value = shots / 8
-    expected_counts = { 
+    expected_counts = {
         '000': value,
         '001': value,
         '010': value,
@@ -223,7 +240,7 @@ def test_valid_circuit_010():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
     value = shots / 8
-    expected_counts = { 
+    expected_counts = {
         '000': value,
         '001': value,
         '010': value,
@@ -258,7 +275,7 @@ def test_valid_circuit_001():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
     value = 1000 / 8
-    expected_counts = { 
+    expected_counts = {
         '000': value,
         '001': value,
         '010': value,
@@ -278,8 +295,8 @@ def test_valid_circuit_001():
         assert lower <= count <= upper
 
 def test_undo_iqft_00():
-    """Test that QFT followed by IQFT on |00> returns original state |00>."""
-    """
+    """Test that QFT followed by IQFT on |00> returns original state |00>.
+
     Undo IQFT using QFT
     """
     device = LocalDevice()
@@ -312,8 +329,8 @@ def test_undo_iqft_00():
 
 
 def test_undo_iqft_superposition():
-    """Test that QFT then IQFT on equal superposition returns superposition."""
-    """
+    """Test that QFT then IQFT on equal superposition returns superposition.
+
     Undo IQFT using QFT
     """
     device = LocalDevice()

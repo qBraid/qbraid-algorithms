@@ -51,11 +51,17 @@ class LocalDevice(QuantumDevice):
         """Transform a circuit for the local device."""
         return transpile(run_input, self.aer_simulator)
 
-    def submit(self, program: QuantumCircuit | list[QuantumCircuit], shots: int = 1024, noise_model=None, **kwargs) -> Result:
+    def submit(
+        self,
+        run_input: QuantumCircuit | list[QuantumCircuit],
+        *args,
+        shots: int = 1024,
+        **kwargs
+    ) -> Result:
         """Run a program on the local device."""
-        job = self.aer_simulator.run(program, shots=shots, **kwargs)
+        job = self.aer_simulator.run(run_input, shots=shots, **kwargs)
         result: qiskit.result.Result = job.result()
-        counts = result.get_counts(program)
+        counts = result.get_counts(run_input)
         return Result(
             device_id=self.id,
             job_id=job.job_id(),
@@ -65,4 +71,3 @@ class LocalDevice(QuantumDevice):
             ),
             **kwargs,
         )
-

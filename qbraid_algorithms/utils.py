@@ -17,9 +17,7 @@ Module containing utility functions for algorithm implementation.
 
 """
 import re
-import pyqasm
 from pathlib import Path
-from pyqasm.modules.base import QasmModule
 
 
 def _replace_vars(qasm_str: str, replacements: dict[str, str]) -> str:
@@ -56,3 +54,18 @@ def _prep_qasm_file(path: str, replacements: dict[str, str]) -> None:
     qasm_str = qasm_path.read_text(encoding="utf-8")
     qasm_str = _replace_vars(qasm_str, replacements)
     qasm_path.write_text(qasm_str, encoding="utf-8")
+
+
+def get_max_count(counts: dict[str, int]) -> tuple[str, int]:
+    """
+    Get the bitstring with the maximum count from a counts dictionary.
+
+    Args:
+        counts (dict[str, int]): A dictionary mapping bitstrings to their counts.
+
+    Returns:
+        tuple[str, int]: The bitstring with the maximum count and its count.
+    """
+    max_bitstring = max(counts, key=counts.get)
+    max_count = counts[max_bitstring]
+    return max_bitstring, max_count

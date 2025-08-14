@@ -15,10 +15,11 @@
 Tests for Bernstein-Vazirani algorithm implementation.
 """
 import tempfile
-import pyqasm
 from pathlib import Path
 
+import pyqasm
 from pyqasm.modules.base import QasmModule
+
 from qbraid_algorithms import bernstein_vazirani as bv
 from qbraid_algorithms.utils import get_max_count
 from .local_device import LocalDevice

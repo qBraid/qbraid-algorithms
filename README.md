@@ -151,6 +151,12 @@ qbraid-algorithms generate bernvaz --secret "101" --show
 
 # Generate only the oracle for Bernstein-Vazirani
 qbraid-algorithms generate bernvaz -s "1001" --oracle-only --show
+
+# Generate QPE subroutine for 4 qubits with a custom unitary gate
+qbraid-algorithms generate qpe --unitary-file my_gate.qasm --qubits 4
+
+# Generate QPE with custom output and show the circuit
+qbraid-algorithms generate qpe -u gate.qasm -q 3 -o my_qpe.qasm --show
 ```
 
 ### Help
@@ -162,6 +168,8 @@ qbraid-algorithms --help
 qbraid-algorithms generate --help
 qbraid-algorithms generate qft --help
 qbraid-algorithms generate iqft --help
+qbraid-algorithms generate bernvaz --help
+qbraid-algorithms generate qpe --help
 qbraid-algorithms generate bernvaz --help
 ```
 
@@ -182,8 +190,14 @@ qbraid-algorithms generate bernvaz --help
    ```
 
 3. Generate an IQFT circuit with custom output:
+
    ```bash
    qbraid-algorithms generate iqft --qubits 4 --output my_iqft_4.qasm --show
+   ```
+
+4. Generate a QPE subroutine for phase estimation:
+   ```bash
+   qbraid-algorithms generate qpe --unitary-file t_gate.qasm --qubits 3 --show
    ```
 
 ## Community

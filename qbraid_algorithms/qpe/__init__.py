@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Fourier Transform (QFT) algorithm implementation.
+Module providing Quantum Phase Estimation (QPE) algorithm implementation.
 
 Functions
 ----------
@@ -23,11 +23,11 @@ Functions
 
     load_program
     generate_subroutine
-    get_eigenvalue
+    get_result
 
 
 """
 
-from .qpe import load_program, generate_subroutine, get_eigenvalue
+from .qpe import load_program, generate_subroutine, get_result
 
-__all__ = ["load_program", "generate_subroutine", "get_eigenvalue"]
+__all__ = ["load_program", "generate_subroutine", "get_result"]

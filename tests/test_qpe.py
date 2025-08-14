@@ -14,11 +14,12 @@
 """
 Tests for Quantum Phase Estimation (QPE) algorithm implementation.
 """
-import pyqasm
-
-from pyqasm.modules.base import QasmModule
-from qbraid_algorithms import qpe
 from pathlib import Path
+
+import pyqasm
+from pyqasm.modules.base import QasmModule
+
+from qbraid_algorithms import qpe
 from .local_device import LocalDevice
 
 RESOURCE_DIR = Path(__file__).parent / "resources" / "qpe"
@@ -27,10 +28,10 @@ def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
     qpe_module = qpe.load_program(
         unitary_filepath = f"{RESOURCE_DIR}/t.qasm",
+        psi_filepath = f"{RESOURCE_DIR}/prepare_state.qasm",
         num_qubits = 3,
     )
     assert isinstance(qpe_module, QasmModule)
-    #assert qpe_module.num_qubits == 3
 
 def test_valid_circuit_r_3pi4():
     """Test QPE with r_3pi4 unitary."""
@@ -38,7 +39,6 @@ def test_valid_circuit_r_3pi4():
     qpe_file = RESOURCE_DIR / "qpe.qasm"
     if qpe_file.exists():
         qpe_file.unlink()
-    
     device = LocalDevice()
     qpe.generate_subroutine(
         unitary_filepath = f"{RESOURCE_DIR}/r_3pi4.qasm",
@@ -50,14 +50,12 @@ def test_valid_circuit_r_3pi4():
     # delete the created subroutine file
     (RESOURCE_DIR / "qpe.qasm").unlink()
     # Unrolling is necessary for proper execution
-    print(pyqasm.dumps(program))
     program.unroll()
     program_str = pyqasm.dumps(program)
     result = device.run(program_str, shots=10000)
     counts = result.data.get_counts()
-    print(counts)
-    result = qpe.get_eigenvalue(counts)
-    expected = (3 / 8)
+    result = qpe.get_result(counts)
+    expected = 3 / 8
     assert result == expected
 
 
@@ -67,11 +65,9 @@ def test_valid_circuit_t():
     qpe_file = RESOURCE_DIR / "qpe.qasm"
     if qpe_file.exists():
         qpe_file.unlink()
-
     iqft_file = RESOURCE_DIR / "iqft.qasm"
     if iqft_file.exists():
         iqft_file.unlink()
-    
     device = LocalDevice()
     qpe.generate_subroutine(
         unitary_filepath = f"{RESOURCE_DIR}/t.qasm",
@@ -84,16 +80,15 @@ def test_valid_circuit_t():
     (RESOURCE_DIR / "qpe.qasm").unlink()
     # delete the created iqft file
     (RESOURCE_DIR / "iqft.qasm").unlink()
-    print(pyqasm.dumps(program))
     # Unrolling is necessary for proper execution
     program.unroll()
     program_str = pyqasm.dumps(program)
     result = device.run(program_str, shots=10000)
     counts = result.data.get_counts()
-    result = qpe.get_eigenvalue(counts)
-    print(counts)
-    expected = (1 / 8)
+    result = qpe.get_result(counts)
+    expected = 1 / 8
     assert result == expected
+
 
 def test_valid_circuit_z():
     """Test QPE with Z gate."""
@@ -101,11 +96,9 @@ def test_valid_circuit_z():
     qpe_file = RESOURCE_DIR / "qpe.qasm"
     if qpe_file.exists():
         qpe_file.unlink()
-
     iqft_file = RESOURCE_DIR / "iqft.qasm"
     if iqft_file.exists():
         iqft_file.unlink()
-    
     device = LocalDevice()
     qpe.generate_subroutine(
         unitary_filepath = f"{RESOURCE_DIR}/z.qasm",
@@ -118,13 +111,11 @@ def test_valid_circuit_z():
     (RESOURCE_DIR / "qpe.qasm").unlink()
     # delete the created iqft file
     (RESOURCE_DIR / "iqft.qasm").unlink()
-    print(pyqasm.dumps(program))
     # Unrolling is necessary for proper execution
     program.unroll()
     program_str = pyqasm.dumps(program)
     result = device.run(program_str, shots=10000)
     counts = result.data.get_counts()
-    result = qpe.get_eigenvalue(counts)
-    print(counts)
+    result = qpe.get_result(counts)
     expected = 0.5
     assert result == expected

@@ -186,6 +186,7 @@ def generate_bernvaz(
             help="Binary secret string for Bernstein-Vazirani algorithm.",
         ),
     ],
+    *,
     oracle_only: Annotated[
         bool,
         typer.Option(
@@ -230,11 +231,11 @@ def generate_bernvaz(
 
     # Set default filenames and gate names
     if oracle_only:
-        default_output = f"oracle.qasm"
+        default_output = "oracle.qasm"
         default_gate_name = f"bernvaz_oracle_{secret}"
         typer.echo(f"Generating Bernstein-Vazirani oracle for secret '{secret}'...")
     else:
-        default_output = f"bernvaz.qasm"
+        default_output = "bernvaz.qasm"
         default_gate_name = f"bernvaz_{secret}"
         typer.echo(f"Generating Bernstein-Vazirani circuit for secret '{secret}'...")
 
