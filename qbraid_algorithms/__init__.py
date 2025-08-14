@@ -25,7 +25,6 @@ Modules
 .. autosummary::
     :toctree: ../stubs/
 
-    bells_inequality
     bernstein_vazirani
     qft
     iqft
@@ -33,12 +32,11 @@ Modules
 
 """
 
-from . import bells_inequality, qft, iqft, bernstein_vazirani, qpe
+from . import qft, iqft, bernstein_vazirani, qpe
 from ._version import __version__
 
 __all__ = [
     "__version__",
-    "bells_inequality",
     "qft",
     "iqft",
     "bernstein_vazirani",

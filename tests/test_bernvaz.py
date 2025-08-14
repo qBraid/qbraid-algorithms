@@ -14,12 +14,65 @@
 """
 Tests for Bernstein-Vazirani algorithm implementation.
 """
+import tempfile
+import pyqasm
+from pathlib import Path
 
 from pyqasm.modules.base import QasmModule
 from qbraid_algorithms import bernstein_vazirani as bv
+from qbraid_algorithms.utils import get_max_count
+from .local_device import LocalDevice
 
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
     bv_module = bv.load_program("101")
     assert isinstance(bv_module, QasmModule)
     assert bv_module.num_qubits == 4 # 3 data qubits + 1 ancilla qubit
+
+
+def test_generate_subroutine():
+    """Test that generate_subroutine correctly generates the subroutine QASM."""
+    s = "101"
+    with tempfile.TemporaryDirectory() as test_dir:
+        bv.generate_subroutine(s, quiet=True, path=test_dir)
+        # Ensure the file was created
+        subroutine_qasm = Path(test_dir) / "bernvaz.qasm"
+        assert subroutine_qasm.exists()
+
+
+def test_generate_oracle():
+    """Test that generate_oracle correctly generates the oracle QASM."""
+    s = "101"
+    with tempfile.TemporaryDirectory() as test_dir:
+        bv.generate_oracle(s, quiet=True, path=test_dir)
+        # Ensure the file was created
+        oracle_qasm = Path(test_dir) / "oracle.qasm"
+        assert oracle_qasm.exists()
+
+
+def test_algorithm_101():
+    """Test the Bernstein-Vazirani algorithm implementation for the input '101'."""
+    s = "101"
+    device = LocalDevice()
+    module = bv.load_program(s)
+    # Unrolling is necessary for proper execution
+    module.unroll()
+    program_str = pyqasm.dumps(module)
+    result = device.run(program_str, shots=1000)
+    counts = result.data.get_counts()
+    max_str, _ = get_max_count(counts)
+    assert max_str == s
+
+
+def test_algorithm_10101():
+    """Test the Bernstein-Vazirani algorithm implementation for the input '10101'."""
+    s = "10101"
+    device = LocalDevice()
+    module = bv.load_program(s)
+    # Unrolling is necessary for proper execution
+    module.unroll()
+    program_str = pyqasm.dumps(module)
+    result = device.run(program_str, shots=1000)
+    counts = result.data.get_counts()
+    max_str, _ = get_max_count(counts)
+    assert max_str == s
