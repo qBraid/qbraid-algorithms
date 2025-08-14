@@ -26,7 +26,7 @@ Functions
 
 """
 
-from .qft import load_program, generate_subroutine
+from .qft import generate_subroutine, load_program
 
 __all__ = [
     "load_program",

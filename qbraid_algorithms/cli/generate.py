@@ -23,8 +23,8 @@ from typing_extensions import Annotated
 
 # Import modules with error handling
 try:
-    from qbraid_algorithms import qft, iqft, qpe
     from qbraid_algorithms import bernstein_vazirani as bv
+    from qbraid_algorithms import iqft, qft, qpe
 except ImportError as e:
     typer.echo(f"Missing required module: {e}", err=True)
     raise typer.Exit(1)

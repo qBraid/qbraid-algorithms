@@ -27,6 +27,6 @@ Functions
 
 """
 
-from .bernvaz import load_program, generate_subroutine, generate_oracle
+from .bernvaz import generate_oracle, generate_subroutine, load_program
 
 __all__ = ["load_program", "generate_subroutine", "generate_oracle"]

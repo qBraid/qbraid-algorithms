@@ -26,6 +26,6 @@ Functions
 
 """
 
-from .iqft import load_program, generate_subroutine
+from .iqft import generate_subroutine, load_program
 
 __all__ = ["load_program", "generate_subroutine"]

@@ -17,8 +17,8 @@ Module providing Quantum Phase Estimation algorithm implementation.
 
 """
 import os
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
 
 import pyqasm
