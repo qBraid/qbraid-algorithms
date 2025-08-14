@@ -33,7 +33,8 @@ qbraid-algorithms requires Python 3.11 or greater, and can be installed with pip
 pip install qbraid-algorithms
 ```
 
-> [!WARNING] > **This project is "pre-alpha", and is not yet stable or fully realized. Use with caution, as the API and functionality are subject to significant changes.**
+>[!WARNING]
+> **This project is "pre-alpha", and is not yet stable or fully realized. Use with caution, as the API and functionality are subject to significant changes.**
 
 ### Install from source
 
@@ -80,7 +81,7 @@ qft_module.unroll()
 qasm_str = pyqasm.dumps(qft_module)
 ```
 
-### Loading Algorithms as .qasm Files
+### Loading Algorithms as `.qasm` Files
 
 In order to utilize algorithms as subroutines in your own circuits, use the
 `generate_subroutine` function for your desired algorithm. By passing algorithm-specific parameters, and optionally a desired output path, you can
@@ -210,5 +211,7 @@ qbraid-algorithms generate bernvaz --help
 - For discussions and/or specific questions about qBraid services, [join our discord community](https://discord.gg/TPBU2sa8Et)
 - For questions that are more suited for a forum, post to [Stack Exchange](https://quantumcomputing.stackexchange.com/) with the [`qbraid`](https://quantumcomputing.stackexchange.com/questions/tagged/qbraid) tag.
 - By participating, you are expected to uphold our [code of conduct](CODE_OF_CONDUCT).
+
+## License
 
 [Apache-2.0 License](LICENSE)

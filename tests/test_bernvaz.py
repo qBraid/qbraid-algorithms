@@ -22,7 +22,9 @@ from pyqasm.modules.base import QasmModule
 
 from qbraid_algorithms import bernstein_vazirani as bv
 from qbraid_algorithms.utils import get_max_count
+
 from .local_device import LocalDevice
+
 
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
