@@ -32,20 +32,32 @@ class AALibrary(GateLibrary):
         sys = GateBuilder()
         std = sys.import_library(std_gates)
         za = sys.import_library(z)
-        names = " " + string.ascii_letters
-        qargs = [names[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits))]
+        names = string.ascii_letters
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         
         std.begin_gate(name,qargs)
         std.call_space = " {} "
         # first application of z prep
-        [std.h(i) for i in name[1:len(qubits)+1]]
+        [std.h(i) for i in qargs]
         #iterated expansion of Z Zp Z0 Zp
-        for _ in range(depth):
-            za.apply(qubits)
-            [sys.h(i) for i in name[1:len(qubits)+1]]
-            std.controlled_op("cphase",[names[len(qubits)+1],names[1:len(qubits)+1]])
-            [sys.h(i) for i in name[1:len(qubits)+1]]
+        std.begin_loop(depth)
+        std.comment("Za")
+        za.apply(qargs)
+        std.comment("Z0")
+        [std.h(i) for i in qargs]
+        std.controlled_op("cz",(qargs[-1],qargs[:-1]),n=len(qubits)-2)
+        [std.h(i) for i in qargs]
+        std.end_loop()
+
+        # for _ in range(depth):
+        #     std.comment("Za")
+        #     za.apply(qargs)
+        #     [std.h(i) for i in qargs]
+        #     std.comment("Z0")
+        #     print((qargs[-1],qargs[:-1]))
+        #     std.controlled_op("cp",(qargs[-1],qargs[:-1]),n=len(qubits)-2)
+        #     [std.h(i) for i in qargs]
         std.end_gate()
 
         

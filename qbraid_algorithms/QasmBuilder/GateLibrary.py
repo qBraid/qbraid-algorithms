@@ -1,11 +1,35 @@
-"""
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                           QUANTUM GATE LIBRARY                               ║
-║                                                                              ║
-║  A comprehensive library for building quantum circuits using OpenQASM 3.0    ║
-║  syntax. Provides high-level interfaces for quantum gates, measurements,     ║
-║  control flow, and circuit composition.                                      ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""          
+QasmBuilder Library - OpenQASM Code Generation Framework
+
+This library provides a flexible framework for generating OpenQASM code through
+a hierarchical builder pattern. It supports different output formats including
+complete quantum circuits, gate definitions, and include files. GateLibrary is
+a base framework for macroing gate, import, and algorithm generation and is                                                 
+built to inject definitions into whatever FileBuilder class it is connected to.
+
+Key (Base) Features:                                             
+- Gate application with controls and phases                             
+- Measurements and classical bit operations                             
+- Control flow (loops, conditionals)                                    
+- Gate and subroutine definitions                                       
+- Code generation and scope management 
+
+Class Extensions:
+- std_gates
 """
 
 class GateLibrary:
@@ -14,11 +38,11 @@ class GateLibrary:
                                                                               
      Core class for quantum gate operations and circuit building.            
      Provides fundamental operations for:                                     
-     • Gate application with controls and phases                             
-     • Measurements and classical bit operations                             
-     • Control flow (loops, conditionals)                                    
-     • Gate and subroutine definitions                                       
-     • Code generation and scope management                                  
+     - Gate application with controls and phases                             
+     - Measurements and classical bit operations                             
+     - Control flow (loops, conditionals)                                    
+     - Gate and subroutine definitions                                       
+     - Code generation and scope management                                  
     
     """
     
@@ -41,8 +65,8 @@ class GateLibrary:
         self.builder = builder             # Circuit builder reference
         self.annotated = annotated         # Annotation flag
         self.prefix = ""                   # Gate modifier (e.g., "ctrl @")
-        self.call_space = "qb[{}]"
-        self.name = "GATE_LIB"            # Library identifier
+        self.call_space = "qb[{}]"         # for namespace (e.g. global qubit register vs gate aliases)
+        self.name = "GATE_LIB"             # Library identifier
 
     def call_gate(self, gate, target, controls=None, phases=None, prefix=""):
         """
@@ -262,7 +286,7 @@ class GateLibrary:
         """End subroutine definition block."""
         self.close_scope()
 
-    def controlled_op(self, gate_call, params, n=1):
+    def controlled_op(self, gate_call, params, n=0):
         """
                                 CONTROLLED OPERATIONS                         
                                                                               
@@ -278,7 +302,7 @@ class GateLibrary:
         """
         if isinstance(gate_call, str):
             # Direct gate name - call with control prefix
-            self.call_gate(gate_call, *params, prefix=f"ctrl{'' if n == 0 else f'({n})'} @")
+            self.call_gate(gate_call, *params, prefix=f"ctrl{'' if n == 0 else f'({n})'} @ ")
         else:
             # Gate function - set modifier and call
             self.prefix = f"ctrl{'' if n<2 else f'({n})'} @ "
@@ -289,7 +313,7 @@ class GateLibrary:
         """
                                 INVERSE OPERATIONS                         
                                                                               
-         Apply gates with control qubits using the ctrl modifier.             
+         Apply inverse of gute using the inv modifier.             
                                                                               
          Format: inv @ gate_operation                                     
         
@@ -297,10 +321,9 @@ class GateLibrary:
         Args:
             gate_call: Gate name (string) or gate function
             params: Gate parameters
-            n: Number of control qubits
         """
         if isinstance(gate_call, str):
-            # Direct gate name - call with control prefix
+            # Direct gate name - call with inv prefix
             self.call_gate(gate_call, *params, prefix=f"inv @")
         else:
             # Gate function - set modifier and call
@@ -322,16 +345,14 @@ class GateLibrary:
 
 class std_gates(GateLibrary):
     """
-    ╔══════════════════════════════════════════════════════════════════════════════╗
-    ║                           STANDARD GATES LIBRARY                             ║
-    ║                                                                              ║
-    ║  Implementation of std_lib quantum gates following OpenQASM 3.0 standards.   ║
-    ║                                                                              ║
-    ║  Available Gates:                                                            ║
-    ║  • Single-qubit: phase, x, y, z, h, s, sdg, sx                               ║
-    ║  • Two-qubit: cx, cy, cz, cp, crx, cry, crz, swap                        ║
-    ║  • Multi-qubit: ccx (Toffoli), cswap (Fredkin)                               ║
-    ╚══════════════════════════════════════════════════════════════════════════════╝
+                    STANDARD GATES LIBRARY                             
+                                                                                  
+    Implementation of std_lib quantum gates following OpenQASM 3.0 standards.   
+                                                                                  
+    Available Gates:                                                            
+    - Single-qubit: phase, x, y, z, h, s, sdg, sx                               
+    - Two-qubit: cx, cy, cz, cp, crx, cry, crz, swap                        
+    - Multi-qubit: ccx (Toffoli), cswap (Fredkin)                               
     """
     
     # Standard gate set from OpenQASM 3.0 specification
@@ -339,7 +360,7 @@ class std_gates(GateLibrary):
              'cx', 'cy', 'cz', 'cp', 'crx', 'cry', 'crz', 
              'swap', 'ccx', 'cswap']
     
-    name = 'std_gates.inc'  # Standard library file name
+    name = 'stdgates.inc'  # Standard library file name
     
     def __init__(self, *args, **kwargs):
         """Initialize standard gates library and register all gates."""

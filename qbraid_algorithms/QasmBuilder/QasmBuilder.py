@@ -13,11 +13,13 @@
 # limitations under the License.
 
 """
-FileBuilder Library - OpenQASM Code Generation Framework
+QasmBuilder Library - OpenQASM Code Generation Framework
 
 This library provides a flexible framework for generating OpenQASM code through
 a hierarchical builder pattern. It supports different output formats including
-complete quantum circuits, gate definitions, and include files.
+complete quantum circuits, gate definitions, and include files. 
+Built on top of the the root FileBuilder class which seperates text content from
+structure/semantics requirements unique to each file
 
 Key Features:
 - Automatic scope and indentation management
@@ -25,6 +27,11 @@ Key Features:
 - Multiple output formats (QASM circuits, includes, gate definitions)
 - Resource allocation for qubits and classical bits
 - Extensible design for custom quantum libraries
+
+Class Extensions:
+- GateBuilder
+- QasmBuilder
+- IncludeBuilder
 """
 
 

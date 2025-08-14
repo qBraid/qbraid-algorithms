@@ -25,7 +25,7 @@ class PhaseEstimationLibrary(GateLibrary):
         name = f'P_EST_{len(qubits)}_{hamiltonian.name}'
         if name in self.gate_ref:
             self.call_gate(name,qubits[-1],qubits[:-1])
-            return
+            return name
         sys = GateBuilder()
         std = sys.import_library(std_gates)
         ham = sys.import_library(hamiltonian)
@@ -49,6 +49,7 @@ class PhaseEstimationLibrary(GateLibrary):
         self.gate_defs[name] = p
         self.gate_ref.append(name)
         self.call_gate(name,qubits[-1],qubits[:-1])
+        return name
         
 
 

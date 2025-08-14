@@ -29,8 +29,8 @@ class QFTLibrary(GateLibrary):
             return
         sys = GateBuilder()
         std = sys.import_library(std_gates)
-        names = " " + string.ascii_letters
-        qargs = [names[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits))]
+        names = string.ascii_letters
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         std.begin_gate(name,qargs)
         std.call_space = "{}"
@@ -38,6 +38,9 @@ class QFTLibrary(GateLibrary):
             std.h(names[i+1])
             for j in range(i+1,len(qubits)):
                 std.call_gate("cp",names[j+1],controls=names[i+1],phases=f"pi/{2**(j-i)}")
+        if(swap):
+            for i in range(len(qubits)//2):
+                std.call_gate("swap",names[i],controls=names[-i-1])
     
         std.end_gate()
 

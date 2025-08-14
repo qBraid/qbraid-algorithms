@@ -26,6 +26,6 @@ def HHLLibrary(PhaseEstimation):
         sys = self.builder
         A = sys.import_library(a)
         P = sys.import_library(PhaseEstimationLibrary)
-        P.phase_estimation(b,clock,a)
+        gate_name = P.phase_estimation(b,clock,a)
         # todo: make the lambda scaling/ U invert
-        P.inverse_op(P.namem)
+        P.inverse_op(gate_name)
