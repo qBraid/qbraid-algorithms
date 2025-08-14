@@ -66,6 +66,6 @@ def get_max_count(counts: dict[str, int]) -> tuple[str, int]:
     Returns:
         tuple[str, int]: The bitstring with the maximum count and its count.
     """
-    max_bitstring = max(counts, key=counts.get)
+    max_bitstring = max(counts, key=lambda k: counts[k])
     max_count = counts[max_bitstring]
     return max_bitstring, max_count

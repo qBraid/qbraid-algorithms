@@ -83,7 +83,7 @@ def load_program(
 
 
 def generate_subroutine(
-    unitary_filepath: str, num_qubits: int = 4, quiet: bool = False, path: str = None
+    unitary_filepath: str, num_qubits: int = 4, quiet: bool = False, path: str | None = None
 ) -> None:
     """
     Creates a QPE subroutine module with user-defined unitary and number of qubits.
@@ -134,7 +134,7 @@ def get_result(counts: dict[str, int]) -> float:
                This represents the phase φ where the eigenvalue is e^(2πiφ).
     """
     # Get most frequent bitstring from counts
-    bitstring = max(counts, key=counts.get)
+    bitstring = max(counts, key=lambda k: counts[k])
     # Convert the result bitstring into a decimal integer
     decimal = int(bitstring, 2)
     # Divide by 2^n to get the fractional phase estimate

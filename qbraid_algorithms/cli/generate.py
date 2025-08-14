@@ -53,7 +53,7 @@ def generate_qft(
         typer.Option("--output", "-o", help="Output filename for the QFT subroutine."),
     ] = "qft.qasm",
     path: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--path",
             "-p",
@@ -123,7 +123,7 @@ def generate_iqft(
         typer.Option("--output", "-o", help="Output filename for the IQFT subroutine."),
     ] = "iqft.qasm",
     path: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--path",
             "-p",
@@ -194,10 +194,10 @@ def generate_bernvaz(
         ),
     ] = False,
     output: Annotated[
-        str, typer.Option("--output", "-o", help="Output filename.")
+        str | None, typer.Option("--output", "-o", help="Output filename.")
     ] = None,
     path: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--path",
             "-p",
@@ -205,7 +205,7 @@ def generate_bernvaz(
         ),
     ] = None,
     gate_name: Annotated[
-        str, typer.Option("--gate-name", "-g", help="Name for the gate.")
+        str | None, typer.Option("--gate-name", "-g", help="Name for the gate.")
     ] = None,
     show_circuit: Annotated[
         bool, typer.Option("--show", help="Display the generated circuit QASM code.")
@@ -311,7 +311,7 @@ def generate_qpe(
         typer.Option("--output", "-o", help="Output filename for the QPE subroutine."),
     ] = "qpe.qasm",
     path: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--path",
             "-p",
