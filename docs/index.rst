@@ -93,7 +93,7 @@ Resources
 
 - `User Guide <https://docs.qbraid.com/qbraid-algorithms/user-guide/overview>`_
 - `Example Notebooks <https://github.com/qBraid/qbraid-algorithms/tree/main/examples>`_
-- `API Reference <https://qbraid.github.io/qBraid/api/qbraid_algorithms.html>`_
+- `API Reference <https://sdk.qbraid.com/qBraid/api/qbraid_algorithms.html>`_
 - `Source Code <https://github.com/qBraid/qbraid-algorithms>`_
 
 .. toctree::
@@ -101,34 +101,34 @@ Resources
    :caption: SDK API Reference
    :hidden:
 
-   qbraid <https://qbraid.github.io/qBraid/api/qbraid.html>
-   qbraid.programs <https://qbraid.github.io/qBraid/api/qbraid.programs.html>
-   qbraid.interface <https://qbraid.github.io/qBraid/api/qbraid.interface.html>
-   qbraid.transpiler <https://qbraid.github.io/qBraid/api/qbraid.transpiler.html>
-   qbraid.passes <https://qbraid.github.io/qBraid/api/qbraid.passes.html>
-   qbraid.runtime <https://qbraid.github.io/qBraid/api/qbraid.runtime.html>
-   qbraid.visualization <https://qbraid.github.io/qBraid/api/qbraid.visualization.html>
+   qbraid <https://sdk.qbraid.com/qBraid/api/qbraid.html>
+   qbraid.programs <https://sdk.qbraid.com/qBraid/api/qbraid.programs.html>
+   qbraid.interface <https://sdk.qbraid.com/qBraid/api/qbraid.interface.html>
+   qbraid.transpiler <https://sdk.qbraid.com/qBraid/api/qbraid.transpiler.html>
+   qbraid.passes <https://sdk.qbraid.com/qBraid/api/qbraid.passes.html>
+   qbraid.runtime <https://sdk.qbraid.com/qBraid/api/qbraid.runtime.html>
+   qbraid.visualization <https://sdk.qbraid.com/qBraid/api/qbraid.visualization.html>
 
 .. toctree::
    :caption: QIR API Reference
    :hidden:
 
-   qbraid_qir <https://qbraid.github.io/qbraid-qir/api/qbraid_qir.html>
-   qbraid_qir.cirq <https://qbraid.github.io/qbraid-qir/api/qbraid_qir.cirq.html>
-   qbraid_qir.qasm3 <https://qbraid.github.io/qbraid-qir/api/qbraid_qir.qasm3.html>
+   qbraid_qir <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.html>
+   qbraid_qir.cirq <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.cirq.html>
+   qbraid_qir.qasm3 <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.qasm3.html>
 
 .. toctree::
    :caption: CORE API Reference
    :hidden:
 
-   qbraid_core <https://qbraid.github.io/qbraid-core/api/qbraid_core.html>
-   qbraid_core.services <https://qbraid.github.io/qbraid-core/api/qbraid_core.services.html>
+   qbraid_core <https://sdk.qbraid.com/qbraid-core/api/qbraid_core.html>
+   qbraid_core.services <https://sdk.qbraid.com/qbraid-core/api/qbraid_core.services.html>
 
 .. toctree::
    :caption: PYQASM API Reference
    :hidden:
 
-   pyqasm <https://qbraid.github.io/pyqasm/api/pyqasm.html>
+   pyqasm <https://sdk.qbraid.com/pyqasm/api/pyqasm.html>
 
 
 .. toctree::

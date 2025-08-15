@@ -20,7 +20,8 @@ from pathlib import Path
 import pyqasm
 from pyqasm.modules.base import QasmModule
 
-from qbraid_algorithms import qft, iqft
+from qbraid_algorithms import iqft, qft
+
 from .local_device import LocalDevice
 
 RESOURCES_DIR = Path(__file__).parent / "resources" / "qft"

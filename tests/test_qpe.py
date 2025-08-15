@@ -20,6 +20,7 @@ import pyqasm
 from pyqasm.modules.base import QasmModule
 
 from qbraid_algorithms import qpe
+
 from .local_device import LocalDevice
 
 RESOURCE_DIR = Path(__file__).parent / "resources" / "qpe"
