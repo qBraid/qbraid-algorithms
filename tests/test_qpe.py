@@ -14,12 +14,18 @@
 """
 Tests for Quantum Phase Estimation (QPE) algorithm implementation.
 """
+import io
+import os
+import sys
+import tempfile
 from pathlib import Path
 
 import pyqasm
 from pyqasm.modules.base import QasmModule
+import pytest
 
 from qbraid_algorithms import qpe
+from qbraid_algorithms.qpe.qpe import _get_unitary, _get_psi
 
 from .local_device import LocalDevice
 
@@ -120,3 +126,97 @@ def test_valid_circuit_z():
     result = qpe.get_result(counts)
     expected = 0.5
     assert result == expected
+
+
+def test_load_program_without_measurement():
+    """Test load_program with include_measurement=False."""
+    qpe_module = qpe.load_program(
+        unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
+        psi_filepath=f"{RESOURCE_DIR}/prepare_state.qasm",
+        num_qubits=3,
+        include_measurement=False
+    )
+    assert isinstance(qpe_module, QasmModule)
+
+
+def test_generate_subroutine_default_path():
+    """Test generate_subroutine with default path (current working directory)."""
+    original_cwd = os.getcwd()
+    # Create temporary directory and change to it
+    with tempfile.TemporaryDirectory() as test_dir:
+        os.chdir(test_dir)
+        try:
+            qpe.generate_subroutine(
+                unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
+                num_qubits=3,
+                quiet=True,
+                path=None
+            )
+            # Ensure the file was created in current directory
+            qpe_qasm = Path(test_dir) / "qpe.qasm"
+            iqft_qasm = Path(test_dir) / "iqft.qasm"
+            assert qpe_qasm.exists()
+            assert iqft_qasm.exists()
+        finally:
+            # Restore original working directory
+            os.chdir(original_cwd)
+
+
+def test_generate_subroutine_verbose():
+    """Test generate_subroutine with verbose output (quiet=False)."""
+    with tempfile.TemporaryDirectory() as test_dir:
+        # Capture stdout
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        try:
+            qpe.generate_subroutine(
+                unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
+                num_qubits=3,
+                quiet=False,
+                path=test_dir
+            )
+            # Get the captured output
+            output = captured_output.getvalue()
+            # Ensure the verbose message was printed
+            assert "Subroutine 'qpe' has been added to" in output
+            assert "qpe.qasm" in output
+            # Ensure the files were created
+            qpe_qasm = Path(test_dir) / "qpe.qasm"
+            iqft_qasm = Path(test_dir) / "iqft.qasm"
+            assert qpe_qasm.exists()
+            assert iqft_qasm.exists()
+        finally:
+            # Restore stdout
+            sys.stdout = sys.__stdout__
+
+
+def test_get_unitary_invalid_file():
+    """Test _get_unitary with invalid QASM file (no gate definitions)."""
+    with tempfile.TemporaryDirectory() as test_dir:
+        # Create an invalid QASM file with no gate definitions
+        invalid_file = Path(test_dir) / "invalid.qasm"
+        invalid_file.write_text("""OPENQASM 3.0;
+include "stdgates.inc";
+
+// This file has no gate definitions
+qubit[1] q;
+h q[0];
+""")
+        with pytest.raises(ValueError, match="No gate definitions found in the provided QASM file"):
+            _get_unitary(str(invalid_file))
+
+
+def test_get_psi_invalid_file():
+    """Test _get_psi with invalid QASM file (no gate definitions)."""
+    with tempfile.TemporaryDirectory() as test_dir:
+        # Create an invalid QASM file with no gate definitions
+        invalid_file = Path(test_dir) / "invalid.qasm"
+        invalid_file.write_text("""OPENQASM 3.0;
+include "stdgates.inc";
+
+// This file has no gate definitions
+qubit[1] q;
+x q[0];
+""")
+        with pytest.raises(ValueError, match="No gate definitions found in the provided QASM file"):
+            _get_psi(str(invalid_file))

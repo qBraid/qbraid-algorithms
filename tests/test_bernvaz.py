@@ -14,6 +14,9 @@
 """
 Tests for Bernstein-Vazirani algorithm implementation.
 """
+import io
+import os
+import sys
 import tempfile
 from pathlib import Path
 
@@ -43,6 +46,45 @@ def test_generate_subroutine():
         assert subroutine_qasm.exists()
 
 
+def test_generate_subroutine_default_path():
+    """Test generate_subroutine with default path (current working directory)."""
+    s = "101"
+    original_cwd = os.getcwd()
+    # Create temporary directory and change to it
+    with tempfile.TemporaryDirectory() as test_dir:
+        os.chdir(test_dir)
+        try:
+            bv.generate_subroutine(s, quiet=True, path=None)
+            # Ensure the file was created in current directory
+            subroutine_qasm = Path(test_dir) / "bernvaz.qasm"
+            assert subroutine_qasm.exists()
+        finally:
+            # Restore original working directory
+            os.chdir(original_cwd)
+
+
+def test_generate_subroutine_verbose():
+    """Test generate_subroutine with verbose output (quiet=False)."""
+    s = "101"
+    with tempfile.TemporaryDirectory() as test_dir:
+        # Capture stdout
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        try:
+            bv.generate_subroutine(s, quiet=False, path=test_dir)
+            # Get the captured output
+            output = captured_output.getvalue()
+            # Ensure the verbose message was printed
+            assert "Subroutine 'bernvaz' has been added to" in output
+            assert "bernvaz.qasm" in output
+            # Ensure the file was created
+            subroutine_qasm = Path(test_dir) / "bernvaz.qasm"
+            assert subroutine_qasm.exists()
+        finally:
+            # Restore stdout
+            sys.stdout = sys.__stdout__
+
+
 def test_generate_oracle():
     """Test that generate_oracle correctly generates the oracle QASM."""
     s = "101"
@@ -51,6 +93,45 @@ def test_generate_oracle():
         # Ensure the file was created
         oracle_qasm = Path(test_dir) / "oracle.qasm"
         assert oracle_qasm.exists()
+
+
+def test_generate_oracle_default_path():
+    """Test generate_oracle with default path (current working directory)."""
+    s = "101"
+    original_cwd = os.getcwd()
+    # Create temporary directory and change to it
+    with tempfile.TemporaryDirectory() as test_dir:
+        os.chdir(test_dir)
+        try:
+            bv.generate_oracle(s, quiet=True, path=None)
+            # Ensure the file was created in current directory
+            oracle_qasm = Path(test_dir) / "oracle.qasm"
+            assert oracle_qasm.exists()
+        finally:
+            # Restore original working directory
+            os.chdir(original_cwd)
+
+
+def test_generate_oracle_verbose():
+    """Test generate_oracle with verbose output (quiet=False)."""
+    s = "101"
+    with tempfile.TemporaryDirectory() as test_dir:
+        # Capture stdout
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        try:
+            bv.generate_oracle(s, quiet=False, path=test_dir)
+            # Get the captured output
+            output = captured_output.getvalue()
+            # Ensure the verbose message was printed
+            assert "Oracle 'oracle' has been added to" in output
+            assert "oracle.qasm" in output
+            # Ensure the file was created
+            oracle_qasm = Path(test_dir) / "oracle.qasm"
+            assert oracle_qasm.exists()
+        finally:
+            # Restore stdout
+            sys.stdout = sys.__stdout__
 
 
 def test_algorithm_101():

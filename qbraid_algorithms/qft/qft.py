@@ -59,7 +59,9 @@ def load_program(num_qubits: int) -> QasmModule:
     return module
 
 
-def generate_subroutine(num_qubits: int, quiet: bool = False, path: str | None = None) -> None:
+def generate_subroutine(
+    num_qubits: int, quiet: bool = False, path: str | None = None
+) -> None:
     """
     Creates a QFT subroutine module with user-defined number of qubits.
 

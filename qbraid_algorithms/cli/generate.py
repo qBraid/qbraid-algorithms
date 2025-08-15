@@ -17,6 +17,7 @@ Generate subroutines and oracles for quantum algorithms.
 """
 
 import os
+from typing import Optional
 
 import typer
 from typing_extensions import Annotated
@@ -53,7 +54,7 @@ def generate_qft(
         typer.Option("--output", "-o", help="Output filename for the QFT subroutine."),
     ] = "qft.qasm",
     path: Annotated[
-        str | None,
+        Optional[str],
         typer.Option(
             "--path",
             "-p",
@@ -123,12 +124,15 @@ def generate_iqft(
         typer.Option("--output", "-o", help="Output filename for the IQFT subroutine."),
     ] = "iqft.qasm",
     path: Annotated[
-        str | None,
+        Optional[str],
         typer.Option(
             "--path",
             "-p",
             help="Directory path where the IQFT subroutine will be created.",
         ),
+    ] = None,
+    gate_name: Annotated[
+        Optional[str], typer.Option("--gate-name", "-g", help="Name for the gate.")
     ] = None,
     show_circuit: Annotated[
         bool, typer.Option("--show", help="Display the generated circuit QASM code.")
@@ -158,6 +162,15 @@ def generate_iqft(
             final_file = target_file
         else:
             final_file = generated_file
+
+        # Handle custom gate name if provided
+        if gate_name:
+            with open(final_file, "r", encoding="utf-8") as f:
+                qasm_content = f.read()
+            # Replace the default gate name with the custom one
+            qasm_content = qasm_content.replace("iqft", gate_name)
+            with open(final_file, "w", encoding="utf-8") as f:
+                f.write(qasm_content)
 
         typer.echo(f"IQFT subroutine for {qubits} qubits generated successfully.")
         typer.echo(f"Output: {os.path.abspath(final_file)}")
@@ -194,10 +207,10 @@ def generate_bernvaz(
         ),
     ] = False,
     output: Annotated[
-        str | None, typer.Option("--output", "-o", help="Output filename.")
+        Optional[str], typer.Option("--output", "-o", help="Output filename.")
     ] = None,
     path: Annotated[
-        str | None,
+        Optional[str],
         typer.Option(
             "--path",
             "-p",
@@ -205,7 +218,7 @@ def generate_bernvaz(
         ),
     ] = None,
     gate_name: Annotated[
-        str | None, typer.Option("--gate-name", "-g", help="Name for the gate.")
+        Optional[str], typer.Option("--gate-name", "-g", help="Name for the gate.")
     ] = None,
     show_circuit: Annotated[
         bool, typer.Option("--show", help="Display the generated circuit QASM code.")
@@ -265,6 +278,15 @@ def generate_bernvaz(
         else:
             final_file = generated_file
 
+        # Handle custom gate name if provided and not oracle_only
+        if gate_name and gate_name != default_gate_name and not oracle_only:
+            with open(final_file, "r", encoding="utf-8") as f:
+                qasm_content = f.read()
+            # Replace the default gate name with the custom one
+            qasm_content = qasm_content.replace("def bernvaz(", f"def {gate_name}(")
+            with open(final_file, "w", encoding="utf-8") as f:
+                f.write(qasm_content)
+
         typer.echo(f"Output: {os.path.abspath(final_file)}")
         typer.echo(f"Secret string: {secret}")
         typer.echo(f"Qubits needed: {len(secret)} + 1 ancilla")
@@ -311,7 +333,7 @@ def generate_qpe(
         typer.Option("--output", "-o", help="Output filename for the QPE subroutine."),
     ] = "qpe.qasm",
     path: Annotated[
-        str | None,
+        Optional[str],
         typer.Option(
             "--path",
             "-p",

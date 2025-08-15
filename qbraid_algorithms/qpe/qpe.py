@@ -83,7 +83,10 @@ def load_program(
 
 
 def generate_subroutine(
-    unitary_filepath: str, num_qubits: int = 4, quiet: bool = False, path: str | None = None
+    unitary_filepath: str,
+    num_qubits: int = 4,
+    quiet: bool = False,
+    path: str | None = None,
 ) -> None:
     """
     Creates a QPE subroutine module with user-defined unitary and number of qubits.

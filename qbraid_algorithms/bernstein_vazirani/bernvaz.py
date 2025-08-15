@@ -20,6 +20,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
+from typing import Optional, Union
 
 import pyqasm
 from pyqasm.modules.base import QasmModule
@@ -27,12 +28,12 @@ from pyqasm.modules.base import QasmModule
 from qbraid_algorithms.utils import _prep_qasm_file
 
 
-def load_program(bitstring: str | list[int]) -> QasmModule:
+def load_program(bitstring: Union[str, list[int]]) -> QasmModule:
     """
     Load the Bernstein-Vazirani circuit as a pyqasm module.
 
     Args:
-        bitstring (str | list[int]): The hidden bitstring `s` as a string of '0's
+        bitstring (Union[str, list[int]]): The hidden bitstring `s` as a string of '0's
         and '1's
 
     Returns:
@@ -63,13 +64,13 @@ def load_program(bitstring: str | list[int]) -> QasmModule:
 
 
 def generate_subroutine(
-    bitstring: str | list[int], quiet: bool = False, path: str | None = None
+    bitstring: Union[str, list[int]], quiet: bool = False, path: Optional[str] = None
 ) -> None:
     """
     Creates a Bernstein-Vazirani subroutine module with user-defined hidden bitstring.
 
     Args:
-        bitstring (str | list[int]): The hidden bitstring.
+        bitstring (Union[str, list[int]]): The hidden bitstring.
         quiet (bool): If True, suppresses output messages.
         path (str): The directory path where the Bernstein-Vazirani subroutine will be created.
                    If None, creates in the current working directory.
@@ -94,13 +95,13 @@ def generate_subroutine(
 
 
 def generate_oracle(
-    bitstring: str |list[int], quiet: bool = False, path: str | None = None
+    bitstring: Union[str, list[int]], quiet: bool = False, path: Optional[str] = None
 ) -> None:
     """
     Creates a Bernstein-Vazirani oracle encoded with user-defined hidden bitstring.
 
     Args:
-        bitstring (list[int] | str): The hidden bitstring `s` as a string
+        bitstring (Union[str, list[int]]): The hidden bitstring `s` as a string
                                    of '0's and '1's
         quiet (bool): If True, suppresses output messages.
         path (str): The directory path where the Bernstein-Vazirani oracle will be created.
@@ -125,12 +126,12 @@ def generate_oracle(
         print(f"Oracle 'oracle' has been added to {oracle_dst}")
 
 
-def _convert_bitstring_decimal(bitstring: str | list[int]) -> int:
+def _convert_bitstring_decimal(bitstring: Union[str, list[int]]) -> int:
     """
     Converts a bitstring (str or list of int) to its decimal integer representation.
 
     Args:
-        bitstring (str | list[int]): The hidden bitstring of '0's and '1's
+        bitstring (Union[str, list[int]]): The hidden bitstring of '0's and '1's
 
     Returns:
         int: Decimal integer representation of the bitstring
@@ -142,12 +143,12 @@ def _convert_bitstring_decimal(bitstring: str | list[int]) -> int:
     return int(bitstring_reversed, 2)
 
 
-def _generate_replacements(bitstring: str | list[int]) -> dict[str, str]:
+def _generate_replacements(bitstring: Union[str, list[int]]) -> dict[str, str]:
     """
     Generates a dictionary of replacements for QASM variable placeholders.
 
     Args:
-        bitstring (str | list[int]): The hidden bitstring of '0's and '1's
+        bitstring (Union[str, list[int]]): The hidden bitstring of '0's and '1's
 
     Returns:
         dict[str, str]: Dictionary mapping variable names to their string values
