@@ -13,23 +13,5 @@
 # limitations under the License.
 
 """
-Bell's Inequality Experiment Implementation
-
-Simple functions for loading and running Bell's inequality circuits.
+CLI package for qbraid-algorithms.
 """
-
-from pathlib import Path
-
-import pyqasm
-from pyqasm.modules.base import QasmModule
-
-
-def load_program() -> QasmModule:
-    """
-    Load the Bell's inequality circuit as a pyqasm module.
-    
-    Returns:
-        pyqasm module containing the Bell's inequality circuit
-    """
-    qasm_path = Path(__file__).parent / "bells_inequality.qasm"
-    return pyqasm.load(str(qasm_path))

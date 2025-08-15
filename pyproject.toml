@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "qbraid-algorithms"
 dynamic = ["version", "dependencies"]
 authors = [{name = "qBraid Development Team"}, {email = "contact@qbraid.com"}]
-description = "Python package for building, simulating, and benchmarking hybrid quantum-classical algorithms."
+description = "Python package for utilizing, implementing, and building quantum algorithms in OpenQASM 3."
 readme = "README.md"
 requires-python = ">=3.11"
 keywords = ["qbraid", "quantum", "algorithms", "openqasm"]
@@ -30,6 +30,16 @@ classifiers = [
     "Operating System :: Unix",
     "Operating System :: MacOS",
 ]
+
+[project.optional-dependencies]
+cli = [
+    "typer>=0.12.1",
+    "rich>=10.11.0",
+    "typing-extensions"
+]
+
+[project.scripts]
+qbraid-algorithms = "qbraid_algorithms.cli.main:app"
 
 [tool.setuptools.dynamic]
 version = {attr = "qbraid_algorithms._version.__version__"}

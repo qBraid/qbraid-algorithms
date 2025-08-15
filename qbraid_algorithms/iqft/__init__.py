@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Bell's Inequality experiment implementation.
+Module providing Inverse Quantum Fourier Transform (QFT) algorithm implementation.
 
 Functions
 ----------
@@ -22,11 +22,10 @@ Functions
     :toctree: ../stubs/
 
     load_program
+    generate_subroutine
 
 """
 
-from .bells_inequality import load_program
+from .iqft import generate_subroutine, load_program
 
-__all__ = [
-    "load_program",
-]
+__all__ = ["load_program", "generate_subroutine"]
