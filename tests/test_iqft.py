@@ -27,7 +27,9 @@ from .local_device import LocalDevice
 RESOURCES_DIR = Path(__file__).parent / "resources" / "iqft"
 
 
-def _run_circuit_and_check_counts(device, program_path, expected_counts, shots=1000, tolerance=0.1):
+def _run_circuit_and_check_counts(
+    device, program_path, expected_counts, shots=1000, tolerance=0.1
+):
     """Helper function to run a circuit and check the measurement counts."""
     program = pyqasm.load(program_path)
     program.unroll()
@@ -41,6 +43,7 @@ def _run_circuit_and_check_counts(device, program_path, expected_counts, shots=1
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
@@ -71,7 +74,7 @@ def test_valid_circuit_0():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '0': 500, '1': 500 }
+    expected_counts = {"0": 500, "1": 500}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -79,6 +82,7 @@ def test_valid_circuit_0():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_1():
     """Test 1-qubit IQFT starting from |1> yields ~uniform distribution."""
@@ -102,7 +106,7 @@ def test_valid_circuit_1():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '0': 500, '1': 500 }
+    expected_counts = {"0": 500, "1": 500}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -110,6 +114,7 @@ def test_valid_circuit_1():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_00():
     """Test 2-qubit IQFT starting from |00> state."""
@@ -133,7 +138,7 @@ def test_valid_circuit_00():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '00': 250, '01': 250, '10': 250,  '11': 250 }
+    expected_counts = {"00": 250, "01": 250, "10": 250, "11": 250}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -141,6 +146,7 @@ def test_valid_circuit_00():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_2qubit_superposition():
     """Test 2-qubit IQFT on equal superposition state."""
@@ -164,7 +170,7 @@ def test_valid_circuit_2qubit_superposition():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '00': 1000, '01': 10, '10': 10,  '11': 10 }
+    expected_counts = {"00": 1000, "01": 10, "10": 10, "11": 10}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -172,7 +178,6 @@ def test_valid_circuit_2qubit_superposition():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
-
 
 
 def test_valid_circuit_000():
@@ -197,14 +202,14 @@ def test_valid_circuit_000():
     counts = result.data.get_counts()
     value = shots / 8
     expected_counts = {
-        '000': value,
-        '001': value,
-        '010': value,
-        '011': value,
-        '100': value,
-        '101': value,
-        '110': value,
-        '111': value
+        "000": value,
+        "001": value,
+        "010": value,
+        "011": value,
+        "100": value,
+        "101": value,
+        "110": value,
+        "111": value,
     }
 
     tolerance = 0.1
@@ -214,6 +219,7 @@ def test_valid_circuit_000():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_010():
     # we want to take in some binary number as a state - ie |010>
@@ -238,14 +244,14 @@ def test_valid_circuit_010():
     counts = result.data.get_counts()
     value = shots / 8
     expected_counts = {
-        '000': value,
-        '001': value,
-        '010': value,
-        '011': value,
-        '100': value,
-        '101': value,
-        '110': value,
-        '111': value
+        "000": value,
+        "001": value,
+        "010": value,
+        "011": value,
+        "100": value,
+        "101": value,
+        "110": value,
+        "111": value,
     }
 
     tolerance = 0.1
@@ -255,6 +261,7 @@ def test_valid_circuit_010():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_001():
     # we want to take in some binary number as a state - ie |001>
@@ -278,14 +285,14 @@ def test_valid_circuit_001():
     counts = result.data.get_counts()
     value = shots / 8
     expected_counts = {
-        '000': value,
-        '001': value,
-        '010': value,
-        '011': value,
-        '100': value,
-        '101': value,
-        '110': value,
-        '111': value
+        "000": value,
+        "001": value,
+        "010": value,
+        "011": value,
+        "100": value,
+        "101": value,
+        "110": value,
+        "111": value,
     }
 
     tolerance = 0.1

@@ -27,7 +27,9 @@ from .local_device import LocalDevice
 RESOURCES_DIR = Path(__file__).parent / "resources" / "qft"
 
 
-def _run_circuit_and_check_counts(device, program_path, expected_counts, shots=1000, tolerance=0.1):
+def _run_circuit_and_check_counts(
+    device, program_path, expected_counts, shots=1000, tolerance=0.1
+):
     """Helper function to run a circuit and check the measurement counts."""
     program = pyqasm.load(program_path)
     program.unroll()
@@ -42,11 +44,13 @@ def _run_circuit_and_check_counts(device, program_path, expected_counts, shots=1
         upper = expected + error
         assert lower <= count <= upper
 
+
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
     qft_module = qft.load_program(3)
     assert isinstance(qft_module, QasmModule)
     assert qft_module.num_qubits == 3
+
 
 def test_generate_subroutine():
     """Placeholder test for QFT generate_subroutine (to be implemented)."""
@@ -75,7 +79,7 @@ def test_valid_circuit_0():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '0': 500, '1': 500 }
+    expected_counts = {"0": 500, "1": 500}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -83,6 +87,7 @@ def test_valid_circuit_0():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_1():
     """Test 1-qubit QFT starting from |1> yields ~uniform distribution."""
@@ -105,7 +110,7 @@ def test_valid_circuit_1():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '0': 500, '1': 500 }
+    expected_counts = {"0": 500, "1": 500}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -113,6 +118,7 @@ def test_valid_circuit_1():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_00():
     """Test 2-qubit QFT on |00> gives ~uniform distribution over 4 states."""
@@ -130,7 +136,7 @@ def test_valid_circuit_00():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '00': 250, '01': 250, '10': 250,  '11': 250 }
+    expected_counts = {"00": 250, "01": 250, "10": 250, "11": 250}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -138,6 +144,7 @@ def test_valid_circuit_00():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_2qubit_superposition():
     """Test 2-qubit QFT on prepared superposition state meets expected counts."""
@@ -155,7 +162,7 @@ def test_valid_circuit_2qubit_superposition():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '00': 1000, '01': 10, '10': 10,  '11': 10 }
+    expected_counts = {"00": 1000, "01": 10, "10": 10, "11": 10}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -181,7 +188,7 @@ def test_valid_circuit_01():
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
 
-    expected_counts = { '00': 250, '01': 250, '10': 250,  '11': 250 }
+    expected_counts = {"00": 250, "01": 250, "10": 250, "11": 250}
     tolerance = 0.1
     error = tolerance * shots
     for state, count in counts.items():
@@ -189,6 +196,7 @@ def test_valid_circuit_01():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_000():
     """Test 3-qubit QFT on |000> yields ~uniform distribution over 8 states."""
@@ -207,14 +215,14 @@ def test_valid_circuit_000():
     counts = result.data.get_counts()
     value = shots / 8
     expected_counts = {
-        '000': value,
-        '001': value,
-        '010': value,
-        '011': value,
-        '100': value,
-        '101': value,
-        '110': value,
-        '111': value
+        "000": value,
+        "001": value,
+        "010": value,
+        "011": value,
+        "100": value,
+        "101": value,
+        "110": value,
+        "111": value,
     }
 
     tolerance = 0.1
@@ -224,6 +232,7 @@ def test_valid_circuit_000():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_010():
     """Test 3-qubit QFT on |010> yields ~uniform distribution over 8 states."""
@@ -242,14 +251,14 @@ def test_valid_circuit_010():
     counts = result.data.get_counts()
     value = shots / 8
     expected_counts = {
-        '000': value,
-        '001': value,
-        '010': value,
-        '011': value,
-        '100': value,
-        '101': value,
-        '110': value,
-        '111': value
+        "000": value,
+        "001": value,
+        "010": value,
+        "011": value,
+        "100": value,
+        "101": value,
+        "110": value,
+        "111": value,
     }
 
     tolerance = 0.1
@@ -259,6 +268,7 @@ def test_valid_circuit_010():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_valid_circuit_001():
     """Test 3-qubit QFT on |001> yields ~uniform distribution over 8 states."""
@@ -272,19 +282,19 @@ def test_valid_circuit_001():
     # Unrolling is necessary for proper execution
     program.unroll()
     program_str = pyqasm.dumps(program)
-    shots  = 1000
+    shots = 1000
     result = device.run(program_str, shots=shots)
     counts = result.data.get_counts()
     value = 1000 / 8
     expected_counts = {
-        '000': value,
-        '001': value,
-        '010': value,
-        '011': value,
-        '100': value,
-        '101': value,
-        '110': value,
-        '111': value
+        "000": value,
+        "001": value,
+        "010": value,
+        "011": value,
+        "100": value,
+        "101": value,
+        "110": value,
+        "111": value,
     }
 
     tolerance = 0.1
@@ -294,6 +304,7 @@ def test_valid_circuit_001():
         lower = expected - error
         upper = expected + error
         assert lower <= count <= upper
+
 
 def test_undo_iqft_00():
     """Test that QFT followed by IQFT on |00> returns original state |00>.
@@ -319,7 +330,7 @@ def test_undo_iqft_00():
     program_str = pyqasm.dumps(program)
     result = device.run(program_str, shots=1000)
     counts = result.data.get_counts()
-    expected_counts = { '00': 1000, '01': 0, '10': 0, '11': 0 }
+    expected_counts = {"00": 1000, "01": 0, "10": 0, "11": 0}
     tolerance = 0.1
     error = tolerance * 1000
     for state, count in counts.items():
@@ -353,7 +364,7 @@ def test_undo_iqft_superposition():
     program_str = pyqasm.dumps(program)
     result = device.run(program_str, shots=1000)
     counts = result.data.get_counts()
-    expected_counts = { '00': 250, '01': 250, '10': 250, '11': 250 }
+    expected_counts = {"00": 250, "01": 250, "10": 250, "11": 250}
     tolerance = 0.1
     error = tolerance * 1000
     for state, count in counts.items():

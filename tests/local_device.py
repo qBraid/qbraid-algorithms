@@ -40,7 +40,9 @@ class LocalDevice(QuantumDevice):
             simulator=True,
             experiment_type=ExperimentType.GATE_MODEL,
             program_spec=ProgramSpec(
-                QuantumCircuit, alias="qiskit", experiment_type=ExperimentType.GATE_MODEL
+                QuantumCircuit,
+                alias="qiskit",
+                experiment_type=ExperimentType.GATE_MODEL,
             ),
             provider_name="Qiskit",
         )
@@ -59,7 +61,7 @@ class LocalDevice(QuantumDevice):
         run_input: QuantumCircuit | list[QuantumCircuit],
         *args,
         shots: int = 1024,
-        **kwargs
+        **kwargs,
     ) -> Result:
         """Run a program on the local device."""
         job = self.aer_simulator.run(run_input, shots=shots, **kwargs)

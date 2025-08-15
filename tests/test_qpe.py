@@ -21,24 +21,26 @@ import tempfile
 from pathlib import Path
 
 import pyqasm
-from pyqasm.modules.base import QasmModule
 import pytest
+from pyqasm.modules.base import QasmModule
 
 from qbraid_algorithms import qpe
-from qbraid_algorithms.qpe.qpe import _get_unitary, _get_psi
+from qbraid_algorithms.qpe.qpe import _get_psi, _get_unitary
 
 from .local_device import LocalDevice
 
 RESOURCE_DIR = Path(__file__).parent / "resources" / "qpe"
 
+
 def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
     qpe_module = qpe.load_program(
-        unitary_filepath = f"{RESOURCE_DIR}/t.qasm",
-        psi_filepath = f"{RESOURCE_DIR}/prepare_state.qasm",
-        num_qubits = 3,
+        unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
+        psi_filepath=f"{RESOURCE_DIR}/prepare_state.qasm",
+        num_qubits=3,
     )
     assert isinstance(qpe_module, QasmModule)
+
 
 def test_valid_circuit_r_3pi4():
     """Test QPE with r_3pi4 unitary."""
@@ -48,10 +50,10 @@ def test_valid_circuit_r_3pi4():
         qpe_file.unlink()
     device = LocalDevice()
     qpe.generate_subroutine(
-        unitary_filepath = f"{RESOURCE_DIR}/r_3pi4.qasm",
-        num_qubits = 3,
-        quiet = True,
-        path = RESOURCE_DIR
+        unitary_filepath=f"{RESOURCE_DIR}/r_3pi4.qasm",
+        num_qubits=3,
+        quiet=True,
+        path=RESOURCE_DIR,
     )
     program = pyqasm.load(f"{RESOURCE_DIR}/qpe_3.qasm")
     # delete the created subroutine file
@@ -77,10 +79,10 @@ def test_valid_circuit_t():
         iqft_file.unlink()
     device = LocalDevice()
     qpe.generate_subroutine(
-        unitary_filepath = f"{RESOURCE_DIR}/t.qasm",
-        num_qubits = 3,
-        quiet = True,
-        path = RESOURCE_DIR
+        unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
+        num_qubits=3,
+        quiet=True,
+        path=RESOURCE_DIR,
     )
     program = pyqasm.load(f"{RESOURCE_DIR}/qpe_3.qasm")
     # delete the created subroutine file
@@ -108,10 +110,10 @@ def test_valid_circuit_z():
         iqft_file.unlink()
     device = LocalDevice()
     qpe.generate_subroutine(
-        unitary_filepath = f"{RESOURCE_DIR}/z.qasm",
-        num_qubits = 3,
-        quiet = True,
-        path = RESOURCE_DIR
+        unitary_filepath=f"{RESOURCE_DIR}/z.qasm",
+        num_qubits=3,
+        quiet=True,
+        path=RESOURCE_DIR,
     )
     program = pyqasm.load(f"{RESOURCE_DIR}/qpe_3.qasm")
     # delete the created subroutine file
@@ -134,7 +136,7 @@ def test_load_program_without_measurement():
         unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
         psi_filepath=f"{RESOURCE_DIR}/prepare_state.qasm",
         num_qubits=3,
-        include_measurement=False
+        include_measurement=False,
     )
     assert isinstance(qpe_module, QasmModule)
 
@@ -150,7 +152,7 @@ def test_generate_subroutine_default_path():
                 unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
                 num_qubits=3,
                 quiet=True,
-                path=None
+                path=None,
             )
             # Ensure the file was created in current directory
             qpe_qasm = Path(test_dir) / "qpe.qasm"
@@ -173,7 +175,7 @@ def test_generate_subroutine_verbose():
                 unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
                 num_qubits=3,
                 quiet=False,
-                path=test_dir
+                path=test_dir,
             )
             # Get the captured output
             output = captured_output.getvalue()
@@ -195,14 +197,18 @@ def test_get_unitary_invalid_file():
     with tempfile.TemporaryDirectory() as test_dir:
         # Create an invalid QASM file with no gate definitions
         invalid_file = Path(test_dir) / "invalid.qasm"
-        invalid_file.write_text("""OPENQASM 3.0;
+        invalid_file.write_text(
+            """OPENQASM 3.0;
 include "stdgates.inc";
 
 // This file has no gate definitions
 qubit[1] q;
 h q[0];
-""")
-        with pytest.raises(ValueError, match="No gate definitions found in the provided QASM file"):
+"""
+        )
+        with pytest.raises(
+            ValueError, match="No gate definitions found in the provided QASM file"
+        ):
             _get_unitary(str(invalid_file))
 
 
@@ -211,12 +217,16 @@ def test_get_psi_invalid_file():
     with tempfile.TemporaryDirectory() as test_dir:
         # Create an invalid QASM file with no gate definitions
         invalid_file = Path(test_dir) / "invalid.qasm"
-        invalid_file.write_text("""OPENQASM 3.0;
+        invalid_file.write_text(
+            """OPENQASM 3.0;
 include "stdgates.inc";
 
 // This file has no gate definitions
 qubit[1] q;
 x q[0];
-""")
-        with pytest.raises(ValueError, match="No gate definitions found in the provided QASM file"):
+"""
+        )
+        with pytest.raises(
+            ValueError, match="No gate definitions found in the provided QASM file"
+        ):
             _get_psi(str(invalid_file))

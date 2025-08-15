@@ -33,7 +33,7 @@ def test_load_program():
     """Test that load_program correctly returns a pyqasm module object."""
     bv_module = bv.load_program("101")
     assert isinstance(bv_module, QasmModule)
-    assert bv_module.num_qubits == 4 # 3 data qubits + 1 ancilla qubit
+    assert bv_module.num_qubits == 4  # 3 data qubits + 1 ancilla qubit
 
 
 def test_generate_subroutine():
