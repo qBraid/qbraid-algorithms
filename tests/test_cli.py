@@ -30,12 +30,6 @@ from qbraid_algorithms.cli.main import app as main_app
 class TestCLI:
     """Test suite for CLI functionality."""
 
-    def __init__(self):
-        """Initialize test attributes."""
-        self.runner = None
-        self.test_dir = None
-        self.test_path = None
-
     def setup_method(self):
         """Set up test environment."""
         self.runner = CliRunner()
