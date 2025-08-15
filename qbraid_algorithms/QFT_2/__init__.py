@@ -26,6 +26,7 @@ Functions
 
 """
 from .QFT import QFT, QFT_Demo
+from .QFTLibrary import QFTLibrary
 
-__all__ = ['QFT', 'QFT_Demo']
+__all__ = ['QFT', 'QFT_Demo','QFTLibrary']
 
