@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # from GateLibrary import GateLibrary, std_gates
-from qbraid_algorithms.QasmBuilder import *
+from qbraid_algorithms.QTran import *
 # from qbraid_algorithms.QFT_2 import QFTLibrary
 import string
 
@@ -27,41 +27,51 @@ class AALibrary(GateLibrary):
     def Grover(self,H,qubits: list,depth:int):
         name = f'AmplAmp{len(qubits)}{H.name}{depth}'
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
+            self.call_subroutine(name,[self.call_space.format("{" + " ,".join(str(i) for i in qubits)+"}")])
+            # self.call_gate(name,qubits[-1],qubits[:-1])
             return
         sys = GateBuilder()
         std = sys.import_library(std_gates)
+        std.call_space = " {}"
         za = sys.import_library(H)
         names = string.ascii_letters
         qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         
-        std.begin_gate(name,qargs)
-        std.call_space = " {}"
-        # first application of z prep
-        [std.h(i) for i in qargs]
-        #iterated expansion of Z Zp Z0 Zp
+        # std.begin_gate(name,qargs)
+        # # first application of z prep
+        # [std.h(i) for i in qargs]
+        # #iterated expansion of Z Zp Z0 Zp
+        # std.begin_loop(depth)
+        # std.comment("Za")
+        # za.apply(qargs)
+        # [std.h(i) for i in qargs]
+        # std.comment("Z0")
+        # [std.x(i) for i in qargs]
+        # std.controlled_op("z",(qargs[-1],qargs[:-1]),n=len(qubits)-1)
+        # [std.x(i) for i in qargs]
+        # [std.h(i) for i in qargs]
+        # std.end_loop()
+        # std.end_gate()
+
+
+        register = "reg"
+        std.begin_subroutine(name,[f"qubit[{len(qubits)}] {register}"])
+        std.h(register)
         std.begin_loop(depth)
         std.comment("Za")
-        za.apply(qargs)
-        [std.h(i) for i in qargs]
+        za.apply([f"reg[{i}]" for i in range(len(qubits))])
+        std.h(register)
         std.comment("Z0")
-        [std.x(i) for i in qargs]
-        std.controlled_op("z",(qargs[-1],qargs[:-1]),n=len(qubits)-1)
-        [std.x(i) for i in qargs]
-        [std.h(i) for i in qargs]
+        std.x(register)
+        std.controlled_op("z",(f"{register}[0]",[f"{register}[{i}]" for i in range(len(qubits)-1)]),n=len(qubits)-1)
+        std.x(register)
+        std.h(register)
         std.end_loop()
-        # for _ in range(depth):
-        #     std.comment("Za")
-        #     za.apply(qargs)
-        #     [std.h(i) for i in qargs]
-        #     std.comment("Z0")
-        #     print((qargs[-1],qargs[:-1]))
-        #     std.controlled_op("cp",(qargs[-1],qargs[:-1]),n=len(qubits)-2)
-        #     [std.h(i) for i in qargs]
-        std.end_gate()
+        std.end_subroutine()
 
-        
+
+
         p, i, d = sys.build()
         for imps in i:
             if imps not in self.gate_import:
@@ -72,13 +82,15 @@ class AALibrary(GateLibrary):
                 self.gate_defs[defs[0]] = defs[1]
         self.gate_defs[name] = p
         self.gate_ref.append(name)
-        self.call_gate(name,qubits[-1],qubits[:-1])
+        # self.call_gate(name,qubits[-1],qubits[:-1])
+        self.call_subroutine(name,[self.call_space.format("{" + " ,".join(str(i) for i in qubits)+"}")])
 
         
     def AA(self,Z,H,qubits: list,depth:int):
         name = f'AmplAmp{len(qubits)}{z.name}{depth}'
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
+            self.call_subroutine(name,[self.call_space.format("{" + " ,".join(str(i) for i in qubits)+"}")])
+            # self.call_gate(name,qubits[-1],qubits[:-1])
             return
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -88,22 +100,22 @@ class AALibrary(GateLibrary):
         qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         
-        std.begin_gate(name,qargs)
-        std.call_space = " {} "
-        # first application of z prep
-        [std.h(i) for i in qargs]
-        #iterated expansion of Z Zp Z0 Zp
-        std.begin_loop(depth)
-        std.comment("Za")
-        Ha.apply(qargs)
-        [std.h(i) for i in qargs]
-        std.comment("Z0")
-        [std.x(i) for i in qargs]
-        std.controlled_op("cz",(qargs[-1],qargs[:-1]),n=len(qubits)-2)
-        [std.x(i) for i in qargs]
-        [std.h(i) for i in qargs]
-        std.end_loop()
-
+        # std.begin_gate(name,qargs)
+        # std.call_space = " {} "
+        # # first application of z prep
+        # [std.h(i) for i in qargs]
+        # #iterated expansion of Z Zp Z0 Zp
+        # std.begin_loop(depth)
+        # std.comment("Za")
+        # Ha.apply(qargs)
+        # [std.h(i) for i in qargs]
+        # std.comment("Z0")
+        # [std.x(i) for i in qargs]
+        # std.controlled_op("cz",(qargs[-1],qargs[:-1]),n=len(qubits)-2)
+        # [std.x(i) for i in qargs]
+        # [std.h(i) for i in qargs]
+        # std.end_loop()
+        # std.end_gate()
         # for _ in range(depth):
         #     std.comment("Za")
         #     za.apply(qargs)
@@ -112,7 +124,25 @@ class AALibrary(GateLibrary):
         #     print((qargs[-1],qargs[:-1]))
         #     std.controlled_op("cp",(qargs[-1],qargs[:-1]),n=len(qubits)-2)
         #     [std.h(i) for i in qargs]
-        std.end_gate()
+        
+        
+        register = "reg"
+        std.begin_subroutine(name,[f"qubit[{len(qubits)}] {register}"])
+        za.unapply([f"reg[{i}]" for i in range(len(qubits))])
+        std.h(register)
+        std.begin_loop(depth)
+        std.comment("H")
+        Ha.apply([f"reg[{i}]" for i in range(len(qubits))])
+        std.comment("Zp*")
+        za.unapply([f"reg[{i}]" for i in range(len(qubits))])
+        std.comment("Z0")
+        std.x(register)
+        std.controlled_op("z",(f"{register}[0]",[f"{register}[{i}]" for i in range(len(qubits)-1)]),n=len(qubits)-1)
+        std.x(register)
+        std.comment("Zp")
+        za.apply([f"reg[{i}]" for i in range(len(qubits))])
+        std.end_loop()
+        std.end_subroutine()
 
         
         p, i, d = sys.build()
@@ -125,7 +155,8 @@ class AALibrary(GateLibrary):
                 self.gate_defs[defs[0]] = defs[1]
         self.gate_defs[name] = p
         self.gate_ref.append(name)
-        self.call_gate(name,qubits[-1],qubits[:-1])
+        # self.call_gate(name,qubits[-1],qubits[:-1])
+        self.call_subroutine(name,[self.call_space.format("{" + " ,".join(str(i) for i in qubits)+"}")])
 
 
 

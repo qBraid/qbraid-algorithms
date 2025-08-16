@@ -30,7 +30,7 @@ Key (Base) Features:
 
 Class Extensions:
 - std_gates
-"""
+""" 
 
 class GateLibrary:
     """
@@ -116,6 +116,29 @@ class GateLibrary:
         # Add target qubit and complete the statement
         call += self.call_space.format(target) + ";"
         self.program(self.prefix + call)
+    
+    def call_subroutine(self,subroutine,parameters,capture=None):
+        """
+                            SUBROUTINE APPLICATION                           
+                                                                              
+         Apply a subroutine with parameters and optionally specify a target
+         variable to return value to    
+                                                                              
+         Format: [capture] = [subroutine](parameters);            
+        
+        
+        Args:
+            subroutine: Name of the gate to apply
+            parameters: list of all parameters to apply
+        """
+        if subroutine not in self.gate_ref:
+            print(f"stdgates: subroutine {subroutine} is not part of visible scope, "
+                  f"make sure that this isn't a floating reference / malformed statement, "
+                  f"or is at least previously defined within untracked environment definitions")
+
+        call = f"{capture + " = " if capture is not None else ""} {subroutine}({", ".join(str(a) for a in parameters)});"
+        self.program(call)
+
 
     def measure(self, qubits: list, clbits: list):
         """
@@ -260,8 +283,8 @@ class GateLibrary:
             return_type: Optional return type specification
         """
         if name in self.gate_ref:
-            print(f"warning:  gate {name} replacing existing namespace")
-        call = f"def {name}({",".join(parameters)}) -> {return_type if return_type is not None else ""}" + "{"
+            print(f"warning:  subroutine {name} replacing existing namespace")
+        call = f"def {name}({",".join(parameters)}) {" -> " + return_type if return_type is not None else ""}" + "{"
         self.program(call)
         self.builder.scope += 1
 

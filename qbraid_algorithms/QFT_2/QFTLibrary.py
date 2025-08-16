@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from GateLibrary import GateLibrary, std_gates
-from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
+from qbraid_algorithms.QTran import *
+# from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
 import string
 
 class QFTLibrary(GateLibrary):

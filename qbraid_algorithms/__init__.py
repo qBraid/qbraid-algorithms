@@ -30,7 +30,7 @@ Modules
 
 """
 
-from . import QFT_2, bells_inequality
+from . import bells_inequality, QTran, QFT_2 
 from ._version import __version__
 
-__all__ = ["__version__", "bells_inequality", "QFT_2"]
+__all__ = ["__version__", "bells_inequality", "QFT_2","QTran"]

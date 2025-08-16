@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from GateLibrary import GateLibrary, std_gates
-from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
+from QTran import FileBuilder, QasmBuilder, GateBuilder
 from QFTLibrary import QFTLibrary
 import string
 

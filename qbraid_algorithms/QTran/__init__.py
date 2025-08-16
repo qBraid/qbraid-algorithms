@@ -26,4 +26,4 @@ Functions
 from .QasmBuilder import *
 from .GateLibrary import *
 
-__all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates']
+__all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary:','std_gates']
