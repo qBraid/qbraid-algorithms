@@ -29,10 +29,12 @@ Modules
     qft
     iqft
     qpe
+    QFT_2
+    QTran
 
 """
 
-from . import bernstein_vazirani, iqft, qft, qpe
+from . import bernstein_vazirani, iqft, qft, qpe, QTran, QFT_2
 from ._version import __version__
 
 __all__ = [
@@ -41,4 +43,6 @@ __all__ = [
     "iqft",
     "bernstein_vazirani",
     "qpe",
+    "QTran",
+    "QFT_2"
 ]
