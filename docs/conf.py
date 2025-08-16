@@ -14,7 +14,7 @@ author = "qBraid Development Team"
 
 # Set the version
 version = qbraid_algorithms.__version__
-
+release = version
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be

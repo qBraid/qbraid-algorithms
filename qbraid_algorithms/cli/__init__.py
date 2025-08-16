@@ -13,32 +13,5 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
-
-.. currentmodule:: qbraid_algorithms
-
-Modules
--------
-
-.. autosummary::
-    :toctree: ../stubs/
-
-    bernstein_vazirani
-    qft
-    iqft
-    qpe
-
+CLI package for qbraid-algorithms.
 """
-
-from . import bernstein_vazirani, iqft, qft, qpe
-from ._version import __version__
-
-__all__ = [
-    "__version__",
-    "qft",
-    "iqft",
-    "bernstein_vazirani",
-    "qpe",
-]

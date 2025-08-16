@@ -13,32 +13,21 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
+Module providing Quantum Phase Estimation (QPE) algorithm implementation.
 
-.. currentmodule:: qbraid_algorithms
-
-Modules
--------
+Functions
+----------
 
 .. autosummary::
     :toctree: ../stubs/
 
-    bernstein_vazirani
-    qft
-    iqft
-    qpe
+    load_program
+    generate_subroutine
+    get_result
+
 
 """
 
-from . import bernstein_vazirani, iqft, qft, qpe
-from ._version import __version__
+from .qpe import generate_subroutine, get_result, load_program
 
-__all__ = [
-    "__version__",
-    "qft",
-    "iqft",
-    "bernstein_vazirani",
-    "qpe",
-]
+__all__ = ["load_program", "generate_subroutine", "get_result"]
