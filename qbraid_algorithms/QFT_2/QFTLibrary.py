@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from qbraid_algorithms.QTran import *
+from ..QTran import *
 # from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
 import string
 
@@ -35,12 +35,12 @@ class QFTLibrary(GateLibrary):
         std.begin_gate(name,qargs)
         std.call_space = "{}"
         for i in range(len(qubits)):
-            std.h(names[i+1])
+            std.h(qargs[i])
             for j in range(i+1,len(qubits)):
-                std.call_gate("cp",names[j+1],controls=names[i+1],phases=f"pi/{2**(j-i)}")
+                std.call_gate("cp",qargs[j],controls=qargs[i],phases=f"pi/{2**(j-i)}")
         if(swap):
             for i in range(len(qubits)//2):
-                std.call_gate("swap",names[i],controls=names[-i-1])
+                std.call_gate("swap",qargs[i],controls=qargs[-i-1])
     
         std.end_gate()
 

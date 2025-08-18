@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # from GateLibrary import GateLibrary, std_gates
-from qbraid_algorithms.QTran import *
+from ..QTran import *
 # from qbraid_algorithms.QFT_2 import QFTLibrary
 import string
 
@@ -25,7 +25,7 @@ class AALibrary(GateLibrary):
         self.name = "AmplAmp"
 
     def Grover(self,H,qubits: list,depth:int):
-        name = f'AmplAmp{len(qubits)}{H.name}{depth}'
+        name = f'Grover{len(qubits)}{H.name}{depth}'
         if name in self.gate_ref:
             self.call_subroutine(name,[self.call_space.format("{" + " ,".join(str(i) for i in qubits)+"}")])
             # self.call_gate(name,qubits[-1],qubits[:-1])

@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from GateLibrary import GateLibrary, std_gates
-from QTran import FileBuilder, QasmBuilder, GateBuilder
-from QFTLibrary import QFTLibrary
+# from GateLibrary import GateLibrary, std_gates
+from QTran import *
+from QFT_2 import QFTLibrary
 import string
 
 class PhaseEstimationLibrary(GateLibrary):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
-    def phase_estimation(self, qubits:list,spectra:list,hamiltonian, evolution=False):
+    def phase_estimation(self, qubits:list,spectra:list,hamiltonian, evolution=None):
         name = f'P_EST_{len(qubits)}_{hamiltonian.name}'
         if name in self.gate_ref:
             self.call_gate(name,qubits[-1],qubits[:-1])
@@ -34,8 +34,11 @@ class PhaseEstimationLibrary(GateLibrary):
         # qargs = [names[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits))]
         std.begin_subroutine(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
         for i in range(len(spectra)):
-            for _ in range(2**i):
-                qft.controlled_op(ham.apply,[qubits,spectra[i]])
+            if evolution is not None:
+                std.controlled_op(lambda p : ham.apply(evolution*2**i,*p))
+            else:
+                for _ in range(2**i):
+                    std.controlled_op(ham.apply,[qubits,spectra[i]])
         qft.QFT(spectra)
         std.end_subroutine()
         p, i, d = sys.build()
@@ -50,6 +53,7 @@ class PhaseEstimationLibrary(GateLibrary):
         self.gate_ref.append(name)
         self.call_gate(name,qubits[-1],qubits[:-1])
         return name
+    
         
 
 

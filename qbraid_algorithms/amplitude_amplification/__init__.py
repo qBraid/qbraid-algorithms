@@ -25,9 +25,8 @@ Functions
 
 """
 
-from .amplitude_amplification import Amplification
 from .AmplAmpLibrary import AALibrary
 
 __all__ = [
-    "Amplification","AALibrary"
+    "AALibrary"
 ]
