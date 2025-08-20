@@ -12,20 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Module providing QFT algorithmic primitive implementation.
+from ..QTran import *
+from ..qft import QFTLibrary
 
-Functions
-----------
-
-.. autosummary::
-    :toctree: ../stubs/
-
-    QFT
-    QFT_Demo
-
-"""
-from .QFTLibrary import QFTLibrary
-
-__all__ = ['QFTLibrary']
-
+class ToeplitzLibrary(GateBuilder):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Fourier Transform (QFT) algorithm implementation.
+Module providing Several different implementations of block encoding
 
 Functions
 ----------
@@ -21,16 +21,12 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    load_program
-    generate_subroutine
+    QFT
+    QFT_Demo
 
 """
+from .PrepSelLibrary import PrepSelLibrary
+from .ToeplitzLibrary import ToeplitzLibrary
 
-from .qft import generate_subroutine, load_program
-from .QFTLibrary import QFTLibrary
+__all__ = ['PrepSelLibrary','ToeplitzLibrary']
 
-__all__ = [
-    "load_program",
-    "generate_subroutine",
-    "QFTLibrary"
-]
