@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from GateLibrary import GateLibrary, std_gates
 from ..QTran import *
-# from qbraid_algorithms.QFT_2 import QFTLibrary
 import string
 
 

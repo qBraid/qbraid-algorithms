@@ -13,8 +13,8 @@
 # limitations under the License.
 
 # from GateLibrary import GateLibrary, std_gates
-from QTran import *
-from QFT_2 import QFTLibrary
+from ..QTran import *
+from ..QFT_2 import QFTLibrary
 import string
 
 class PhaseEstimationLibrary(GateLibrary):
@@ -24,34 +24,39 @@ class PhaseEstimationLibrary(GateLibrary):
     def phase_estimation(self, qubits:list,spectra:list,hamiltonian, evolution=None):
         name = f'P_EST_{len(qubits)}_{hamiltonian.name}'
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
+            self.call_gate(name,spectra[-1],qubits+spectra[:-1])
             return name
         sys = GateBuilder()
         std = sys.import_library(std_gates)
         ham = sys.import_library(hamiltonian)
+        ham.call_space = " {}"
         qft = sys.import_library(QFTLibrary)
+        qft.call_space = " {}"
         # names = " " + string.ascii_letters
-        # qargs = [names[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits))]
-        std.begin_subroutine(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
+        qargs = [string.ascii_letters[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits)+len(spectra))]
+        # std.begin_gate(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
+        std.begin_gate(name,qargs)
         for i in range(len(spectra)):
             if evolution is not None:
-                std.controlled_op(lambda p : ham.apply(evolution*2**i,*p))
+                ham.controlled(evolution*2**i,qargs[:len(qubits)],qargs[len(qubits)+i])
             else:
                 for _ in range(2**i):
-                    std.controlled_op(ham.apply,[qubits,spectra[i]])
-        qft.QFT(spectra)
-        std.end_subroutine()
+                    ham.controlled(qargs[:len(qubits)],qargs[len(qubits)+i])
+        qft.QFT(qargs[len(qubits):])
+        std.end_gate()
         p, i, d = sys.build()
+        # print("phase lib:",p,i,d)
         for imps in i:
             if imps not in self.gate_import:
                 self.gate_import.append(imps)
             
-        for defs in d:
-            if defs[0] not in self.gate_defs:
-                self.gate_defs[defs[0]] = defs[1]
+        for nem, defs in d.items():
+            # print("name:",nem,"def:",defs)
+            if nem not in self.gate_defs:
+                self.gate_defs[nem] = defs
         self.gate_defs[name] = p
         self.gate_ref.append(name)
-        self.call_gate(name,qubits[-1],qubits[:-1])
+        self.call_gate(name,spectra[-1],qubits+spectra[:-1])
         return name
     
         

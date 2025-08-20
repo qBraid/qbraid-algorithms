@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Qasm file generator Qasmbuilder, and base class GateLibrary acting as a macro system on top
+Module providing QFT algorithmic primitive implementation.
 
 Functions
 ----------
@@ -21,9 +21,11 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    
-"""
-from .QasmBuilder import *
-from .GateLibrary import *
+    QFT
+    QFT_Demo
 
-__all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates']
+"""
+from .RodeoLibrary import RodeoLibrary
+
+__all__ = ['RodeoLibrary']
+

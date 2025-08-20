@@ -34,16 +34,16 @@ Class Extensions:
 
 class GateLibrary:
     """
-                                BASE GATE LIBRARY                            
-                                                                              
-     Core class for quantum gate operations and circuit building.            
-     Provides fundamental operations for:                                     
-     - Gate application with controls and phases                             
-     - Measurements and classical bit operations                             
-     - Control flow (loops, conditionals)                                    
-     - Gate and subroutine definitions                                       
-     - Code generation and scope management                                  
-    
+    BASE GATE LIBRARY                            
+                                                                            
+    Core class for quantum gate operations and circuit building.            
+    Provides fundamental operations for:                                     
+    - Gate application with controls and phases                             
+    - Measurements and classical bit operations                             
+    - Control flow (loops, conditionals)                                    
+    - Gate and subroutine definitions                                       
+    - Code generation and scope management                                  
+
     """
     
     def __init__(self, gate_import, gate_ref, gate_defs, program_append, builder, annotated=False):
@@ -70,11 +70,11 @@ class GateLibrary:
 
     def call_gate(self, gate, target, controls=None, phases=None, prefix=""):
         """
-                                   GATE APPLICATION                           
+        GATE APPLICATION                           
                                                                               
-         Apply a quantum gate with optional controls and phase parameters.    
-                                                                              
-         Format: [prefix][gate]([phases]) [controls...] [target];            
+        Apply a quantum gate with optional controls and phase parameters.    
+                                                                            
+        Format: [prefix][gate]([phases]) [controls...] [target];            
         
         
         Args:
@@ -119,12 +119,12 @@ class GateLibrary:
     
     def call_subroutine(self,subroutine,parameters,capture=None):
         """
-                            SUBROUTINE APPLICATION                           
-                                                                              
-         Apply a subroutine with parameters and optionally specify a target
-         variable to return value to    
-                                                                              
-         Format: [capture] = [subroutine](parameters);            
+        SUBROUTINE APPLICATION                           
+                                                                            
+        Apply a subroutine with parameters and optionally specify a target
+        variable to return value to    
+                                                                            
+        Format: [capture] = [subroutine](parameters);            
         
         
         Args:
@@ -142,11 +142,11 @@ class GateLibrary:
 
     def measure(self, qubits: list, clbits: list):
         """
-                                   MEASUREMENT                                
+        MEASUREMENT                                
                                                                               
-         Measure quantum bits and store results in classical bits.            
-                                                                              
-         Format: cb[{clbit_indices}] = measure qb[{qubit_indices}];           
+        Measure quantum bits and store results in classical bits.            
+                                                                            
+        Format: cb[{clbit_indices}] = measure qb[{qubit_indices}];           
         
         
         Args:
@@ -161,7 +161,7 @@ class GateLibrary:
 
     def comment(self, line: str):
         """
-                                    COMMENTS                                  
+        COMMENTS                                  
                                                                               
          Add comments to the generated code for documentation.                
          Supports both single-line (//) and multi-line (/* */) comments.     
@@ -181,30 +181,30 @@ class GateLibrary:
 
     def begin_if(self, conditional: str):
         """
-                                 CONDITIONAL BLOCK                           
+        CONDITIONAL BLOCK                           
                                                                               
-         Start a conditional execution block.                                 
-                                                                              
-         Format: if (condition) { ... }                                      
+        Start a conditional execution block.                                 
+                                                                            
+        Format: if (condition) { ... }                                      
         
         
         Args:
             conditional: Boolean expression string
         """
         call = f"if ({conditional})" + "{"
-        self.builder.scope += 1  # Increase indentation level
         self.program(call)
+        self.builder.scope += 1  # Increase indentation level
 
     def begin_loop(self, iter, id: str = "i"):
         """
-                                     LOOPS                                    
+        LOOPS                                    
                                                                               
-         Start a loop block with various iteration patterns:                  
-         - int: for int i in [0:n]                                           
-         - (start, end): for int i in [start:end]                            
-         - (start, step, end): for int i in [start:end:step]                 
-         - string: custom loop syntax                                        
-        
+        Start a loop block with various iteration patterns:                  
+        - int: for int i in [0:n]                                           
+        - (start, end): for int i in [start:end]                            
+        - (start, step, end): for int i in [start:end:step]                 
+        - string: custom loop syntax                                        
+    
         Args:
             iter: Loop specification (int, tuple, or string)
             id: Loop variable identifier
@@ -239,22 +239,23 @@ class GateLibrary:
             call = "for " + iter + "{"
             self.program(call)
             self.builder.scope += 1
-            return
+            return id
         else:
             print(f"loop has improper parameterization with: {iter}")
-            return
+            return None
         
         call = f"for {base} {id} in {dom} " + "{"
         self.program(call)
         self.builder.scope += 1
+        return id
 
     def begin_gate(self, name, qargs, params=None):
         """
-                                GATE DEFINITION                               
+        GATE DEFINITION                               
                                                                               
-         Define a custom quantum gate.                                        
+        Define a custom quantum gate.                                        
                                                                               
-         Format: gate name(params) qargs { ... }                             
+        Format: gate name(params) qargs { ... }                             
         
         Args:
             name: Gate name
@@ -263,18 +264,18 @@ class GateLibrary:
         """
         if name in self.gate_ref:
             print(f"warning: gate {name} replacing existing namespace")
-        call = f"gate {name}{"("+str(params)[1:-1]+")" if params is not None else ""} {",".join(qargs)}" +"{"
+        call = f"gate {name}{"("+",".join(params)+")" if params is not None else ""} {",".join(qargs)}" +"{"
         self.program(call)
         self.builder.scope += 1
 
 
     def begin_subroutine(self, name, parameters: list[str], return_type=None):
         """
-                              SUBROUTINE DEFINITION                           
-                                                                              
-         Define a classical subroutine with optional return type.             
-                                                                              
-         Format: def name(parameters) -> return_type { ... }                  
+        SUBROUTINE DEFINITION                            
+                                                                            
+        Define a classical subroutine with optional return type.             
+                                                                            
+        Format: def name(parameters) -> return_type { ... }                  
         
         
         Args:
@@ -311,11 +312,11 @@ class GateLibrary:
 
     def controlled_op(self, gate_call, params, n=0):
         """
-                                CONTROLLED OPERATIONS                         
-                                                                              
-         Apply gates with control qubits using the ctrl modifier.             
-                                                                              
-         Format: ctrl(n) @ gate_operation                                     
+        CONTROLLED OPERATIONS                         
+                                                                            
+        Apply gates with control qubits using the ctrl modifier.             
+                                                                            
+        Format: ctrl(n) @ gate_operation                                     
         
         
         Args:
@@ -334,11 +335,11 @@ class GateLibrary:
     
     def inverse_op(self, gate_call, params):
         """
-                                INVERSE OPERATIONS                         
-                                                                              
-         Apply inverse of gute using the inv modifier.             
-                                                                              
-         Format: inv @ gate_operation                                     
+        INVERSE OPERATIONS                         
+                                                                            
+        Apply inverse of gute using the inv modifier.             
+                                                                            
+        Format: inv @ gate_operation                                     
         
         
         Args:
@@ -362,7 +363,42 @@ class GateLibrary:
             name: Gate name
             gate_def: Gate definition string
         """
+        if name in self.gate_ref:
+            print(f"warning:  gate {name} replacing existing namespace")
         self.gate_defs[name] = gate_def
+        self.gate_ref.append(name)
+
+    def add_var(self,name,assignment = None,type= None):
+        '''
+        simple stub for programatically adding a variable
+
+        Args:
+            name: variable name
+            Assignment: whatever definition you want as long as it resolves to a string
+        '''
+        if name in self.gate_ref:
+            print(f"warning:  gate {name} replacing existing namespace")
+        call = f"{type if type is not None else "let"} {name} {f'= {assignment}' if assignment is not None else ""};"
+        self.program(call)
+        return name
+
+    def merge(self,program,imports,definitions,name):
+        """
+        Merges data from a built library/GateBuilder into the current library bases scope
+        Args:
+            program: Gate body which is added into definitions
+            imports: all imports the gate depends on
+            gate_def: Gate definitions for any child gates/dynamic libraries used
+
+        """
+        for imps in imports:
+            if imps not in self.gate_import:
+                self.gate_import.append(imps)
+            
+        for nem, defs in definitions.items():
+            if nem not in self.gate_defs:
+                self.gate_defs[nem] = defs
+        self.gate_defs[name] = program
         self.gate_ref.append(name)
 
 
