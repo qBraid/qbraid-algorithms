@@ -15,13 +15,15 @@
 from ..QTran import *
 import numpy as np
 import itertools
+from scipy.optimize import minimize
+import string
 
-class PrepSelLibrary(GateBuilder):
+class PrepSelLibrary(GateLibrary):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
     def prep_select(self,qubits,matrix,approximate=0):
-        if isinstance(matrix,tuple):
+        if len(np.array(matrix).shape)==1:
             id = hash(matrix)
             PauliString = matrix
         else:
@@ -32,26 +34,105 @@ class PrepSelLibrary(GateBuilder):
             self.call_gate(name,qubits[-1],qubits[:-1])
             return name
 
-    def gen_prepare_circuit(self,dist):
+    def prep(self,qubits,dist):
+        name = f"PREP_{hash(dist)}"
+        if name in self.gate_ref:
+            self.call_gate(name,qubits[-1],qubits[:-1])
+            return name, mapping
+
+        sys = GateBuilder()
+        std = sys.import_library(std_gates)
+        qb = int(np.ceil(np.log2(len(dist))))
+        names = string.ascii_letters
+        angles, mapping = self.gen_prep_angles(dist)
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(qb)]
+        std.begin_gate(name,qargs)
+        index = 0
+        for i in range(qb):
+            std.ry(angles[index],qargs[i])
+            index +=1
+        for x in range(3): 
+            for j in range(1,qb,2):
+                std.cry(angles[index],qargs[j-1],qargs[j]) 
+                index +=1 
+                
+            for j in range(2,qb,2):
+                std.cry(angles[index],qargs[j-1],qargs[j])    
+                index +=1 
+        std.end_gate()
+
+        self.merge(*sys.build(),name)
+        self.call_gate(name,qubits[-1],qubits[:-1])
+        return name, mapping
+    
+    def select(self,reg,operators,mapping):
+        pinv = {v:k for k,v in mapping.items()}
+        for i in range(len(operators)):
+            pass
+
+    
+    def Apply_operator(self,op,reg,anc,index):
+        if not isinstance(op,str):
+            #operator is a gate library object
+            pass
+
+        
+
+        # Process each symbol
+        for i, gate in enumerate(op):
+            match gate:  # Python 3.10+ (pattern matching)
+                case 'I':
+                    print(f"Step {i}: Identity gate (I)")
+                case 'X':
+                    print(f"Step {i}: Pauli-X gate")
+                case 'Y':
+                    print(f"Step {i}: Pauli-Y gate")
+                case 'Z':
+                    print(f"Step {i}: Pauli-Z gate")
+                case _:
+                    print(f"Step {i}: Unknown gate (should not happen)")
+
+
+    def gen_prep_angles(self,dist):
         y = lambda t: np.array([[np.cos(t/2),-np.sin(t/2)],[np.sin(t/2),np.cos(t/2)]])
-        cy = lambda t: np.block([[np.eye(2),np.zeros(2)],[np.zeros(2),y(t)]])
-        qb = np.ceil(np.log2(len(dist)))
-        ref = np.pad(dist,(0,2**qb-len(dist)))/np.linalg.norm(dist)
-        def cost(params):
+        cy = lambda t: np.block([[np.eye(2),np.zeros((2,2))],[np.zeros((2,2)),y(t)]])
+        qb = int(np.ceil(np.log2(len(dist))))
+        cdist = np.sort(dist)
+        indist = np.argsort(dist)
+        ref = np.pad(cdist,(0,int(2**qb-len(dist))),mode="constant",constant_values=0)/np.linalg.norm(dist)
+        def render_mat(params):
             sy = y(params[0])
             index = 1
             for i in range(1,qb):
                 sy = np.kron(y(params[index]),sy)
                 index +=1
-            dy = cy(params[index])  
-            index +=1
-            for j in range(1,qb//2):
-                dy = np.kron(cy(params[index]),dy)   
-                index +=1 
-            if qb%2 == 1:
-                dy = np.kron(np.eye(2),dy)
-            fit = (dy@sy)[:,0]     
+            fit = sy
+            for x in range(3):
+                dy = cy(params[index])  
+                index +=1
+                for j in range(1,qb//2):
+                    dy = np.kron(cy(params[index]),dy)   
+                    index +=1 
+                if qb%2 == 1:
+                    dy = np.kron(np.eye(2),dy)
+                    
+                uy = np.eye(2)
+                for j in range((qb-1)//2):
+                    uy = np.kron(cy(params[index]),uy)   
+                    index +=1 
+                if qb%2 == 0:
+                    uy = np.kron(np.eye(2),uy)
 
+                fit = uy@dy@fit
+            return fit[:,0]
+            # plt.plot(fit)
+        def cost(params):
+            fit = render_mat(params)
+            sety = np.sort(fit)
+            return 1-np.inner(ref,sety)
+        res = minimize(cost,x0=np.zeros(int(qb*4)))
+        diff = np.zip(indist,np.argsort(render_mat(res.x)))
+        return res.x, diff
 
     def gen_pauli_string(self,matrix, epsilon):
         """

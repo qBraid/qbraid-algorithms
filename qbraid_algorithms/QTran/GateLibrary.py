@@ -416,6 +416,7 @@ class std_gates(GateLibrary):
     
     # Standard gate set from OpenQASM 3.0 specification
     gates = ["phase", "x", "y", "z", "h", "s", "sdg", "sx", 
+             'rx','ry','rz'
              'cx', 'cy', 'cz', 'cp', 'crx', 'cry', 'crz', 
              'swap', 'ccx', 'cswap']
     
@@ -437,34 +438,51 @@ class std_gates(GateLibrary):
     #                           SINGLE-QUBIT GATES
     # ═══════════════════════════════════════════════════════════════════════════
 
-    def phase(self, theta, targ: int):
+    def phase(self, theta, targ):
         """Apply phase gate: |0⟩→|0⟩, |1⟩→e^(iθ)|1⟩"""
         self.call_gate("phase", targ, phases=theta)
 
-    def x(self, targ: int):
+    def x(self, targ):
         """Apply Pauli-X gate (bit flip): |0⟩→|1⟩, |1⟩→|0⟩"""
         self.call_gate('x', targ)
 
-    def y(self, targ: int):
+    def y(self, targ):
         """Apply Pauli-Y gate: |0⟩→i|1⟩, |1⟩→-i|0⟩"""
         self.call_gate('y', targ)
 
-    def z(self, targ: int):
+    def z(self, targ):
         """Apply Pauli-Z gate (phase flip): |0⟩→|0⟩, |1⟩→-|1⟩"""
         self.call_gate('z', targ)
 
-    def h(self, targ: int):
+    def h(self, targ):
         """Apply Hadamard gate: creates superposition"""
         self.call_gate('h', targ)
 
-    def s(self, targ: int):
+    def s(self, targ):
         """Apply S gate (phase): |1⟩→i|1⟩"""
         self.call_gate('s', targ)
 
-    def sdg(self, targ: int):
+    def sdg(self, targ):
         """Apply S-dagger gate (inverse phase): |1⟩→-i|1⟩"""
         self.call_gate('sdg', targ)
 
-    def sx(self, targ: int):
+    def sx(self, targ):
         """Apply square root of X gate"""
         self.call_gate('sx', targ)
+
+    def rx(self,theta,targ):
+        """Apply rx gate"""
+        self.call_gate("rx", targ, phases=theta)
+        
+    def ry(self,theta,targ):
+        """Apply ry gate"""
+        self.call_gate("ry", targ, phases=theta)
+        
+    def rz(self,theta,targ):
+        """Apply rz gate"""
+        self.call_gate("rz", targ, phases=theta)
+
+    def cry(self,theta,control,targ):
+        """Apply rz gate"""
+        self.call_gate("cry", targ,controls=control, phases=theta)
+
