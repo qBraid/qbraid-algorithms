@@ -12,53 +12,88 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Quantum Gate Library for Preparation and Selection Operations
+
+This module implements quantum gates for state preparation, operator selection,
+and Pauli string decomposition using quantum compilation techniques.
+"""
+
 from ..QTran import *
 import numpy as np
 import itertools
 from scipy.optimize import minimize
 import string
 
-class PrepSelLibrary(GateLibrary):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
 
-    def prep_select(self,qubits,matrix,approximate=0):
-        if len(np.array(matrix).shape)==1:
-            id = hash(matrix)
-            opChain = matrix
+class PrepSelLibrary(GateLibrary):
+    """Library for combined preparation and selection quantum operations."""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prep_select(self, qubits, matrix, approximate=0):
+        """
+        Create a preparation-selection gate for a given matrix/operator chain.
+        
+        Args:
+            qubits: Target qubits for the operation
+            matrix: Either a matrix to decompose or pre-computed operator chain
+            approximate: Approximation threshold for Pauli decomposition
+            
+        Returns:
+            Gate name and operation counts (if new gate created)
+        """
+        # Handle both matrix and pre-computed operator chain inputs
+        if len(np.array(matrix).shape) == 1:
+            op_chain = matrix
+            gate_id = abs(hash(tuple(matrix)))  # BUG FIX: Use tuple for abs(hashable
         else:
-            opChain = self.gen_pauli_string(matrix,approximate )
-            id = hash(opChain)
-        qb = int(np.ceil(np.log2(len(opChain))))
-        name = f"PS_{len(qubits)}_{id}"
+            op_chain = self.gen_pauli_string(matrix, approximate)
+            gate_id = abs(hash(tuple(op_chain)))  # BUG FIX: Use tuple for abs(hashable
+        
+        # Calculate required ancilla qubits
+        qb = int(np.ceil(np.log2(len(op_chain))))
+        name = f"PS_{len(qubits)}_{gate_id}"
+        print(op_chain)
+        # Claim quantum resources
         anc_q = self.builder.claim_qubits(qb)
         anc_c = self.builder.claim_clbits(qb)
+        
+        # Use existing gate if available
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],anc_q+qubits[:-1])
-            self.measure(anc_q,anc_c)
+            self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
+            self.measure(anc_q, anc_c)
             return name
         
+        # Build new gate
         sys = GateBuilder()
         std = sys.import_library(std_gates)
         prep = sys.import_library(Prep)
+        prep.call_space = "{}"
         sel = sys.import_library(Select)
+        sel.call_space = "{}"
+        
+        # Generate unique qubit argument names
         names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+qb)]
-
+        qargs = [names[i // len(names)] + names[i % len(names)] 
+                for i in range(len(qubits) + qb)]
+        
         std.begin_gate(name,qargs)
-        np, mapping = prep.prep(qargs[:qb],[a[1] for a in matrix])
-        ns = sel.select(qargs[qb:],qargs[:qb],opChain,mapping)
-        prep.inverse_op(prep.prep,[qargs[:qb],[a[1] for a in matrix]])
+        nprep, mapping = prep.prep(qargs[:qb],[a[1] for a in op_chain])
+        nsel = sel.select(qargs[qb:],qargs[:qb],[a[0] for a in op_chain],mapping)
+        prep.inverse_op(prep.prep,[qargs[:qb],[a[1] for a in op_chain]])
         std.end_gate()
 
-        self.merge(*sys.build(),name)
-        self.call_gate(name,qubits[-1],anc_q+qubits[:-1])
-        self.measure(anc_q,anc_c)
-        return name, np, ns
+        # Register and execute gate
+        self.merge(*sys.build(), name)
+        self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
+        self.measure(anc_q, anc_c)
         
-    
+        return name, nprep, nsel
+       
     @staticmethod
-    def gen_pauli_string(self,matrix, epsilon):
+    def gen_pauli_string(matrix, epsilon):
         """
         Decompose a square matrix into tensor products of Pauli matrices.
 
@@ -106,154 +141,286 @@ class PrepSelLibrary(GateLibrary):
         # Sort by absolute value of coefficient (descending)
         result.sort(key=lambda x: abs(x[1]), reverse=True)
         return result
-    
-        
+
 
 class Prep(GateLibrary):
-    def prep(self,qubits,dist):
-        name = f"PREP_{hash(dist)}"
+    """Quantum state preparation library using amplitude encoding."""
+    
+    def prep(self, qubits, dist):
+        """
+        Prepare a quantum state with given amplitude distribution.
+        
+        Args:
+            qubits: Target qubits for state preparation
+            dist: Probability/amplitude distribution
+            
+        Returns:
+            Gate name and state mapping
+        """
+        name = f"PREP_{abs(hash(tuple(dist)))}"  # BUG FIX: Use tuple for abs(hashing
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
-            return name
+            self.call_gate(name, qubits[-1],qubits[:-1])  # BUG FIX: Simplified call
+            return name, {}
 
+        # Build preparation circuit
         sys = GateBuilder()
         std = sys.import_library(std_gates)
+        std.call_space = "{}"
         qb = int(np.ceil(np.log2(len(dist))))
-        names = string.ascii_letters
+        
+        # Generate parameter angles and mapping
         angles, mapping = self.gen_prep_angles(dist)
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(qb)]
-        std.begin_gate(name,qargs)
-        index = 0
+        
+        # Create qubit argument names
+        names = string.ascii_letters
+        qargs = [names[i // len(names)] + names[i % len(names)] 
+                for i in range(qb)]
+        
+        std.begin_gate(name, qargs)
+        
+        # Apply rotation gates in structured pattern
+        angle_idx = 0
+        
+        # Initial Y-rotations
         for i in range(qb):
-            std.ry(angles[index],qargs[i])
-            index +=1
-        for x in range(3): 
-            for j in range(1,qb,2):
-                std.cry(angles[index],qargs[j-1],qargs[j]) 
-                index +=1 
+            std.ry(angles[angle_idx], qargs[i])
+            angle_idx += 1
+        
+        # Controlled Y-rotations in three layers
+        for layer in range(3): 
+            # Odd-indexed controls
+            for j in range(1, qb, 2):
+                if angle_idx < len(angles):  # BUG FIX: Bounds checking
+                    std.cry(angles[angle_idx], qargs[j-1], qargs[j]) 
+                    angle_idx += 1 
                 
-            for j in range(2,qb,2):
-                std.cry(angles[index],qargs[j-1],qargs[j])    
-                index +=1 
+            # Even-indexed controls  
+            for j in range(2, qb, 2):
+                if angle_idx < len(angles):  # BUG FIX: Bounds checking
+                    std.cry(angles[angle_idx], qargs[j-1], qargs[j])    
+                    angle_idx += 1 
+                    
         std.end_gate()
 
-        self.merge(*sys.build(),name)
-        self.call_gate(name,qubits[-1],qubits[:-1])
+        self.merge(*sys.build(), name)
+        self.call_gate(name, qubits[-1],qubits[:-1])  # BUG FIX: Simplified call
         return name, mapping
     
-    def gen_prep_angles(self,dist):
-        y = lambda t: np.array([[np.cos(t/2),-np.sin(t/2)],[np.sin(t/2),np.cos(t/2)]])
-        cy = lambda t: np.block([[np.eye(2),np.zeros((2,2))],[np.zeros((2,2)),y(t)]])
+    def gen_prep_angles(self, dist):
+        """
+        Generate rotation angles for state preparation via optimization.
+        
+        Args:
+            dist: Target probability distribution
+            
+        Returns:
+            Optimized angles and index mapping
+        """
+        # Gate definitions
+        y_rot = lambda t: np.array([[np.cos(t/2), -np.sin(t/2)], 
+                                   [np.sin(t/2), np.cos(t/2)]])
+        cy_rot = lambda t: np.block([[np.eye(2), np.zeros((2,2))], 
+                                    [np.zeros((2,2)), y_rot(t)]])
+        
         qb = int(np.ceil(np.log2(len(dist))))
-        cdist = np.sort(dist)
-        indist = np.argsort(dist)
-        ref = np.pad(cdist,(0,int(2**qb-len(dist))),mode="constant",constant_values=0)/np.linalg.norm(dist)
-        def render_mat(params):
-            sy = y(params[0])
-            index = 1
-            for i in range(1,qb):
-                sy = np.kron(y(params[index]),sy)
-                index +=1
+        sorted_dist = np.sort(dist)
+        sort_indices = np.argsort(dist)
+        
+        # Normalize and pad distribution
+        padded_size = 2**qb
+        ref_dist = np.pad(sorted_dist, (0, padded_size - len(dist)), 
+                         mode="constant", constant_values=0)
+        ref_dist = ref_dist / np.linalg.norm(ref_dist)
+        def render_state(params):
+            """Simulate quantum circuit with given parameters."""
+            # Initial Y-rotations
+            sy = y_rot(params[0])
+            param_idx = 1
+            
+            for i in range(1, qb):
+                if param_idx < len(params):
+                    sy = np.kron(y_rot(params[param_idx]), sy)
+                    param_idx += 1
             fit = sy
-            for x in range(3):
-                dy = cy(params[index])  
-                index +=1
-                for j in range(1,qb//2):
-                    dy = np.kron(cy(params[index]),dy)   
-                    index +=1 
-                if qb%2 == 1:
-                    dy = np.kron(np.eye(2),dy)
+            if qb > 1:
+                # Apply controlled rotations
+                for layer in range(3):
+                    # Build controlled gates
+                    dy = cy_rot(params[param_idx]) if param_idx < len(params) else np.eye(4)
+                    param_idx += 1
                     
-                uy = np.eye(2)
-                for j in range((qb-1)//2):
-                    uy = np.kron(cy(params[index]),uy)   
-                    index +=1 
-                if qb%2 == 0:
-                    uy = np.kron(np.eye(2),uy)
+                    for j in range(1, qb//2):
+                        if param_idx < len(params):
+                            dy = np.kron(cy_rot(params[param_idx]), dy)   
+                            param_idx += 1
+                            
+                    if qb % 2 == 1:
+                        dy = np.kron(np.eye(2), dy)
+                        
+                    # Upper controlled gates
+                    uy = np.eye(2)
+                    for j in range((qb-1)//2):
+                        if param_idx < len(params):
+                            uy = np.kron(cy_rot(params[param_idx]), uy)   
+                            param_idx += 1
+                            
+                    if qb % 2 == 0:
+                        uy = np.kron(np.eye(2), uy)
+                    # print(uy.shape,dy.shape,fit.shape)
+                    fit = uy @ dy @ fit
+                    
+            return fit[:, 0]
+        
+        def cost_function(params):
+            """Optimization cost: 1 - fidelity with target distribution."""
+            simulated = render_state(params)
+            sorted_sim = np.sort(np.abs(simulated))
+            return 1 - np.abs(np.inner(ref_dist, sorted_sim))
+        
+        # Optimize parameters
+        num_params = qb + 3*2*(qb//2)  # BUG FIX: More accurate parameter count
+        result = minimize(cost_function, x0=np.ones((num_params)))
+        
+        # Create mapping from original to sorted indices
+        final_state = render_state(result.x)
+        mapping = dict(zip(sort_indices, np.argsort(np.abs(final_state))))
+        
+        return result.x, mapping
 
-                fit = uy@dy@fit
-            return fit[:,0]
-            # plt.plot(fit)
-        def cost(params):
-            fit = render_mat(params)
-            sety = np.sort(fit)
-            return 1-np.inner(ref,sety)
-        res = minimize(cost,x0=np.zeros(int(qb*4)))
-        diff = np.zip(indist,np.argsort(render_mat(res.x)))
-        return res.x, diff
 
 class Select(GateLibrary): 
-    def select(self,qubits,anc,operators,mapping):
-        name = f"SEL_{hash(operators)}_{hash(mapping)}"
+    """Quantum operator selection library for controlled operations."""
+    
+    def select(self, qubits, anc, operators, mapping):
+        """
+        Apply selected operators based on ancilla qubit states.
+        
+        Args:
+            qubits: Target qubits for operations
+            anc: Ancilla qubits encoding selection
+            operators: List of operators to select from
+            mapping: Index mapping for operator selection
+            
+        Returns:
+            Gate name
+        """
+        gate_id = abs(hash((tuple(operators), tuple(mapping.items()))))
+        name = f"SEL_{gate_id}"
+        
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
-            return name, mapping
+            self.call_gate(name,  qubits[-1],anc + qubits[:-1])  # BUG FIX: Proper argument order
+            return name
 
-        names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+len(anc))]
+        # Generate argument names
+        names = string.ascii_letters  
+        qargs = [names[i // len(names)] + names[i % len(names)] 
+                for i in range(len(qubits) + len(anc))]
+        
         sys = GateBuilder()
         std = sys.import_library(std_gates)
-        Pauli = sys.import_library(PauliOperator)
+        std.call_space = "{}"
+        pauli_lib = sys.import_library(PauliOperator)
+        pauli_lib.call_space = "{}"
 
-        pinv = {v:k for k,v in mapping.items()}
-        std.begin_gate(name,qargs)
-        t = None
+        # Invert mapping for lookup
+        pinv = {v: k for k, v in mapping.items()}
+        
+        std.begin_gate(name, qargs)
+        
+        prev_gray = None
         for i in range(len(operators)):
-            r= i^(i>>1)
-            if t is not None:
-                b = (r^t).bit_length()-1
-                std.x(qargs[b])
+            # Gray code for efficient state transitions
+            gray_code = i ^ (i >> 1)
+            
+            if prev_gray is not None:
+                # Flip qubits that changed in Gray code
+                diff = gray_code ^ prev_gray
+                bit_pos = (diff & -diff).bit_length() - 1  # Find rightmost set bit
+                if bit_pos < len(anc):
+                    std.x(qargs[bit_pos])
 
-            map = pinv[i]
-            op = operators[map]
-            if isinstance(op,str):
-                Pauli.controlled_op(Pauli.pauli_operator,[qargs,op],n=len(anc))
-            else:
-                oper = sys.import_library(op)
-                oper.controlled(qargs[len(anc):],qargs[:len(anc)])
-        self.merge(*sys.build(),name)
-        self.call_gate(name,qubits[-1],qubits[:-1])
-    
+            # Apply selected operator
+            mapped_idx = pinv.get(i, i)  # BUG FIX: Handle missing mappings
+            if mapped_idx < len(operators):
+                op = operators[mapped_idx]
+                
+                if isinstance(op, str):
+                    # Pauli string operator
+                    pauli_lib.controlled_op(pauli_lib.pauli_operator, 
+                                          [qargs, op], n=len(anc))
+                else:
+                    # Custom gate library operator
+                    op_lib = sys.import_library(op)
+                    op_lib.controlled(qargs[len(anc):], qargs[:len(anc)])
+                    
+            prev_gray = gray_code
+            
+        std.end_gate()
+        
+        self.merge(*sys.build(), name)
+        self.call_gate(name,  qubits[-1],anc + qubits[:-1])  # BUG FIX: Proper argument order
+        return name
+
 
 class PauliOperator(GateLibrary):
+    """Library for Pauli string operations."""
     
-    def pauli_operator(self,qubits,op):
-        if not isinstance(op,str):
-            #operator is not a Pauli String, likely gate library
-            return 
+    def pauli_operator(self, qubits, op):
+        """
+        Apply a Pauli string operator to qubits.
         
-        # Define allowed symbols
+        Args:
+            qubits: Target qubits
+            op: Pauli string (e.g., "XYZI")
+            
+        Returns:
+            Gate name or None if invalid
+        """
+        if not isinstance(op, str):
+            # Not a Pauli string - skip
+            return None
+        
+        # Validate Pauli string
         valid_symbols = {'I', 'X', 'Y', 'Z'}
-
-        # Early exit if invalid
         if not all(ch in valid_symbols for ch in op):
-            print("Invalid Pauli string.")
-            return
+            print(f"Invalid Pauli string: {op}")
+            return None
         
         if op in self.gate_ref:
-            self.call_gate(op,qubits[-1],qubits[:-1])
+            self.call_gate(op, qubits[-1],qubits[:-1])
             return op
 
-        #time to define a new Pauli Operator
+        # BUG FIX: Correct qubit count
+        if len(op) > len(qubits):
+            print(f"Pauli string length {len(op)} doesn't match qubit count {len(qubits)}")
+            return None
+
+        # Create new Pauli operator gate
         names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len())]
+        qargs = [names[i // len(names)] + names[i % len(names)] 
+                for i in range(len(op))]  # BUG FIX: Use len(op)
+        
         sys = GateBuilder()
-        std=  sys.import_library(std_gates)
-        std.begin_gate(op,qargs)
-        # Process each symbol
+        std = sys.import_library(std_gates)
+        std.begin_gate(op, qargs)
+        std.call_space = "{}"
+        
+        # Apply Pauli gates
         for i, gate in enumerate(op):
             match gate: 
                 case 'I':
-                    pass
+                    pass  # Identity - no operation
                 case 'X':
-                    std.x(i)
+                    std.x(qargs[i])  # BUG FIX: Use qargs instead of index
                 case 'Y':
-                    std.y(i)
+                    std.y(qargs[i])
                 case 'Z':
-                    std.z(i)
+                    std.z(qargs[i])
                 case _:
-                    print(f"Step {i}: Unknown gate (should not happen)")
+                    print(f"Unknown Pauli gate: {gate}")
+                    
         std.end_gate()
-        self.merge(*sys.build(),op)
-        self.call_gate(op,qubits[-1],qubits[:-1])
+        
+        self.merge(*sys.build(), op)
+        self.call_gate(op,  qubits[-1],qubits[:-1])
         return op
