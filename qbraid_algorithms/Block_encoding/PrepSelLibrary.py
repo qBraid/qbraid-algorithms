@@ -25,115 +25,39 @@ class PrepSelLibrary(GateLibrary):
     def prep_select(self,qubits,matrix,approximate=0):
         if len(np.array(matrix).shape)==1:
             id = hash(matrix)
-            PauliString = matrix
+            opChain = matrix
         else:
-            PauliString = self.gen_pauli_string(matrix,approximate )
-            id = hash(PauliString)
-        name = f"PS_{id}"
+            opChain = self.gen_pauli_string(matrix,approximate )
+            id = hash(opChain)
+        qb = int(np.ceil(np.log2(len(opChain))))
+        name = f"PS_{len(qubits)}_{id}"
+        anc_q = self.builder.claim_qubits(qb)
+        anc_c = self.builder.claim_clbits(qb)
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
+            self.call_gate(name,qubits[-1],anc_q+qubits[:-1])
+            self.measure(anc_q,anc_c)
             return name
-
-    def prep(self,qubits,dist):
-        name = f"PREP_{hash(dist)}"
-        if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],qubits[:-1])
-            return name, mapping
-
+        
         sys = GateBuilder()
         std = sys.import_library(std_gates)
-        qb = int(np.ceil(np.log2(len(dist))))
+        prep = sys.import_library(Prep)
+        sel = sys.import_library(Select)
         names = string.ascii_letters
-        angles, mapping = self.gen_prep_angles(dist)
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(qb)]
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+qb)]
+
         std.begin_gate(name,qargs)
-        index = 0
-        for i in range(qb):
-            std.ry(angles[index],qargs[i])
-            index +=1
-        for x in range(3): 
-            for j in range(1,qb,2):
-                std.cry(angles[index],qargs[j-1],qargs[j]) 
-                index +=1 
-                
-            for j in range(2,qb,2):
-                std.cry(angles[index],qargs[j-1],qargs[j])    
-                index +=1 
+        np, mapping = prep.prep(qargs[:qb],[a[1] for a in matrix])
+        ns = sel.select(qargs[qb:],qargs[:qb],opChain,mapping)
+        prep.inverse_op(prep.prep,[qargs[:qb],[a[1] for a in matrix]])
         std.end_gate()
 
         self.merge(*sys.build(),name)
-        self.call_gate(name,qubits[-1],qubits[:-1])
-        return name, mapping
-    
-    def select(self,reg,operators,mapping):
-        pinv = {v:k for k,v in mapping.items()}
-        for i in range(len(operators)):
-            pass
-
-    
-    def Apply_operator(self,op,reg,anc,index):
-        if not isinstance(op,str):
-            #operator is a gate library object
-            pass
-
+        self.call_gate(name,qubits[-1],anc_q+qubits[:-1])
+        self.measure(anc_q,anc_c)
+        return name, np, ns
         
-
-        # Process each symbol
-        for i, gate in enumerate(op):
-            match gate:  # Python 3.10+ (pattern matching)
-                case 'I':
-                    print(f"Step {i}: Identity gate (I)")
-                case 'X':
-                    print(f"Step {i}: Pauli-X gate")
-                case 'Y':
-                    print(f"Step {i}: Pauli-Y gate")
-                case 'Z':
-                    print(f"Step {i}: Pauli-Z gate")
-                case _:
-                    print(f"Step {i}: Unknown gate (should not happen)")
-
-
-    def gen_prep_angles(self,dist):
-        y = lambda t: np.array([[np.cos(t/2),-np.sin(t/2)],[np.sin(t/2),np.cos(t/2)]])
-        cy = lambda t: np.block([[np.eye(2),np.zeros((2,2))],[np.zeros((2,2)),y(t)]])
-        qb = int(np.ceil(np.log2(len(dist))))
-        cdist = np.sort(dist)
-        indist = np.argsort(dist)
-        ref = np.pad(cdist,(0,int(2**qb-len(dist))),mode="constant",constant_values=0)/np.linalg.norm(dist)
-        def render_mat(params):
-            sy = y(params[0])
-            index = 1
-            for i in range(1,qb):
-                sy = np.kron(y(params[index]),sy)
-                index +=1
-            fit = sy
-            for x in range(3):
-                dy = cy(params[index])  
-                index +=1
-                for j in range(1,qb//2):
-                    dy = np.kron(cy(params[index]),dy)   
-                    index +=1 
-                if qb%2 == 1:
-                    dy = np.kron(np.eye(2),dy)
-                    
-                uy = np.eye(2)
-                for j in range((qb-1)//2):
-                    uy = np.kron(cy(params[index]),uy)   
-                    index +=1 
-                if qb%2 == 0:
-                    uy = np.kron(np.eye(2),uy)
-
-                fit = uy@dy@fit
-            return fit[:,0]
-            # plt.plot(fit)
-        def cost(params):
-            fit = render_mat(params)
-            sety = np.sort(fit)
-            return 1-np.inner(ref,sety)
-        res = minimize(cost,x0=np.zeros(int(qb*4)))
-        diff = np.zip(indist,np.argsort(render_mat(res.x)))
-        return res.x, diff
-
+    
+    @staticmethod
     def gen_pauli_string(self,matrix, epsilon):
         """
         Decompose a square matrix into tensor products of Pauli matrices.
@@ -182,3 +106,154 @@ class PrepSelLibrary(GateLibrary):
         # Sort by absolute value of coefficient (descending)
         result.sort(key=lambda x: abs(x[1]), reverse=True)
         return result
+    
+        
+
+class Prep(GateLibrary):
+    def prep(self,qubits,dist):
+        name = f"PREP_{hash(dist)}"
+        if name in self.gate_ref:
+            self.call_gate(name,qubits[-1],qubits[:-1])
+            return name
+
+        sys = GateBuilder()
+        std = sys.import_library(std_gates)
+        qb = int(np.ceil(np.log2(len(dist))))
+        names = string.ascii_letters
+        angles, mapping = self.gen_prep_angles(dist)
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(qb)]
+        std.begin_gate(name,qargs)
+        index = 0
+        for i in range(qb):
+            std.ry(angles[index],qargs[i])
+            index +=1
+        for x in range(3): 
+            for j in range(1,qb,2):
+                std.cry(angles[index],qargs[j-1],qargs[j]) 
+                index +=1 
+                
+            for j in range(2,qb,2):
+                std.cry(angles[index],qargs[j-1],qargs[j])    
+                index +=1 
+        std.end_gate()
+
+        self.merge(*sys.build(),name)
+        self.call_gate(name,qubits[-1],qubits[:-1])
+        return name, mapping
+    
+    def gen_prep_angles(self,dist):
+        y = lambda t: np.array([[np.cos(t/2),-np.sin(t/2)],[np.sin(t/2),np.cos(t/2)]])
+        cy = lambda t: np.block([[np.eye(2),np.zeros((2,2))],[np.zeros((2,2)),y(t)]])
+        qb = int(np.ceil(np.log2(len(dist))))
+        cdist = np.sort(dist)
+        indist = np.argsort(dist)
+        ref = np.pad(cdist,(0,int(2**qb-len(dist))),mode="constant",constant_values=0)/np.linalg.norm(dist)
+        def render_mat(params):
+            sy = y(params[0])
+            index = 1
+            for i in range(1,qb):
+                sy = np.kron(y(params[index]),sy)
+                index +=1
+            fit = sy
+            for x in range(3):
+                dy = cy(params[index])  
+                index +=1
+                for j in range(1,qb//2):
+                    dy = np.kron(cy(params[index]),dy)   
+                    index +=1 
+                if qb%2 == 1:
+                    dy = np.kron(np.eye(2),dy)
+                    
+                uy = np.eye(2)
+                for j in range((qb-1)//2):
+                    uy = np.kron(cy(params[index]),uy)   
+                    index +=1 
+                if qb%2 == 0:
+                    uy = np.kron(np.eye(2),uy)
+
+                fit = uy@dy@fit
+            return fit[:,0]
+            # plt.plot(fit)
+        def cost(params):
+            fit = render_mat(params)
+            sety = np.sort(fit)
+            return 1-np.inner(ref,sety)
+        res = minimize(cost,x0=np.zeros(int(qb*4)))
+        diff = np.zip(indist,np.argsort(render_mat(res.x)))
+        return res.x, diff
+
+class Select(GateLibrary): 
+    def select(self,qubits,anc,operators,mapping):
+        name = f"SEL_{hash(operators)}_{hash(mapping)}"
+        if name in self.gate_ref:
+            self.call_gate(name,qubits[-1],qubits[:-1])
+            return name, mapping
+
+        names = string.ascii_letters
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+len(anc))]
+        sys = GateBuilder()
+        std = sys.import_library(std_gates)
+        Pauli = sys.import_library(PauliOperator)
+
+        pinv = {v:k for k,v in mapping.items()}
+        std.begin_gate(name,qargs)
+        t = None
+        for i in range(len(operators)):
+            r= i^(i>>1)
+            if t is not None:
+                b = (r^t).bit_length()-1
+                std.x(qargs[b])
+
+            map = pinv[i]
+            op = operators[map]
+            if isinstance(op,str):
+                Pauli.controlled_op(Pauli.pauli_operator,[qargs,op],n=len(anc))
+            else:
+                oper = sys.import_library(op)
+                oper.controlled(qargs[len(anc):],qargs[:len(anc)])
+        self.merge(*sys.build(),name)
+        self.call_gate(name,qubits[-1],qubits[:-1])
+    
+
+class PauliOperator(GateLibrary):
+    
+    def pauli_operator(self,qubits,op):
+        if not isinstance(op,str):
+            #operator is not a Pauli String, likely gate library
+            return 
+        
+        # Define allowed symbols
+        valid_symbols = {'I', 'X', 'Y', 'Z'}
+
+        # Early exit if invalid
+        if not all(ch in valid_symbols for ch in op):
+            print("Invalid Pauli string.")
+            return
+        
+        if op in self.gate_ref:
+            self.call_gate(op,qubits[-1],qubits[:-1])
+            return op
+
+        #time to define a new Pauli Operator
+        names = string.ascii_letters
+        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len())]
+        sys = GateBuilder()
+        std=  sys.import_library(std_gates)
+        std.begin_gate(op,qargs)
+        # Process each symbol
+        for i, gate in enumerate(op):
+            match gate: 
+                case 'I':
+                    pass
+                case 'X':
+                    std.x(i)
+                case 'Y':
+                    std.y(i)
+                case 'Z':
+                    std.z(i)
+                case _:
+                    print(f"Step {i}: Unknown gate (should not happen)")
+        std.end_gate()
+        self.merge(*sys.build(),op)
+        self.call_gate(op,qubits[-1],qubits[:-1])
+        return op

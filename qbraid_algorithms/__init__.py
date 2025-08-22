@@ -34,7 +34,7 @@ Modules
 
 """
 
-from . import bernstein_vazirani, iqft, qft, qpe, QTran, QFT_2
+from . import bernstein_vazirani, iqft, qft, qpe, QTran
 from ._version import __version__
 
 __all__ = [

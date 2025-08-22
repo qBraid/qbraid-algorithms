@@ -14,7 +14,7 @@
 
 # from GateLibrary import GateLibrary, std_gates
 from ..QTran import *
-from ..QFT_2 import QFTLibrary
+from ..qft import QFTLibrary
 import string
 
 class PhaseEstimationLibrary(GateLibrary):
