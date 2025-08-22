@@ -18,3 +18,6 @@ from ..qft import QFTLibrary
 class ToeplitzLibrary(GateBuilder):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
+
+    def real_toeplitz(qubits,coefficients,):
+        name = f"R_TOP_{len(qubits)}_{abs(hash(tuple(coefficients)))}"
