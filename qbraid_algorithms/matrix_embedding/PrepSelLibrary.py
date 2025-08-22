@@ -187,7 +187,7 @@ class Prep(GateLibrary):
             angle_idx += 1
         
         # Controlled Y-rotations in three layers
-        for layer in range(3): 
+        for layer in range(2): 
             # Odd-indexed controls
             for j in range(1, qb, 2):
                 if angle_idx < len(angles):  # BUG FIX: Bounds checking
@@ -223,14 +223,14 @@ class Prep(GateLibrary):
                                     [np.zeros((2,2)), y_rot(t)]])
         
         qb = int(np.ceil(np.log2(len(dist))))
-        sorted_dist = np.sort(dist)
-        sort_indices = np.argsort(dist)
-        
         # Normalize and pad distribution
         padded_size = 2**qb
-        ref_dist = np.pad(sorted_dist, (0, padded_size - len(dist)), 
+        ref_dist = np.pad(dist, (0, padded_size - len(dist)), 
                          mode="constant", constant_values=0)
         ref_dist = ref_dist / np.linalg.norm(ref_dist)
+        sorted_dist = np.sort(ref_dist)
+        sort_indices = np.argsort(ref_dist)
+        
         def render_state(params):
             """Simulate quantum circuit with given parameters."""
             # Initial Y-rotations
@@ -244,7 +244,7 @@ class Prep(GateLibrary):
             fit = sy
             if qb > 1:
                 # Apply controlled rotations
-                for layer in range(3):
+                for layer in range(2):
                     # Build controlled gates
                     dy = cy_rot(params[param_idx]) if param_idx < len(params) else np.eye(4)
                     param_idx += 1
@@ -274,17 +274,21 @@ class Prep(GateLibrary):
         def cost_function(params):
             """Optimization cost: 1 - fidelity with target distribution."""
             simulated = render_state(params)
-            sorted_sim = np.sort(np.abs(simulated))
-            return 1 - np.abs(np.inner(ref_dist, sorted_sim))
+            sorted_sim = np.sort(simulated)
+            return 1 - np.abs(np.inner(sorted_dist, sorted_sim))
         
         # Optimize parameters
-        num_params = qb + 3*2*(qb//2)  # BUG FIX: More accurate parameter count
-        result = minimize(cost_function, x0=np.ones((num_params)))
-        
+        num_params = qb + 2*2*(qb//2)  # BUG FIX: More accurate parameter count
+        result = minimize(cost_function, x0=np.ones((num_params))*.1)
+        print(result)
+
+
         # Create mapping from original to sorted indices
         final_state = render_state(result.x)
-        mapping = dict(zip(sort_indices, np.argsort(np.abs(final_state))))
-        
+        mapping = dict(zip(sort_indices, np.argsort(final_state)))
+        print(ref_dist)
+        print(final_state)
+        print([final_state[mapping[i]] for i in range(len(dist))])
         return result.x, mapping
 
 
@@ -354,7 +358,9 @@ class Select(GateLibrary):
                     op_lib.controlled(qargs[len(anc):], qargs[:len(anc)])
                     
             prev_gray = gray_code
-            
+        for j in range(len(anc)):
+            if (prev_gray>>j)%2 == True:
+                std.x(qargs[j])
         std.end_gate()
         
         self.merge(*sys.build(), name)

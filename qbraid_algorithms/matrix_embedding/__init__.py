@@ -26,7 +26,7 @@ Functions
 
 """
 from .PrepSelLibrary import PrepSelLibrary, Prep, Select
-from .ToeplitzLibrary import ToeplitzLibrary
+from .ToeplitzLibrary import Toeplitz
 
-__all__ = ['PrepSelLibrary','ToeplitzLibrary','Prep','Select']
+__all__ = ['PrepSelLibrary','Toeplitz','Prep','Select']
 
