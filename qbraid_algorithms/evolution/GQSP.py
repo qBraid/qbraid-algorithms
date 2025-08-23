@@ -12,23 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
 
-Functions
-----------
+from ..QTran import *
+import numpy as np
+import itertools
+from scipy.optimize import minimize
+import string
 
-.. autosummary::
-    :toctree: ../stubs/
-
-    load_program
-    generate_subroutine
-    get_result
-
-
-"""
-
-from .qpe import generate_subroutine, get_result, load_program
-from .PhaseEstLibrary import PhaseEstimationLibrary
-
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+class GQSP(GateLibrary):
+    '''
+    use this paper for future work, to be more in line with the actual gqsp implementation:
+    arXiv:2105.02859 <https://arxiv.org/abs/2105.02859>
+    this current work is essentially an incomplete derivative, but it works for any low degree polynomial   
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

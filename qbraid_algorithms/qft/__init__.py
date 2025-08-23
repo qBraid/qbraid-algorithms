@@ -27,8 +27,10 @@ Functions
 """
 
 from .qft import generate_subroutine, load_program
+from .QFTLibrary import QFTLibrary
 
 __all__ = [
     "load_program",
     "generate_subroutine",
+    "QFTLibrary"
 ]

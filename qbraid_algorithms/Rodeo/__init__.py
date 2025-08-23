@@ -13,36 +13,19 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
+Module providing QFT algorithmic primitive implementation.
 
-.. currentmodule:: qbraid_algorithms
-
-Modules
--------
+Functions
+----------
 
 .. autosummary::
     :toctree: ../stubs/
 
-    bernstein_vazirani
-    qft
-    iqft
-    qpe
-    QFT_2
-    QTran
+    QFT
+    QFT_Demo
 
 """
+from .RodeoLibrary import RodeoLibrary
 
-from . import bernstein_vazirani, iqft, qft, qpe, QTran
-from ._version import __version__
+__all__ = ['RodeoLibrary']
 
-__all__ = [
-    "__version__",
-    "qft",
-    "iqft",
-    "bernstein_vazirani",
-    "qpe",
-    "QTran",
-    "QFT_2"
-]
