@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Several different implementations of block encoding
+Module providing Several different implementations of hamiltonian evolution
 
 Functions
 ----------
@@ -25,8 +25,7 @@ Functions
     QFT_Demo
 
 """
-from .PrepSelLibrary import PrepSelLibrary, Prep, Select
-from .ToeplitzLibrary import Toeplitz, Diagonal
+
 
 __all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal']
 

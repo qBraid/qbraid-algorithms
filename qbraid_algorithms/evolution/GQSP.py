@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Module providing Several different implementations of block encoding
 
-Functions
-----------
+from ..QTran import *
+import numpy as np
+import itertools
+from scipy.optimize import minimize
+import string
 
-.. autosummary::
-    :toctree: ../stubs/
-
-    QFT
-    QFT_Demo
-
-"""
-from .PrepSelLibrary import PrepSelLibrary, Prep, Select
-from .ToeplitzLibrary import Toeplitz, Diagonal
-
-__all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal']
-
+class GQSP(GateLibrary):
+    '''
+    use this paper for future work, to be more in line with the actual gqsp implementation:
+    arXiv:2105.02859 <https://arxiv.org/abs/2105.02859>
+    this current work is essentially an incomplete derivative, but it works for any low degree polynomial   
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
