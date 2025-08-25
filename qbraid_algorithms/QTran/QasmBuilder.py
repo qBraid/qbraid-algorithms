@@ -138,6 +138,11 @@ class GateBuilder(FileBuilder):
         specializing for gate definition output format.
         """
         super().__init__()
+    
+    def import_library(self, lib_class, annotated=False):
+        ret = super().import_library(lib_class, annotated)
+        ret.call_space = " {}"
+        return  ret
 
     def build(self):
         """
