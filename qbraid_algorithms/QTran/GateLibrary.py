@@ -136,7 +136,7 @@ class GateLibrary:
                   f"make sure that this isn't a floating reference / malformed statement, "
                   f"or is at least previously defined within untracked environment definitions")
 
-        call = f"{capture + " = " if capture is not None else ""} {subroutine}({", ".join(str(a) for a in parameters)});"
+        call = f"{capture + " = " if capture is not None else ""}{subroutine}({", ".join(str(a) for a in parameters)});"
         self.program(call)
 
 

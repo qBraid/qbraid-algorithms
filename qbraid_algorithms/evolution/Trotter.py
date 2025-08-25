@@ -34,13 +34,13 @@ class Trotter(GateLibrary):
             self.call_subroutine(name,[qubits,t,depth])
             return
         
-        self.gate_ref.append(name)
         sys = self.builder
         std = sys.import_library(std_gates)
         Ha = sys.import_library(Hp)
         Hb = sys.import_library(Hq)
 
         std.begin_subroutine(name,[f"qubit[{len(qubits)}] a","float r","int d"])
+        self.gate_ref.append(name)
         std.begin_if("d < 2")
         Ha.apply("r/2",[f"a[{i}]" for i in range(len(qubits))])
         Hb.apply("r",[f"a[{i}]" for i in range(len(qubits))])
@@ -56,7 +56,7 @@ class Trotter(GateLibrary):
         std.end_subroutine()
 
         
-        self.call_subroutine(name,[qubits,t,depth])
+        self.call_subroutine(name,[self.call_space.format("{"+" ,".join([str(q) for q in qubits])+"}"),t,depth])
 
 
 
