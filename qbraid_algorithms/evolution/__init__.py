@@ -21,11 +21,12 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    QFT
-    QFT_Demo
+    GQSP
+    Trotter
 
 """
+from .GQSP import GQSP
+from .Trotter import Trotter
 
-
-__all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal']
+__all__ = ['Trotter','GQSP']
 

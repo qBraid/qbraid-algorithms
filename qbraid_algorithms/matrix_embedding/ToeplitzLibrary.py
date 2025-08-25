@@ -74,8 +74,6 @@ class Toeplitz(GateLibrary):
             return name
 
 
-
-
 class Diagonal(GateLibrary):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)

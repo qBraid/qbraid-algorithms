@@ -35,7 +35,9 @@ class AALibrary(GateLibrary):
         names = string.ascii_letters
         qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
-        
+        # WIP! swap commenting of implementation if subroutine misbehaves/does not work with current parser
+        # subrouting keeps the generated code compact whereas gates cannot use loops (thus following gate impl will need to be fixed with python loop)
+
         # std.begin_gate(name,qargs)
         # # first application of z prep
         # [std.h(i) for i in qargs]
