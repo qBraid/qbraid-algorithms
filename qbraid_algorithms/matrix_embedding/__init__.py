@@ -25,8 +25,8 @@ Functions
     QFT_Demo
 
 """
-from .PrepSelLibrary import PrepSelLibrary, Prep, Select
+from .PrepSelLibrary import PrepSelLibrary, Prep, Select, PauliOperator
 from .ToeplitzLibrary import Toeplitz, Diagonal
 
-__all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal']
+__all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal','PauliOperator']
 
