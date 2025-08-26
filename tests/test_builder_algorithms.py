@@ -1,3 +1,17 @@
+# Copyright 2025 qBraid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Test Algorithms - Semantic Validation
 
@@ -18,7 +32,7 @@ import tempfile
 import os
 from itertools import combinations
 
-# Import your modules (adjust paths as needed)
+# Import modules
 from qbraid_algorithms.QTran import *
 from qbraid_algorithms.evolution import *
 from qbraid_algorithms.matrix_embedding import *
@@ -36,39 +50,33 @@ class TestGQSPAlgorithm:
     def setup_method(self):
         """Set up test environment."""
         self.test_hamiltonians = create_test_hamiltonians(reg_size=3)
-        self.test_qubits = [f'q[{i}]' for i in range(3)]
+        self.test_qubits = [*range(3)]
         self.test_phases = [0.1, 0.2, 0.3, 0.15, 0.25, 0.35, 0.05]  # 2*depth + 1
         
     def test_gqsp_basic_functionality(self):
         """Test GQSP with basic parameters."""
         for ham_name, hamiltonian in self.test_hamiltonians.items():
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             gqsp = builder.import_library(GQSP)
-            
-            std.begin_program()
-            std.qubit(4)  # 3 target + 1 ancilla
-            std.bit(4)
             
             try:
                 # Test GQSP with depth 3
                 gqsp.GQSP(self.test_qubits, self.test_phases, hamiltonian, depth=3)
-                std.measure_all()
-                std.end_program()
+                std.measure(self.test_qubits,self.test_qubits)
                 
-                program, imports, defs = builder.build()
+                program = builder.build()
                 
                 # Validate structure
                 assert isinstance(program, str)
                 assert len(program) > 0
                 
                 # Should contain GQSP-specific elements
-                full_qasm = self._build_full_qasm(program, imports, defs)
-                assert 'GQSP' in full_qasm or 'gqsp' in full_qasm.lower()
+                assert 'GQSP' in program or 'gqsp' in program.lower()
                 
                 # Validate with pyqasm
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
-                assert is_valid, f"GQSP failed for {ham_name}: {error_msg}\nQASM:\n{full_qasm}"
+                is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
+                assert is_valid, f"GQSP failed for {ham_name}: {error_msg}\nQASM:\n{program}"
                 
             except Exception as e:
                 pytest.fail(f"GQSP basic test failed for {ham_name}: {str(e)}")
@@ -79,21 +87,17 @@ class TestGQSPAlgorithm:
         hamiltonian = list(self.test_hamiltonians.values())[0]  # Use first Hamiltonian
         
         for depth in depths:
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             gqsp = builder.import_library(GQSP)
             
             # Generate appropriate number of phases
             phases = [0.1 * (i + 1) for i in range(2 * depth + 1)]
             
-            std.begin_program()
-            std.qubit(4)
-            std.bit(4)
             
             try:
                 gqsp.GQSP(self.test_qubits, phases, hamiltonian, depth=depth)
-                std.measure_all()
-                std.end_program()
+                std.measure(self.test_qubits,self.test_qubits)
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -174,19 +178,15 @@ class TestTrotterAlgorithm:
         ham_pairs = list(combinations(self.test_hamiltonians.items(), 2))[:3]  # Test 3 pairs
         
         for (name1, ham1), (name2, ham2) in ham_pairs:
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             trotter = builder.import_library(Trotter)
             
-            std.begin_program()
-            std.qubit(3)
-            std.bit(3)
             
             try:
                 # Test Suzuki-Trotter decomposition
                 trotter.trot_suz(self.test_qubits, "0.5", ham1, ham2, depth=2)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -207,18 +207,13 @@ class TestTrotterAlgorithm:
         ham1, ham2 = list(self.test_hamiltonians.values())[:2]
         
         for depth in depths:
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             trotter = builder.import_library(Trotter)
-            
-            std.begin_program()
-            std.qubit(3)
-            std.bit(3)
             
             try:
                 trotter.trot_suz(self.test_qubits, "0.3", ham1, ham2, depth=depth)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -234,13 +229,9 @@ class TestTrotterAlgorithm:
         """Test Trotter with multiple Hamiltonians."""
         hamiltonians = list(self.test_hamiltonians.values())[:3]  # Test with 3 Hamiltonians
         
-        builder = GateBuilder()
+        builder = QasmBuilder(3)
         std = builder.import_library(std_gates)
         trotter = builder.import_library(Trotter)
-        
-        std.begin_program()
-        std.qubit(3)
-        std.bit(3)
         
         try:
             # Test multi-Hamiltonian Trotter
@@ -262,13 +253,10 @@ class TestTrotterAlgorithm:
         """Test linear (first-order) Trotter decomposition."""
         hamiltonians = list(self.test_hamiltonians.values())[:2]
         
-        builder = GateBuilder()
+        builder = QasmBuilder(3)
         std = builder.import_library(std_gates)
         trotter = builder.import_library(Trotter)
         
-        std.begin_program()
-        std.qubit(3)
-        std.bit(3)
         
         try:
             # Test linear Trotter
@@ -292,18 +280,13 @@ class TestTrotterAlgorithm:
         ham1, ham2 = list(self.test_hamiltonians.values())[:2]
         
         for time_param in time_params:
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             trotter = builder.import_library(Trotter)
-            
-            std.begin_program()
-            std.qubit(3)
-            std.bit(3)
             
             try:
                 trotter.trot_suz(self.test_qubits, time_param, ham1, ham2, depth=1)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -333,11 +316,11 @@ class TestPrepSelAlgorithm:
         ]
         
         for i, matrix in enumerate(test_matrices):
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             prep_sel = builder.import_library(PrepSelLibrary)
             
-            std.begin_program()
+            
             std.qubit(6)  # Need extra qubits for ancillas
             std.bit(6)
             
@@ -345,7 +328,6 @@ class TestPrepSelAlgorithm:
                 # Test prep-select with matrix
                 prep_sel.prep_select(self.test_qubits, matrix, approximate=0.1)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -370,18 +352,17 @@ class TestPrepSelAlgorithm:
         ]
         
         for i, chain in enumerate(test_chains):
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             prep_sel = builder.import_library(PrepSelLibrary)
             
-            std.begin_program()
+            
             std.qubit(8)  # Extra qubits for larger chains
             std.bit(8)
             
             try:
                 prep_sel.prep_select(self.test_qubits, chain)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -404,20 +385,19 @@ class TestPrepSelAlgorithm:
         ]
         
         for i, dist in enumerate(test_distributions):
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             prep = builder.import_library(Prep)
             
             qubits = [f'q[{j}]' for j in range(int(np.ceil(np.log2(len(dist)))))]
             
-            std.begin_program()
+            
             std.qubit(len(qubits) + 1)
             std.bit(len(qubits) + 1)
             
             try:
                 prep.prep(qubits, dist)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -437,11 +417,11 @@ class TestPrepSelAlgorithm:
         operators = ["X", "Y", "Z", "XX"]
         mapping = {0: 0, 1: 1, 2: 2, 3: 3}
         
-        builder = GateBuilder()
+        builder = QasmBuilder(3)
         std = builder.import_library(std_gates)
         select = builder.import_library(Select)
         
-        std.begin_program()
+        
         std.qubit(6)
         std.bit(6)
         
@@ -472,20 +452,19 @@ class TestPrepSelAlgorithm:
         pauli_strings = ["X", "Y", "Z", "XX", "XY", "XZ", "XYZI", "IXYZ"]
         
         for pauli_str in pauli_strings:
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             pauli = builder.import_library(PauliOperator)
             
             qubits = [f'q[{i}]' for i in range(len(pauli_str))]
             
-            std.begin_program()
+            
             std.qubit(len(qubits))
             std.bit(len(qubits))
             
             try:
                 pauli.pauli_operator(qubits, pauli_str)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -514,18 +493,14 @@ class TestAlgorithmIntegration:
         phases = [0.1, 0.2, 0.3]  # depth=1
         
         for ham_name, hamiltonian in self.test_hamiltonians.items():
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             gqsp = builder.import_library(GQSP)
             
-            std.begin_program()
-            std.qubit(4)
-            std.bit(4)
             
             try:
                 gqsp.GQSP(self.test_qubits, phases, hamiltonian, depth=1)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -545,18 +520,17 @@ class TestAlgorithmIntegration:
             name1, ham1 = ham_items[i]
             name2, ham2 = ham_items[i + 1]
             
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             trotter = builder.import_library(Trotter)
             
-            std.begin_program()
-            std.qubit(3)
-            std.bit(3)
+            
+            
+            
             
             try:
                 trotter.trot_suz(self.test_qubits, "0.1", ham1, ham2, depth=1)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -575,19 +549,18 @@ class TestAlgorithmIntegration:
         # Test very small times
         small_times = ["1e-6", "0.001", "0.01"]
         for time in small_times:
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             trotter = builder.import_library(Trotter)
             
-            std.begin_program()
-            std.qubit(3)
-            std.bit(3)
+            
+            
+            
             
             try:
                 ham_pair = list(self.test_hamiltonians.values())[:2]
                 trotter.trot_suz(self.test_qubits, time, ham_pair[0], ham_pair[1], depth=1)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -611,11 +584,11 @@ class TestAlgorithmIntegration:
             qubits = [f'q[{i}]' for i in range(n_qubits)]
             
             # Test GQSP scaling
-            builder = GateBuilder()
+            builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             gqsp = builder.import_library(GQSP)
             
-            std.begin_program()
+            
             std.qubit(n_qubits + 1)  # +1 for ancilla
             std.bit(n_qubits + 1)
             
@@ -624,7 +597,6 @@ class TestAlgorithmIntegration:
                 hamiltonian = list(test_hams.values())[0]
                 gqsp.GQSP(qubits, phases, hamiltonian, depth=1)
                 std.measure_all()
-                std.end_program()
                 
                 program, imports, defs = builder.build()
                 full_qasm = self._build_full_qasm(program, imports, defs)
@@ -679,13 +651,13 @@ class TestAlgorithmStressTests:
         ham_list = list(hamiltonians.values())[:2]
         qubits = ['q[0]', 'q[1]', 'q[2]']
         
-        builder = GateBuilder()
+        builder = QasmBuilder(3)
         std = builder.import_library(std_gates)
         gqsp = builder.import_library(GQSP)
         trotter = builder.import_library(Trotter)
         prep_sel = builder.import_library(PrepSelLibrary)
         
-        std.begin_program()
+        
         std.qubit(8)  # Plenty of qubits
         std.bit(8)
         
@@ -719,11 +691,11 @@ class TestAlgorithmStressTests:
         hamiltonian = list(hamiltonians.values())[0]
         
         # Test higher depth GQSP (but not too high for test speed)
-        builder = GateBuilder()
+        builder = QasmBuilder(3)
         std = builder.import_library(std_gates)
         gqsp = builder.import_library(GQSP)
         
-        std.begin_program()
+        
         std.qubit(4)
         std.bit(4)
         

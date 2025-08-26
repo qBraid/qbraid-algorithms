@@ -416,8 +416,8 @@ class std_gates(GateLibrary):
     
     # Standard gate set from OpenQASM 3.0 specification
     gates = ["phase", "x", "y", "z", "h", "s", "sdg", "sx", 
-             'rx','ry','rz'
-             'cx', 'cy', 'cz', 'cp', 'crx', 'cry', 'crz', 
+             'rx','ry','rz',
+             'cx', 'cy', 'cz', 'cp', 'crx', 'cry', 'crz', 'cnot',
              'swap', 'ccx', 'cswap']
     
     name = 'stdgates.inc'  # Standard library file name
@@ -481,6 +481,13 @@ class std_gates(GateLibrary):
     def rz(self,theta,targ):
         """Apply rz gate"""
         self.call_gate("rz", targ, phases=theta)
+
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    #                           Two-QUBIT GATES
+    # ═══════════════════════════════════════════════════════════════════════════
+    def cnot(self,control,targ):
+        self.call_gate("cnot",targ,controls=control)
 
     def cry(self,theta,control,targ):
         """Apply rz gate"""
