@@ -20,10 +20,9 @@ Functions
 
 .. autosummary::
     :toctree: ../stubs/
-
-    QFT
-    QFT_Demo
-
+    
+    RodeoLibrary
+    
 """
 from .RodeoLibrary import RodeoLibrary
 

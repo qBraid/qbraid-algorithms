@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from GateLibrary import GateLibrary, std_gates
-from QTran import FileBuilder, QasmBuilder, GateBuilder
-from QFTLibrary import QFTLibrary
-from PhaseEstLibrary import PhaseEstimationLibrary
-import string
+
+from ..qpe import PhaseEstimationLibrary
+
+# from GateLibrary import GateLibrary, std_gates
+from ..QTran import *
+
 
 def HHLLibrary(PhaseEstimation):
     def __init__(self,*args,**kwargs):

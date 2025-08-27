@@ -21,8 +21,8 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    Amplification
-
+    AALibrary
+    
 """
 
 from .AmplAmpLibrary import AALibrary

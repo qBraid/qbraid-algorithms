@@ -13,8 +13,11 @@
 # limitations under the License.
 
 
+import random
+import string
+
 from ..QTran import *
-import string, random
+
 
 class RodeoLibrary(GateLibrary):
     def __init__(self,*args,**kwargs):

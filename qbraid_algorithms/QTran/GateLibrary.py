@@ -348,10 +348,10 @@ class GateLibrary:
         """
         if isinstance(gate_call, str):
             # Direct gate name - call with inv prefix
-            self.call_gate(gate_call, *params, prefix=f"inv @")
+            self.call_gate(gate_call, *params, prefix="inv @")
         else:
             # Gate function - set modifier and call
-            self.prefix = f"inv @ "
+            self.prefix = "inv @ "
             gate_call(*params)
             self.prefix = ""
 

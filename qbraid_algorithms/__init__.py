@@ -24,17 +24,32 @@ Modules
 
 .. autosummary::
     :toctree: ../stubs/
-
+    
     bernstein_vazirani
     qft
     iqft
     qpe
-    QFT_2
     QTran
-
+    HHL
+    evolution
+    matrix_embedding
+    amplitude_amplification
+    Rodeo
+    
 """
 
-from . import bernstein_vazirani, iqft, qft, qpe, QTran, evolution, matrix_embedding, amplitude_amplification
+from . import (
+    HHL,
+    QTran,
+    Rodeo,
+    amplitude_amplification,
+    bernstein_vazirani,
+    evolution,
+    iqft,
+    matrix_embedding,
+    qft,
+    qpe,
+)
 from ._version import __version__
 
 __all__ = [
@@ -47,5 +62,7 @@ __all__ = [
     "QFT_2",
     'evolution',
     'matrix_embedding',
-    'amplitude_amplification'
+    'amplitude_amplification',
+    'HHL',
+    'Rodeo'
 ]

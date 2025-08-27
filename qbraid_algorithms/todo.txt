@@ -15,3 +15,7 @@ means that only update would be safety checking certain calls when not establish
 Ambiguous:
 pragma annotations in general
 -specifically one for 0 state ancilla postselection?
+
+Testing:
+direct pyqasm validation tests have been suspended due to lack of controlled op and subroutine scope support in pyqasm module
+- once those are fixed and released in new pyqasm version, "assert is_valid" checks need to be uncommented

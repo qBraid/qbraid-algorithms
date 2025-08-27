@@ -20,10 +20,16 @@ Functions
 
 .. autosummary::
     :toctree: ../stubs/
-
+    
+    FileBuilder
+    GateBuilder
+    QasmBuilder
+    IncludeBuilder  
+    GateLibrary
+    std_gates
     
 """
-from .QasmBuilder import FileBuilder, GateBuilder, QasmBuilder, IncludeBuilder
 from .GateLibrary import GateLibrary, std_gates
+from .QasmBuilder import FileBuilder, GateBuilder, IncludeBuilder, QasmBuilder
 
 __all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates']

@@ -19,11 +19,13 @@ This module implements quantum gates for state preparation, operator selection,
 and Pauli string decomposition using quantum compilation techniques.
 """
 
-from ..QTran import *
-import numpy as np
 import itertools
-from scipy.optimize import minimize
 import string
+
+import numpy as np
+from scipy.optimize import minimize
+
+from ..QTran import *
 
 
 class PrepSelLibrary(GateLibrary):

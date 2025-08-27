@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..QTran import *
 import string
+
+from ..QTran import *
 
 
 class AALibrary(GateLibrary):
@@ -25,7 +26,7 @@ class AALibrary(GateLibrary):
     def Grover(self,H,qubits: list,depth:int):
         name = f'Grover{len(qubits)}{H.name}{depth}'
         if name in self.gate_ref:
-            self.call_subroutine(name,[self.call_space.format("{" + " ,".join(str(i) for i in qubits)+"}")])
+            self.call_subroutine(name,[self.call_space.format("{"+" ,".join(str(i) for i in qubits)+"}")])
             # self.call_gate(name,qubits[-1],qubits[:-1])
             return
         sys = GateBuilder()
@@ -36,7 +37,7 @@ class AALibrary(GateLibrary):
         qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         # WIP! swap commenting of implementation if subroutine misbehaves/does not work with current parser
-        # subrouting keeps the generated code compact whereas gates cannot use loops (thus following gate impl will need to be fixed with python loop)
+        # subroutine keeps the generated code compact whereas gates cannot use loops (thus following gate impl will need to be fixed with python loop)
 
         # std.begin_gate(name,qargs)
         # # first application of z prep

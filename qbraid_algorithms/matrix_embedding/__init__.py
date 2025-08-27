@@ -20,13 +20,17 @@ Functions
 
 .. autosummary::
     :toctree: ../stubs/
-
-    QFT
-    QFT_Demo
+    
+    PrepSelLibrary
+    Prep
+    Select
+    PauliOperator
+    Toeplitz
+    Diagonal
 
 """
-from .PrepSelLibrary import PrepSelLibrary, Prep, Select, PauliOperator
-from .ToeplitzLibrary import Toeplitz, Diagonal
+from .PrepSelLibrary import PauliOperator, Prep, PrepSelLibrary, Select
+from .ToeplitzLibrary import Diagonal, Toeplitz
 
 __all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal','PauliOperator']
 

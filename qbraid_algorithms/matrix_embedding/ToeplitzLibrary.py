@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..QTran import *
-from ..qft import QFTLibrary
+import string
+from itertools import combinations
+
 import numpy as np
 import scipy as scp
-from itertools import combinations
-import string
+
+from ..qft import QFTLibrary
+from ..QTran import *
+
 
 class Toeplitz(GateLibrary):
     def __init__(self,*args,**kwargs):

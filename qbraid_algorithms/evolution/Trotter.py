@@ -31,9 +31,9 @@ Key features:
 - Requires fractional time evolution of individual Hamiltonians
 """
 
+
+
 from ..QTran import *
-import numpy as np
-import string
 
 
 class Trotter(GateLibrary):

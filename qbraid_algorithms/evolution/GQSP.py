@@ -27,13 +27,14 @@ This generates arbitrary positive polynomials of H under normalization.
 Works well for low-degree polynomials (degree < 5).
 """
 
-from ..QTran import *
-import numpy as np
-import itertools
-from scipy.optimize import minimize
-import scipy as scp  # BUG FIX: Import scipy properly for special functions
 import string
+
+import numpy as np
+import scipy as scp  # BUG FIX: Import scipy properly for special functions
 import sympy as sp
+from scipy.optimize import minimize
+
+from ..QTran import *
 
 
 class GQSP(GateLibrary):
@@ -204,7 +205,7 @@ class GQSP(GateLibrary):
                 diff = np.sum(np.abs(series - ref)**2)
                 return float(diff)  # BUG FIX: Ensure scalar return
                 
-            except (ValueError, TypeError, ZeroDivisionError) as e:
+            except (ValueError, TypeError, ZeroDivisionError):
                 # Return large penalty for invalid parameter values
                 return 1e6
         

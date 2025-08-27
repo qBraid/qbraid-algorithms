@@ -26,8 +26,14 @@ Functions
 
 """
 from .GQSP import GQSP
+from .H_TestSuite import (
+    FermionicHubbard,
+    HeisenbergXYZ,
+    RandomizedHamiltonian,
+    TransverseFieldIsing,
+    create_test_hamiltonians,
+)
 from .Trotter import Trotter
-from .H_TestSuite import TransverseFieldIsing, HeisenbergXYZ, FermionicHubbard, RandomizedHamiltonian, create_test_hamiltonians
 
 __all__ = ['Trotter','GQSP','TransverseFieldIsing', 'HeisenbergXYZ', 'FermionicHubbard', 'RandomizedHamiltonian','create_test_hamiltonians']
 

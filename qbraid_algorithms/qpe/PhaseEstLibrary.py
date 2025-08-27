@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import string
+
+from ..qft import QFTLibrary
+
 # from GateLibrary import GateLibrary, std_gates
 from ..QTran import *
-from ..qft import QFTLibrary
-import string
+
 
 class PhaseEstimationLibrary(GateLibrary):
     def __init__(self,*args,**kwargs):

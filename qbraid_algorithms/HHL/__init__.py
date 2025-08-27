@@ -21,7 +21,8 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    
+    HHLLibrary
+
 """
 from .HHLLibrary import *
 

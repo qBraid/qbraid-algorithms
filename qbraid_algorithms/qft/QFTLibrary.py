@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..QTran import *
 # from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
 import string
+
+from ..QTran import *
+
 
 class QFTLibrary(GateLibrary):
     name = "QFT"
