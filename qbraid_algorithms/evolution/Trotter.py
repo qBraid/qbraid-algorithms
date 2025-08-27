@@ -78,7 +78,6 @@ class Trotter(GateLibrary):
         Hb = sys.import_library(Hq)
 
         # Define subroutine signature
-        # BUG FIX: More descriptive parameter names and proper types
         qubit_array_param = f"qubit[{len(qubits)}] qubits"
         time_param = "float time"  
         depth_param = "int recursion_depth"
@@ -153,16 +152,16 @@ class Trotter(GateLibrary):
             depth: Recursion depth for each pairwise decomposition
             
         Returns:
-            Name of the constructed subroutine
+            constructed anonymous gatebuilder
         """
-        if len(hamiltonians) < 2:
-            sys = self.builder
-            H = sys.import_library(hamiltonians[0])
-            H.apply(t,qubits)
-            return H.name
         
         if len(hamiltonians) == 2:
-            return self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
+            self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
+            class H(Trotter):
+                name = f"M_trot_suz_{hash(hamiltonians[0].name)}_{hash(hamiltonians[1].name)}"
+                def apply(self,t,qubits):
+                    self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
+            return H
         
         # For multiple Hamiltonians, use binary tree approach
         # Split into two groups and recursively apply Trotter
@@ -171,11 +170,17 @@ class Trotter(GateLibrary):
         right_hams = hamiltonians[mid:]
         
         # Create composite Hamiltonian subroutines
-        left_name = self.multi_trot_suz(qubits, t, left_hams, depth) if len(left_hams) > 1 else left_hams[0]
-        right_name = self.multi_trot_suz(qubits, t, right_hams, depth) if len(right_hams) > 1 else right_hams[0]
+        left = self.multi_trot_suz(qubits, t, left_hams, depth) if len(left_hams) > 1 else left_hams[0]
+        right = self.multi_trot_suz(qubits, t, right_hams, depth) if len(right_hams) > 1 else right_hams[0]
         
         # Apply Trotter to the two composite groups
-        return self.trot_suz(qubits, t, left_name, right_name, depth)
+        self.trot_suz(qubits, t, left, right, depth)
+        m_name = f"M_trot_suz_{hash(left.name)}_{hash(right.name)}" 
+        class H(Trotter):
+            name = m_name
+            def apply(self,t,qubits):
+                self.trot_suz(qubits, t, left, right, depth)
+        return H
 
     def trot_linear(self, qubits, t, hamiltonians, steps=1):
         """

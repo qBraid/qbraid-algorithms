@@ -686,9 +686,9 @@ class TestAlgorithmStressTests:
         """Test combining multiple algorithms in sequence."""
         hamiltonians = create_test_hamiltonians(reg_size=3)
         ham_list = list(hamiltonians.values())[:2]
-        qubits = ['q[0]', 'q[1]', 'q[2]']
         
         builder = QasmBuilder(8)
+        qubits = [*range(8)]
         std = builder.import_library(std_gates)
         gqsp = builder.import_library(GQSP)
         trotter = builder.import_library(Trotter)
@@ -701,25 +701,19 @@ class TestAlgorithmStressTests:
             
             def controlled(self,*args,**kwargs):
                 super().controlled(.1,*args,**kwargs)
-        class H2( ham_list[1]):
-            def apply(self,*args,**kwargs):
-                super().apply(.1,*args,**kwargs)
-            
-            def controlled(self,*args,**kwargs):
-                super().controlled(.1,*args,**kwargs)
         
         try:
             # Apply Trotter decomposition
-            trotter.trot_suz(['q[0]', 'q[1]', 'q[2]'], "0.1", H1, H2, depth=1)
+            trotter.trot_suz(qubits[:3], "0.1", ham_list[0], ham_list[1], depth=1)
             
             # Apply GQSP  
-            gqsp.GQSP(['q[3]', 'q[4]', 'q[5]'], [0.1, 0.2, 0.3], H1, depth=1)
+            gqsp.GQSP(qubits[3:6], [0.1, 0.2, 0.3], H1, depth=1)
             
             # Apply prep-select
             test_matrix = np.array([[1, 0], [0, -1]])
-            prep_sel.prep_select(['q[6]', 'q[7]'], test_matrix)
+            prep_sel.prep_select(qubits[6:], test_matrix)
             
-            std.measure(self.test_qubits,self.test_qubits)
+            std.measure(qubits,qubits)
             
             program = builder.build()
             full_qasm = program
@@ -738,17 +732,21 @@ class TestAlgorithmStressTests:
         
         # Test higher depth GQSP (but not too high for test speed)
         builder = QasmBuilder(3)
+        reg = [*range(3)]
         std = builder.import_library(std_gates)
         gqsp = builder.import_library(GQSP)
         
-        
-        # std.qubit(4)
-        # std.bit(4)
+        class H1(hamiltonian):
+            def apply(self,*args,**kwargs):
+                super().apply(.1,*args,**kwargs)
+            
+            def controlled(self,*args,**kwargs):
+                super().controlled(.1,*args,**kwargs)
         
         try:
             phases = [0.1 * i for i in range(7)]  # depth=3
-            gqsp.GQSP(['q[0]', 'q[1]'], phases, hamiltonian, depth=3)
-            std.measure(self.test_qubits,self.test_qubits)
+            gqsp.GQSP(reg[:2], phases, H1, depth=3)
+            std.measure(reg,reg)
             
             
             program = builder.build()

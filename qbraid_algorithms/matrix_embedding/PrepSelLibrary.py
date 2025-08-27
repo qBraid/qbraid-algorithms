@@ -46,8 +46,9 @@ class PrepSelLibrary(GateLibrary):
         Returns:
             Gate name and operation counts (if new gate created)
         """
+        print(matrix)
         # Handle both matrix and pre-computed operator chain inputs
-        if len(np.array(matrix).shape) == 1:
+        if isinstance(matrix[0],tuple) :
             op_chain = matrix
             gate_id = abs(hash(tuple(matrix)))  # BUG FIX: Use tuple for abs(hashable
         else:
@@ -55,7 +56,7 @@ class PrepSelLibrary(GateLibrary):
             gate_id = abs(hash(tuple(op_chain)))  # BUG FIX: Use tuple for abs(hashable
         
         # Calculate required ancilla qubits
-        qb = int(np.ceil(np.log2(len(op_chain))))
+        qb = max(int(np.ceil(np.log2(len(op_chain)))),1)
         name = f"PS_{len(qubits)}_{gate_id}"
         print(op_chain)
         # Claim quantum resources
@@ -159,6 +160,7 @@ class Prep(GateLibrary):
         Returns:
             Gate name and state mapping
         """
+        print("qubits",qubits)
         name = f"PREP_{abs(hash(tuple(dist)))}"  # BUG FIX: Use tuple for abs(hashing
         if name in self.gate_ref:
             self.call_gate(name, qubits[-1],qubits[:-1])  # BUG FIX: Simplified call
@@ -168,7 +170,7 @@ class Prep(GateLibrary):
         sys = GateBuilder()
         std = sys.import_library(std_gates)
         std.call_space = "{}"
-        qb = int(np.ceil(np.log2(len(dist))))
+        qb = max(int(np.ceil(np.log2(len(dist)))),1)
         
         # Generate parameter angles and mapping
         angles, mapping = self.gen_prep_angles(dist)
@@ -224,7 +226,8 @@ class Prep(GateLibrary):
         cy_rot = lambda t: np.block([[np.eye(2), np.zeros((2,2))], 
                                     [np.zeros((2,2)), y_rot(t)]])
         
-        qb = int(np.ceil(np.log2(len(dist))))
+        qb = max(int(np.ceil(np.log2(len(dist)))),1)
+        # print(qb,np.ceil(np.log2(len(dist))),dist)
         # Normalize and pad distribution
         padded_size = 2**qb
         ref_dist = np.pad(dist, (0, padded_size - len(dist)), 
