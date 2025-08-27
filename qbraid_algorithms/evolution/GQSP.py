@@ -109,8 +109,9 @@ class GQSP(GateLibrary):
         self.call_gate(name,qubits[-1],anc_q+qubits[:-1],phases=phases)
         self.measure(anc_q, anc_c)
         return name
-
-    def GQSP_recurse(self, mat, depth):
+    
+    @staticmethod
+    def GQSP_recurse( mat, depth):
         """
         Recursively construct symbolic GQSP matrix expression.
         
@@ -135,9 +136,10 @@ class GQSP(GateLibrary):
         rp = sp.Matrix([[1, 0], [0, sp.exp(1j * p)]])
         
         # Recursive GQSP construction
-        return qr * rp * GQSP.U * self.GQSP_recurse(mat, depth - 1)
-
-    def gen_cost(self, depth, t=1):
+        return qr * rp * GQSP.U * GQSP.GQSP_recurse(mat, depth - 1)
+    
+    @staticmethod
+    def gen_cost(depth, t=1):
         """
         Generate cost function for GQSP parameter optimization.
         
@@ -150,7 +152,7 @@ class GQSP(GateLibrary):
         """
         # Get symbolic expression for GQSP circuit
         initial_state = sp.Matrix([[1], [0]])  # BUG FIX: Proper column vector
-        expr = self.GQSP_recurse(initial_state, depth)[0]  # Take first component
+        expr = GQSP.GQSP_recurse(initial_state, depth)[0]  # Take first component
         
         # Evaluation points
         time = np.linspace(-1, 1, 50)
@@ -208,7 +210,7 @@ class GQSP(GateLibrary):
         
         return cost, names
 
-    def find_gqsp_spectrum(self, depth):
+    def find_gqsp_spectrum( depth):
         """
         Find optimal GQSP parameters across a spectrum of time values.
         
@@ -235,7 +237,7 @@ class GQSP(GateLibrary):
             
             try:
                 # Get cost function for current time
-                cost_func, param_names = self.gen_cost(depth, t)
+                cost_func, param_names = GQSP.gen_cost(depth, t)
                 
                 # Optimize parameters
                 result = minimize(cost_func, x0=x_prev, 
