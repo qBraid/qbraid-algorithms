@@ -32,7 +32,7 @@ import pytest
 from qbraid_algorithms.evolution import create_test_hamiltonians
 
 # Import your modules (adjust paths as needed)
-from qbraid_algorithms.QTran import *
+from qbraid_algorithms.QTran import GateBuilder, QasmBuilder, std_gates
 
 try:
     import pyqasm as pq
@@ -177,7 +177,9 @@ class TestQASMBuilderBasic:
         sys = QasmBuilder(3)
         std = sys.import_library(std_gates)
         anc_q = sys.claim_qubits(5)
-        anc_p = sys.claim_clbits(5)
+        anc_c = sys.claim_clbits(5)
+        assert len(anc_q) == 5
+        assert len(anc_c) == 5
         std.x(0)
         program = sys.build()
         assert "qubit[8]" in program
@@ -199,6 +201,7 @@ class TestQASMBuilderBasic:
             # Validate using pyqasm
             try:
                 program = pq.loads(qasm_string)
+                program.validate()
                 validation_result = True
                 error_msg = None
             except Exception as e:
@@ -265,7 +268,6 @@ class TestHamiltonianInterface:
                 
                 # Test QASM validity with pyqasm
                 is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
-                
                 assert is_valid, f"Invalid QASM for {name}: {error_msg}\nQASM:\n{program}"
                 
             except Exception as e:
@@ -351,6 +353,7 @@ class TestHamiltonianInterface:
         try:
             # Try to parse with pyqasm
             program = pq.loads(qasm_string)
+            program.validate()
             return True, None
         except Exception as e:
             return False, str(e)

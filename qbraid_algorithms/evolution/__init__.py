@@ -25,15 +25,15 @@ Functions
     Trotter
 
 """
-from .GQSP import GQSP
-from .H_TestSuite import (
+from .gqsp import GQSP
+from .h_test_suite import (
     FermionicHubbard,
     HeisenbergXYZ,
     RandomizedHamiltonian,
     TransverseFieldIsing,
     create_test_hamiltonians,
 )
-from .Trotter import Trotter
+from .trotter import Trotter
 
 __all__ = ['Trotter','GQSP','TransverseFieldIsing', 'HeisenbergXYZ', 'FermionicHubbard', 'RandomizedHamiltonian','create_test_hamiltonians']
 

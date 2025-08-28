@@ -16,7 +16,7 @@
 import random
 import string
 
-from ..QTran import *
+from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
 
 class RodeoLibrary(GateLibrary):

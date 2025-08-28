@@ -34,7 +34,7 @@ import scipy as scp  # BUG FIX: Import scipy properly for special functions
 import sympy as sp
 from scipy.optimize import minimize
 
-from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
+from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
 
 class GQSP(GateLibrary):

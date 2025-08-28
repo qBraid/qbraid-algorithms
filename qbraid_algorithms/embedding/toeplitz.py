@@ -19,7 +19,7 @@ import numpy as np
 import scipy as scp
 
 from qbraid_algorithms.qft import QFTLibrary
-from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
+from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
 
 class Toeplitz(GateLibrary):

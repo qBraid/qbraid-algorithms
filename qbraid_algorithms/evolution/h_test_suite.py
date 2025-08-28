@@ -39,7 +39,7 @@ collecting versions will be added at a later date
 
 import string
 
-from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
+from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
 
 class TransverseFieldIsing(GateLibrary):

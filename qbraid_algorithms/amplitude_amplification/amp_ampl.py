@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import string
 
-from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
+from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
 
 class AALibrary(GateLibrary):
@@ -33,8 +32,8 @@ class AALibrary(GateLibrary):
         std = sys.import_library(std_gates)
         std.call_space = " {}"
         za = sys.import_library(H)
-        names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
+        # names = string.ascii_letters
+        # qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         # WIP! swap commenting of implementation if subroutine misbehaves/does not work with current parser
         # subroutine keeps the generated code compact whereas gates cannot use loops (thus following gate impl will need to be fixed with python loop)
@@ -97,8 +96,8 @@ class AALibrary(GateLibrary):
         std = sys.import_library(std_gates)
         za = sys.import_library(Z)
         Ha = sys.import_library(H)
-        names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
+        # names = string.ascii_letters
+        # qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits))]
 
         
         # std.begin_gate(name,qargs)

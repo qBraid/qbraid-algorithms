@@ -1,6 +1,6 @@
 import os
 from functools import wraps
-from typing import Callable, Tuple, Optional
+from typing import Callable
 
 
 def qasm_pipe(func: Callable) -> Callable:

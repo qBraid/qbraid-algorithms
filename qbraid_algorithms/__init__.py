@@ -39,14 +39,14 @@ Modules
 """
 
 from . import (
-    HHL,
+    hhl,
     QTran,
-    Rodeo,
+    rodeo,
     amplitude_amplification,
     bernstein_vazirani,
     evolution,
     iqft,
-    matrix_embedding,
+    embedding,
     qft,
     qpe,
 )
@@ -59,10 +59,9 @@ __all__ = [
     "bernstein_vazirani",
     "qpe",
     "QTran",
-    "QFT_2",
     'evolution',
-    'matrix_embedding',
+    'embedding',
     'amplitude_amplification',
-    'HHL',
-    'Rodeo'
+    'hhl',
+    'rodeo'
 ]

@@ -24,6 +24,6 @@ Functions
     HHLLibrary
 
 """
-from .HHLLibrary import *
+from .hhl import HHLLibrary
 
 __all__ = ['HHLLibrary']

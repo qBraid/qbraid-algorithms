@@ -31,11 +31,11 @@ from itertools import combinations
 import numpy as np
 import pytest
 
-from qbraid_algorithms.evolution import *
-from qbraid_algorithms.matrix_embedding import *
+from qbraid_algorithms.evolution import GQSP, Trotter, create_test_hamiltonians
+from qbraid_algorithms.embedding import PauliOperator, Prep, PrepSelLibrary, Select
 
 # Import modules
-from qbraid_algorithms.QTran import *
+from qbraid_algorithms.QTran import QasmBuilder, std_gates
 
 try:
     import pyqasm as pq
@@ -82,7 +82,7 @@ class TestGQSPAlgorithm:
                 assert 'GQSP' in program or 'gqsp' in program.lower()
                 
                 # Validate with pyqasm
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
                 # assert is_valid, f"GQSP failed for {ham_name}: {error_msg}\nQASM:\n{program}"
                 
             except Exception as e:
@@ -115,7 +115,7 @@ class TestGQSPAlgorithm:
                 full_qasm = program
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"GQSP depth {depth} invalid: {error_msg}"
                 
                 # Check depth appears in gate name
@@ -184,6 +184,7 @@ class TestGQSPAlgorithm:
         try:
             # Try to parse with pyqasm
             program = pq.loads(qasm_string)
+            program.validate()
             return True, None
         except Exception as e:
             return False, str(e)
@@ -231,7 +232,7 @@ class TestTrotterAlgorithm:
                 assert 'trot_suz' in full_qasm or 'trotter' in full_qasm.lower()
                 
                 # Validate with pyqasm
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"Trotter failed for {name1}+{name2}: {error_msg}"
                 
             except Exception as e:
@@ -255,7 +256,7 @@ class TestTrotterAlgorithm:
                 full_qasm = program
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"Trotter depth {depth} invalid: {error_msg}"
                 
             except Exception as e:
@@ -278,7 +279,7 @@ class TestTrotterAlgorithm:
             full_qasm = program
             
             # Validate QASM
-            is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+            # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
             # assert is_valid, f"Multi-Hamiltonian Trotter invalid: {error_msg}"
             
         except Exception as e:
@@ -301,7 +302,7 @@ class TestTrotterAlgorithm:
             full_qasm = program
             
             # Validate QASM
-            is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+            # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
             # assert is_valid, f"Linear Trotter invalid: {error_msg}"
             
         except Exception as e:
@@ -325,7 +326,7 @@ class TestTrotterAlgorithm:
                 full_qasm = program
                 
                 # Basic validation
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"Trotter with time {time_param} invalid: {error_msg}"
                 
             except Exception as e:
@@ -339,6 +340,7 @@ class TestTrotterAlgorithm:
         try:
             # Try to parse with pyqasm
             program = pq.loads(qasm_string)
+            program.validate()
             return True, None
         except Exception as e:
             return False, str(e)
@@ -381,7 +383,7 @@ class TestPrepSelAlgorithm:
                 assert 'PS_' in full_qasm or 'prep' in full_qasm.lower()
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"PrepSel matrix {i} invalid: {error_msg}"
                 
             except Exception as e:
@@ -413,7 +415,7 @@ class TestPrepSelAlgorithm:
                 full_qasm = program
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"PrepSel chain {i} invalid: {error_msg}"
                 
             except Exception as e:
@@ -451,7 +453,7 @@ class TestPrepSelAlgorithm:
                 assert 'PREP_' in full_qasm or 'prep' in full_qasm.lower()
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"Preparation dist {i} invalid: {error_msg}"
                 
             except Exception as e:
@@ -484,7 +486,7 @@ class TestPrepSelAlgorithm:
             assert 'SEL_' in full_qasm or 'select' in full_qasm.lower()
             
             # Validate QASM
-            is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+            # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
             # assert is_valid, f"Selection invalid: {error_msg}"
             
         except Exception as e:
@@ -517,7 +519,7 @@ class TestPrepSelAlgorithm:
                 assert pauli_str in full_qasm or any(p in full_qasm.lower() for p in ['x', 'y', 'z'])
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"Pauli {pauli_str} invalid: {error_msg}"
                 
             except Exception as e:
@@ -529,6 +531,7 @@ class TestPrepSelAlgorithm:
             return True, "pyqasm not available - skipping validation"
         try:
             program = pq.loads(qasm_string)
+            program.validate()
             return True, None
         except Exception as e:
             return False, str(e)
@@ -566,7 +569,7 @@ class TestAlgorithmIntegration:
                 full_qasm = program
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"GQSP+{ham_name} invalid: {error_msg}"
                 
             except Exception as e:
@@ -592,7 +595,7 @@ class TestAlgorithmIntegration:
                 full_qasm = program
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"Trotter+{name1}+{name2} invalid: {error_msg}"
                 
             except Exception as e:
@@ -660,7 +663,7 @@ class TestAlgorithmIntegration:
                 full_qasm = program
                 
                 # Validate QASM
-                is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+                # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 # assert is_valid, f"GQSP {n_qubits}-qubit scaling invalid: {error_msg}"
                 
             except Exception as e:
@@ -674,6 +677,7 @@ class TestAlgorithmIntegration:
         try:
             # Try to parse with pyqasm
             program = pq.loads(qasm_string)
+            program.validate()
             return True, None
         except Exception as e:
             return False, str(e)
@@ -719,7 +723,7 @@ class TestAlgorithmStressTests:
             full_qasm = program
         
             # Validate combined QASM
-            is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+            # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
             # assert is_valid, f"Combined algorithms invalid: {error_msg}"
             
         except Exception as e:
@@ -753,7 +757,7 @@ class TestAlgorithmStressTests:
             full_qasm = program
             
             # Should still be valid
-            is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
+            # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
             # assert is_valid, f"Resource-intensive GQSP invalid: {error_msg}"
             
         except Exception as e:
@@ -765,6 +769,7 @@ class TestAlgorithmStressTests:
             return True, "pyqasm not available - skipping validation"
         try:
             program = pq.loads(qasm_string)
+            program.validate()
             return True, None
         except Exception as e:
             return False, str(e)

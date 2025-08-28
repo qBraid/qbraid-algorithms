@@ -12,25 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Module providing Several different implementations of block encoding
 
-Functions
-----------
 
-.. autosummary::
-    :toctree: ../stubs/
-    
-    PrepSelLibrary
-    Prep
-    Select
-    PauliOperator
-    Toeplitz
-    Diagonal
+# from GateLibrary import GateLibrary, std_gates
+# from qbraid_algorithms.QTran import 
 
-"""
-from .PrepSelLibrary import PauliOperator, Prep, PrepSelLibrary, Select
-from .ToeplitzLibrary import Diagonal, Toeplitz
+def HHLLibrary(PhaseEstimationLibrary):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
 
-__all__ = ['PrepSelLibrary','Toeplitz','Prep','Select','Diagonal','PauliOperator']
-
+    def HHL(self,a,b,clock):
+        sys = self.builder
+        # A = sys.import_library(a)
+        P = sys.import_library(PhaseEstimationLibrary)
+        gate_name = P.phase_estimation(b,clock,a)
+        # todo: make the lambda scaling/ U invert
+        P.inverse_op(gate_name)
