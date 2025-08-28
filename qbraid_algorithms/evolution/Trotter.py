@@ -33,7 +33,7 @@ Key features:
 
 
 
-from ..QTran import *
+from qbraid_algorithms.QTran import GateLibrary, std_gates
 
 
 class Trotter(GateLibrary):

@@ -15,7 +15,7 @@
 # from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
 import string
 
-from ..QTran import *
+from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
 
 
 class QFTLibrary(GateLibrary):

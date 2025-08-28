@@ -14,7 +14,7 @@
 
 import string
 
-from ..QTran import *
+from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
 
 
 class AALibrary(GateLibrary):

@@ -31,5 +31,6 @@ Functions
 """
 from .GateLibrary import GateLibrary, std_gates
 from .QasmBuilder import FileBuilder, GateBuilder, IncludeBuilder, QasmBuilder
+from .ModuleLoader import qasm_pipe
 
-__all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates']
+__all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates','qasm_pipe']

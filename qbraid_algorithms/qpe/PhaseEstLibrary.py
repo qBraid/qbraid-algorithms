@@ -14,10 +14,11 @@
 
 import string
 
+
 from ..qft import QFTLibrary
 
 # from GateLibrary import GateLibrary, std_gates
-from ..QTran import *
+from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
 
 
 class PhaseEstimationLibrary(GateLibrary):

@@ -18,8 +18,8 @@ from itertools import combinations
 import numpy as np
 import scipy as scp
 
-from ..qft import QFTLibrary
-from ..QTran import *
+from qbraid_algorithms.qft import QFTLibrary
+from qbraid_algorithms.QTran import GateLibrary, GateBuilder, std_gates
 
 
 class Toeplitz(GateLibrary):

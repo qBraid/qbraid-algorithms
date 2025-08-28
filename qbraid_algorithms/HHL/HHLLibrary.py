@@ -13,13 +13,12 @@
 # limitations under the License.
 
 
-from ..qpe import PhaseEstimationLibrary
+from qbraid_algorithms.qpe import PhaseEstimationLibrary
 
 # from GateLibrary import GateLibrary, std_gates
-from ..QTran import *
+# from qbraid_algorithms.QTran import 
 
-
-def HHLLibrary(PhaseEstimation):
+def HHLLibrary(PhaseEstimationLibrary):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
