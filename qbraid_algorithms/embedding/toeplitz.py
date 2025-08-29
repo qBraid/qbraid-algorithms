@@ -107,10 +107,11 @@ class Toeplitz(GateLibrary):
 
         std.begin_gate(name, qargs)
         qft.inverse_op(qft.QFT, (qargs[1:],))
-        diagonal.controlled_op(diagonal.diag_scale, (qargs[1:], diag_vals, (qargs[0], 0)))
+        diagonal.controlled_op(diagonal.diag_scale, (qargs[1:], diag_vals, ([qargs[0]], 0)))
         qft.QFT(qargs[1:])
         std.end_gate()
 
+        self.merge(*sys.build(), name)
         # Finalize
         if name in self.gate_ref:
             self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
@@ -137,7 +138,7 @@ class Diagonal(GateLibrary):
             str: Gate name.
         """
         qb = int(np.log2(len(vals)) + 0.01)
-        name = f"diag{qb}_s_{hash(tuple(vals))}"
+        name = f"diag{qb}_s_{abs(hash(tuple(vals)))}"
 
         # Claim ancilla if none provided
         if anc is None:
@@ -183,7 +184,7 @@ class Diagonal(GateLibrary):
         diagonal.diag(qargs[1:], phase_corr)
         std.end_gate()
 
-        self.merge(sys.build(), name)
+        self.merge(*sys.build(), name)
         self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
         if anc is None:
             self.measure(anc_q, anc_c)
@@ -201,8 +202,9 @@ class Diagonal(GateLibrary):
         Returns:
             str: Gate name.
         """
+        print("building diagonal gate:",qubits, vals, depth)
         qb = int(np.log2(len(vals)) + 0.01)
-        name = f"diag{qb}_{hash(tuple(vals))}"
+        name = f"diag{qb}_{np.abs(hash(tuple(vals)))}"
 
         if name in self.gate_ref:
             self.call_gate(name, qubits[-1], qubits[:-1])
@@ -221,9 +223,9 @@ class Diagonal(GateLibrary):
         projection = self.phase_projector(vals, depth)
 
         std.begin_gate(name, qargs)
-        std.x(0)
-        std.p(projection[0], 0)
-        std.x(0)
+        std.x(qargs[0])
+        std.call_gate("p",qargs[0],phases=projection[0] )
+        std.x(qargs[0])
 
         # Apply projections
         pindex = 1
@@ -233,21 +235,21 @@ class Diagonal(GateLibrary):
                     pindex += 1
                     continue
                 if len(c) == 1:
-                    std.p(projection[pindex], qargs[c[0]])
+                    std.call_gate("p",qargs[c[0]],phases=projection[pindex] )
                 else:
                     std.controlled_op(
                         "p",
-                        (projection[pindex], qargs[c[0]], [qargs[n] for n in c[1:]]),
+                        ( qargs[c[0]], [qargs[n] for n in c[1:]], projection[pindex]),
                         n=len(c) - 1,
                     )
                 pindex += 1
 
         std.end_gate()
-        self.merge(sys.build(), name)
+        self.merge(*sys.build(), name)
         self.call_gate(name, qubits[-1], qubits[:-1])
         return name
 
-    def phase_projector(target, depth, plot=False):
+    def phase_projector(self,target, depth, plot=False):
         """
         Construct a phase projector decomposition.
 

@@ -24,6 +24,9 @@ def HHLLibrary(PhaseEstimationLibrary):
     def HHL(self,a,b,clock):
         sys = self.builder
         # A = sys.import_library(a)
+        # operation currently works within main method due to need of inverse op and use of ancillas
+        #TODO: edit this into a full subroutine once complex hamiltonians for phase est are implemented
+        # this is due to evolution being just a negative time value while static hamiltonians need a full inverse_op call
         P = sys.import_library(PhaseEstimationLibrary)
         gate_name = P.phase_estimation(b,clock,a)
         # todo: make the lambda scaling/ U invert

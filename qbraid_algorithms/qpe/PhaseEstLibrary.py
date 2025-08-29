@@ -52,7 +52,35 @@ class PhaseEstimationLibrary(GateLibrary):
         self.call_gate(name,spectra[-1],qubits+spectra[:-1])
         return name
     
-        
+    def inverse_op(self, qubits:list,spectra:list,hamiltonian, evolution=None):
+        name = f'Pest_INV_{len(qubits)}_{hamiltonian.name}'
+        if name in self.gate_ref:
+            self.call_gate(name,spectra[-1],qubits+spectra[:-1])
+            return name
+        sys = GateBuilder()
+        std = sys.import_library(std_gates)
+        ham = sys.import_library(hamiltonian)
+        ham.call_space = " {}"
+        qft = sys.import_library(QFTLibrary)
+        qft.call_space = " {}"
+
+        # names = " " + string.ascii_letters
+        qargs = [string.ascii_letters[int(i/len(string.ascii_letters))]+string.ascii_letters[i%len(string.ascii_letters)] for i in range(len(qubits)+len(spectra))]
+        # std.begin_gate(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
+        qft.inverse_op(qft.QFT, (qargs[:len(qubits)],))
+        std.begin_gate(name,qargs)
+        for i in range(len(spectra)):
+            if evolution is not None:
+                ham.controlled(-evolution*2**i,qargs[:len(qubits)],qargs[len(qubits)+i])
+            else:
+                #TODO: incomplete function due to lack of inverse operation with controlled application, do once build pattern for multi augment is clearer/better
+                for _ in range(2**i):
+                    ham.controlled(qargs[:len(qubits)],qargs[len(qubits)+i])
+        std.end_gate()
+
+        self.merge(sys.build(),name)
+        self.call_gate(name,spectra[-1],qubits+spectra[:-1])
+        return name
 
 
 
