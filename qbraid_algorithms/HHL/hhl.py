@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-# from GateLibrary import GateLibrary, std_gates
-# from qbraid_algorithms.QTran import 
+from qbraid_algorithms.QTran import GateLibrary, std_gates
 
 def HHLLibrary(PhaseEstimationLibrary):
     def __init__(self,*args,**kwargs):
@@ -28,6 +25,11 @@ def HHLLibrary(PhaseEstimationLibrary):
         #TODO: edit this into a full subroutine once complex hamiltonians for phase est are implemented
         # this is due to evolution being just a negative time value while static hamiltonians need a full inverse_op call
         P = sys.import_library(PhaseEstimationLibrary)
+        anc_q = sys.claim_qubits(1)
+        anc_c = sys.claim_clbits(1)
+        std = sys.import_library(std_gates)
         gate_name = P.phase_estimation(b,clock,a)
-        # todo: make the lambda scaling/ U invert
-        P.inverse_op(gate_name)
+        for i in range(len(clock)-1):
+            self.controlled_op("ry", (anc_q[0],clock[i],f'pi>>{i+1}'))
+        P.inverse_op(b,clock,a)
+        self.measure(anc_q,anc_c)
