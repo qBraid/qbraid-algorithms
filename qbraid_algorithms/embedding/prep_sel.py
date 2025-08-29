@@ -46,7 +46,7 @@ class PrepSelLibrary(GateLibrary):
         Returns:
             Gate name and operation counts (if new gate created)
         """
-        print(matrix)
+        # print(matrix)
         # Handle both matrix and pre-computed operator chain inputs
         if isinstance(matrix[0],tuple) :
             op_chain = matrix
@@ -160,7 +160,7 @@ class Prep(GateLibrary):
         Returns:
             Gate name and state mapping
         """
-        print("qubits",qubits)
+        # print("qubits",qubits)
         name = f"PREP_{abs(hash(tuple(dist)))}"  # BUG FIX: Use tuple for abs(hashing
         if name in self.gate_ref:
             self.call_gate(name, qubits[-1],qubits[:-1])  # BUG FIX: Simplified call
@@ -285,15 +285,15 @@ class Prep(GateLibrary):
         # Optimize parameters
         num_params = qb + 2*2*(qb//2)  # BUG FIX: More accurate parameter count
         result = minimize(cost_function, x0=np.ones((num_params))*.1)
-        print(result)
+        # print(result)
 
 
         # Create mapping from original to sorted indices
         final_state = render_state(result.x)
         mapping = dict(zip(sort_indices, np.argsort(final_state)))
-        print(ref_dist)
-        print(final_state)
-        print([final_state[mapping[i]] for i in range(len(dist))])
+        # print(ref_dist)
+        # print(final_state)
+        # print([final_state[mapping[i]] for i in range(len(dist))])
         return result.x, mapping
 
 

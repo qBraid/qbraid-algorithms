@@ -111,10 +111,8 @@ class AALibrary(GateLibrary):
         std_library.comment("Z0")
         std_library.x(register)  # Flip all qubits
         # Multi-controlled Z gate (phase flip when all qubits are |1⟩)
-        std_library.controlled_op(
-            "z",
-            (f"{register}[0]", [f"{register}[{i}]" for i in range(len(qubits) - 1)]),
-            n=len(qubits) - 1
+        std_library.controlled_op("z",(f"{register}[0]", [f"{register}[{i}]" for i in range(len(qubits) - 1)]), 
+        n=len(qubits) - 1
         )
         std_library.x(register)  # Flip back
         std_library.h(register)
@@ -123,7 +121,7 @@ class AALibrary(GateLibrary):
         std_library.end_subroutine()
         
         # Build and merge the subroutine into main library
-        self.merge(gate_system.build(), name)
+        self.merge(*gate_system.build(), name)
         
         # Call the created subroutine
         qubit_list = "{" + " ,".join(str(i) for i in qubits) + "}"
@@ -156,8 +154,7 @@ class AALibrary(GateLibrary):
             There's a bug in the original code where 'z' is used instead of 'Z'
             in the name generation. This is preserved to maintain exact logic.
         """
-        # BUG: Original code uses 'z' instead of 'Z' - preserving this bug
-        name = f'AmplAmp{len(qubits)}{z.name}{depth}'  # 'z' is undefined, should be 'Z'
+        name = f'AmplAmp{len(qubits)}{Z.name}{depth}'
         
         # Check if subroutine already exists
         if name in self.gate_ref:
@@ -243,7 +240,7 @@ class AALibrary(GateLibrary):
         std_library.end_subroutine()
         
         # Build and merge the subroutine
-        self.merge(gate_system.build(), name)
+        self.merge(*gate_system.build(), name)
         
         # Call the created subroutine
         # Alternative gate-based call (commented out):

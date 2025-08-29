@@ -30,10 +30,12 @@ from itertools import combinations
 
 import numpy as np
 import pytest
+import string
+# Import modules
 from qbraid_algorithms.evolution import GQSP, Trotter, create_test_hamiltonians
 from qbraid_algorithms.embedding import PauliOperator, Prep, PrepSelLibrary, Select
-# Import modules
-from qbraid_algorithms.QTran import QasmBuilder, std_gates
+from qbraid_algorithms.amplitude_amplification import AALibrary
+from qbraid_algorithms.QTran import QasmBuilder, std_gates, GateBuilder, GateLibrary
 
 try:
     import pyqasm as pq
@@ -757,6 +759,82 @@ class TestAlgorithmStressTests:
             return True, None
         except Exception as e:
             return False, str(e)
+
+
+class TestAmplitude:
+    class Za(GateLibrary):
+        """Custom gate: controlled-Z on all qubits except index 2."""
+
+        def __init__(self, reg, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            self.name = f"Z_on_two{len(reg)}"
+            names = string.ascii_letters
+            qargs = [
+                names[i // len(names)] + names[i % len(names)]
+                for i in range(len(reg))
+            ]
+
+            sys = GateBuilder()
+            std = sys.import_library(std_gates)
+            std.call_space = " {}"
+
+            ind = dict(zip(range(len(reg)), qargs))
+            ind.pop(2)
+
+            # Gate definition
+            std.begin_gate(self.name, qargs)
+            std.x(qargs[2])
+            std.controlled_op("z", (qargs[2], list(ind.values())), n=len(reg) - 1)
+            std.x(qargs[2])
+            std.end_gate()
+
+            # Collect gate definitions and imports
+            p, i, d = sys.build()
+            for imps in i:
+                if imps not in self.gate_import:
+                    self.gate_import.append(imps)
+
+            for defs in d:
+                if defs[0] not in self.gate_defs:
+                    self.gate_defs[defs[0]] = defs[1]
+
+            self.gate_defs[self.name] = p
+            self.gate_ref.append(self.name)
+
+        def apply(self, qubits):
+            """Apply the custom gate to a set of qubits."""
+            self.call_gate(self.name, qubits[-1], qubits[:-1])
+
+        def controlled(self, qubits, control):
+            """Controlled version of the custom gate."""
+            self.controlled_op(self.name, (qubits[-1], [control] + qubits[:-1]))
+
+    def test_full_algorithm_builds(self):
+        """Ensure full algorithm builds and pq.loads() runs."""
+
+        # Build algorithm with 3 qubits
+        alg = QasmBuilder(3, 0, version="3")
+        reg = list(range(3))
+
+        # Import standard gates and Grover
+        program = alg.import_library(std_gates)
+        ampl = alg.import_library(AALibrary)
+
+        # Add Grover with custom gate
+        ampl.grover(TestAmplitude.Za, reg, 3)
+
+        # Build OpenQASM code
+        prog = alg.build()
+
+        # Parse into pq object
+        res = pq.loads(prog)
+
+        # Basic assertion
+        assert res is not None
+
+        # Validation (commented for now)
+        # res.validate()
 
 if __name__ == "__main__":
     # Run tests if executed directly

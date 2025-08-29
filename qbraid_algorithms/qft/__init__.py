@@ -33,5 +33,5 @@ from .qft_lib import QFTLibrary
 __all__ = [
     "load_program",
     "generate_subroutine",
-    "qft_lib"
+    "QFTLibrary"
 ]

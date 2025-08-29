@@ -158,7 +158,7 @@ class Trotter(GateLibrary):
         if len(hamiltonians) == 2:
             self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
             class H(Trotter):
-                name = f"M_trot_suz_{hash(hamiltonians[0].name)}_{hash(hamiltonians[1].name)}"
+                name = f"M_trot_suz_{abs(hash(hamiltonians[0].name))}_{abs(hash(hamiltonians[1].name))}"
                 def apply(self,t,qubits):
                     self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
             return H
@@ -175,7 +175,7 @@ class Trotter(GateLibrary):
         
         # Apply Trotter to the two composite groups
         self.trot_suz(qubits, t, left, right, depth)
-        m_name = f"M_trot_suz_{hash(left.name)}_{hash(right.name)}" 
+        m_name = f"M_trot_suz_{abs(hash(left.name))}_{abs(hash(right.name))}"
         class H(Trotter):
             name = m_name
             def apply(self,t,qubits):
