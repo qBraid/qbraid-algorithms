@@ -30,10 +30,8 @@ from itertools import combinations
 
 import numpy as np
 import pytest
-
 from qbraid_algorithms.evolution import GQSP, Trotter, create_test_hamiltonians
 from qbraid_algorithms.embedding import PauliOperator, Prep, PrepSelLibrary, Select
-
 # Import modules
 from qbraid_algorithms.QTran import QasmBuilder, std_gates
 
@@ -43,7 +41,6 @@ try:
 except ImportError:
     PYQASM_AVAILABLE = False
     pytest.skip("pyqasm not available", allow_module_level=True)
-
 
 class TestGQSPAlgorithm:
     """Test Generalized Quantum Signal Processing algorithm."""
@@ -105,8 +102,7 @@ class TestGQSPAlgorithm:
             
             # Generate appropriate number of phases
             phases = [0.1 * (i + 1) for i in range(2 * depth + 1)]
-            
-            
+             
             try:
                 gqsp.GQSP(self.test_qubits, phases, ham, depth=depth)
                 std.measure(self.test_qubits,self.test_qubits)
@@ -188,7 +184,6 @@ class TestGQSPAlgorithm:
             return True, None
         except Exception as e:
             return False, str(e)
-
 
 class TestTrotterAlgorithm:
     """Test Trotter decomposition algorithm."""
@@ -345,7 +340,6 @@ class TestTrotterAlgorithm:
         except Exception as e:
             return False, str(e)
 
-
 class TestPrepSelAlgorithm:
     """Test Preparation-Selection library algorithms."""
     
@@ -366,7 +360,6 @@ class TestPrepSelAlgorithm:
             builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             prep_sel = builder.import_library(PrepSelLibrary)
-            
             
             # std.qubit(6)  # Need extra qubits for ancillas
             # std.bit(6)
@@ -402,8 +395,7 @@ class TestPrepSelAlgorithm:
             builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             prep_sel = builder.import_library(PrepSelLibrary)
-            
-            
+             
             # std.qubit(8)  # Extra qubits for larger chains
             # std.bit(8)
             
@@ -438,7 +430,6 @@ class TestPrepSelAlgorithm:
             
             qubits = [f'q[{j}]' for j in range(int(np.ceil(np.log2(len(dist)))))]
             
-            
             # std.qubit(len(qubits) + 1)
             # std.bit(len(qubits) + 1)
             
@@ -467,7 +458,6 @@ class TestPrepSelAlgorithm:
         builder = QasmBuilder(6)
         std = builder.import_library(std_gates)
         select = builder.import_library(Select)
-        
         
         # std.qubit(6)
         # std.bit(6)
@@ -504,7 +494,6 @@ class TestPrepSelAlgorithm:
             
             qubits = [f'q[{i}]' for i in range(len(pauli_str))]
             
-            
             # std.qubit(len(qubits))
             # std.bit(len(qubits))
             
@@ -535,7 +524,6 @@ class TestPrepSelAlgorithm:
             return True, None
         except Exception as e:
             return False, str(e)
-
 
 class TestAlgorithmIntegration:
     """Test algorithm interactions and edge cases."""
@@ -643,7 +631,6 @@ class TestAlgorithmIntegration:
             std = builder.import_library(std_gates)
             gqsp = builder.import_library(GQSP)
             
-            
             # std.qubit(n_qubits + 1)  # +1 for ancilla
             # std.bit(n_qubits + 1)
             
@@ -682,7 +669,6 @@ class TestAlgorithmIntegration:
         except Exception as e:
             return False, str(e)
 
-
 class TestAlgorithmStressTests:
     """Stress tests for algorithm robustness."""
     
@@ -696,8 +682,7 @@ class TestAlgorithmStressTests:
         std = builder.import_library(std_gates)
         gqsp = builder.import_library(GQSP)
         trotter = builder.import_library(Trotter)
-        prep_sel = builder.import_library(PrepSelLibrary)
-        
+        prep_sel = builder.import_library(PrepSelLibrary)   
         
         class H1(ham_list[0]):
             def apply(self,*args,**kwargs):
@@ -752,7 +737,6 @@ class TestAlgorithmStressTests:
             gqsp.GQSP(reg[:2], phases, H1, depth=3)
             std.measure(reg,reg)
             
-            
             program = builder.build()
             full_qasm = program
             
@@ -773,7 +757,6 @@ class TestAlgorithmStressTests:
             return True, None
         except Exception as e:
             return False, str(e)
-
 
 if __name__ == "__main__":
     # Run tests if executed directly

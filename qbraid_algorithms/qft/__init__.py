@@ -23,14 +23,15 @@ Functions
 
     load_program
     generate_subroutine
+    QFTLibrary
 
 """
 
 from .qft import generate_subroutine, load_program
-from .QFTLibrary import QFTLibrary
+from .qft_lib import QFTLibrary
 
 __all__ = [
     "load_program",
     "generate_subroutine",
-    "QFTLibrary"
+    "qft_lib"
 ]

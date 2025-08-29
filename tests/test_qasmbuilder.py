@@ -41,10 +41,8 @@ except ImportError:
     PYQASM_AVAILABLE = False
     pytest.skip("pyqasm not available", allow_module_level=True)
 
-
 class TestQASMBuilderBasic:
     """Test basic QASM generation with exact string matching."""
-    
     def test_simple_gate_sequence(self):
         """Test exact QASM output for simple gate sequence."""
         n = 3
@@ -57,7 +55,7 @@ class TestQASMBuilderBasic:
         std.cnot(qubits[0], qubits[1])
         std.x(qubits[2])
         std.measure(qubits,qubits)
-        
+
         program = builder.build()
         
         # Expected QASM output (adjust based on your actual format)
@@ -164,8 +162,6 @@ class TestQASMBuilderBasic:
         std.h("q[i]")
         std.end_loop()
         
-        
-        
         program, imports, defs = builder.build()
         
         # Check for control flow structures
@@ -184,7 +180,6 @@ class TestQASMBuilderBasic:
         program = sys.build()
         assert "qubit[8]" in program
         assert "bit[8]" in program
-
 
     def validate_qasm_with_pyqasm(self, qasm_string):
         """Helper method to validate QASM using pyqasm."""
@@ -215,7 +210,6 @@ class TestQASMBuilderBasic:
             
         except Exception as e:
             return False, f"Validation setup failed: {str(e)}"
-
 
 class TestHamiltonianInterface:
     """Test Hamiltonian interface for correct QASM generation."""
@@ -258,7 +252,6 @@ class TestHamiltonianInterface:
                 ham_lib.apply("0.5", self.test_qubits)
                 std.measure(self.test_qubits,self.test_qubits)
                 
-                
                 program= builder.build()
                 
                 # Validate basic structure
@@ -283,7 +276,6 @@ class TestHamiltonianInterface:
             std = builder.import_library(std_gates)
             ham_lib = builder.import_library(ham)
             
-            
             anc_q = builder.claim_qubits(1)  # Need extra qubit for control
             anc_c = builder.claim_clbits(1)
             
@@ -296,17 +288,14 @@ class TestHamiltonianInterface:
                 std.measure(self.test_qubits+anc_q,self.test_qubits+anc_c)
                 
                 program = builder.build()
-                
                 # Validate structure
                 assert isinstance(program, str)
                 assert len(program) > 0
-                
                 # Test QASM validity
                 full_qasm = program
                 is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
                 
                 assert is_valid, f"Invalid controlled QASM for {name}: {error_msg}\nQASM:\n{full_qasm}"
-                
             except Exception as e:
                 pytest.fail(f"Failed to apply controlled Hamiltonian {name}: {str(e)}")
 
@@ -314,14 +303,11 @@ class TestHamiltonianInterface:
         """Test Hamiltonians with different parameter types."""
         test_times = ["0.1", "pi/4", "theta", "2*pi/3"]
         
-        # builder = GateBuilder()
-        
         for time_param in test_times:
             for name, ham in self.test_hamiltonians.items():
                 builder = QasmBuilder(len(self.test_qubits))
                 std = builder.import_library(std_gates)
                 ham_lib = builder.import_library(ham)
-                
                 try:
                     ham_lib.apply(time_param, self.test_qubits)
                     std.measure(self.test_qubits,self.test_qubits)
@@ -338,8 +324,7 @@ class TestHamiltonianInterface:
                     # else:  # Symbolic parameter
                         # For symbolic parameters, they should appear in gate definitions
                         # assert any(time_param.replace('*', '').replace('/', '').replace('pi', '') in gate_def 
-                        #          for gate_def in defs.values() if gate_def)
-                        
+                        #          for gate_def in defs.values() if gate_def)   
                 except Exception as e:
                     # Some parameter types might not be supported - that's OK
                     if "parameter" not in str(e).lower():
@@ -349,7 +334,7 @@ class TestHamiltonianInterface:
         """Helper method to validate QASM using pyqasm."""
         if not PYQASM_AVAILABLE:
             return True, "pyqasm not available - skipping validation"
-        
+
         try:
             # Try to parse with pyqasm
             program = pq.loads(qasm_string)
@@ -358,10 +343,8 @@ class TestHamiltonianInterface:
         except Exception as e:
             return False, str(e)
 
-
 class TestQASMStability:
     """Test QASM output stability across runs."""
-    
     def test_deterministic_output(self):
         """Test that identical inputs produce identical QASM output."""
         def create_test_program():
@@ -374,10 +357,8 @@ class TestQASMStability:
             # std.measure([0],[1])
             
             return builder.build()
-        
         # Generate the same program multiple times
         results = [create_test_program() for _ in range(5)]
-        
         # All results should be identical
         first_result = results[0]
         for i, result in enumerate(results[1:], 1):
@@ -395,7 +376,6 @@ class TestQASMStability:
             
             for _ in range(3):
                 # Create fresh instances
-                # test_ham = ham_class.__class__(list(range(3)), **ham_class.__dict__)
                 class test_ham(ham_class):
                     pass
                 builder = QasmBuilder(len(reg))
@@ -413,7 +393,6 @@ class TestQASMStability:
                 assert result[0] == first_result[0], f"Hamiltonian {name} program differs at run {i}"
                 # Gate definitions should be the same
                 assert result[2] == first_result[2], f"Hamiltonian {name} definitions differ at run {i}"
-
 
 if __name__ == "__main__":
     # Run tests if executed directly

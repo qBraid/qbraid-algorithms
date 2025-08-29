@@ -26,7 +26,7 @@ from pyqasm.modules.base import QasmModule
 from qbraid_algorithms.QTran import QasmBuilder
 from qbraid_algorithms.utils import _prep_qasm_file
 
-from .QFTLibrary import QFTLibrary
+from .qft_lib import QFTLibrary
 
 
 def load_program(num_qubits: int) -> QasmModule:

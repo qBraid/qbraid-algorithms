@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Bell's Inequality experiment implementation.
+Module providing Amplitude Amplification implementation.
 
 Functions
 ----------
@@ -25,7 +25,7 @@ Functions
     
 """
 
-from .AmplAmpLibrary import AALibrary
+from .amp_ampl import AALibrary
 
 __all__ = [
     "AALibrary"

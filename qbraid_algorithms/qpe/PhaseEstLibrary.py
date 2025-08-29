@@ -47,18 +47,8 @@ class PhaseEstimationLibrary(GateLibrary):
                     ham.controlled(qargs[:len(qubits)],qargs[len(qubits)+i])
         qft.QFT(qargs[len(qubits):])
         std.end_gate()
-        p, i, d = sys.build()
-        # print("phase lib:",p,i,d)
-        for imps in i:
-            if imps not in self.gate_import:
-                self.gate_import.append(imps)
-            
-        for nem, defs in d.items():
-            # print("name:",nem,"def:",defs)
-            if nem not in self.gate_defs:
-                self.gate_defs[nem] = defs
-        self.gate_defs[name] = p
-        self.gate_ref.append(name)
+        
+        self.merge(sys.build(),name)
         self.call_gate(name,spectra[-1],qubits+spectra[:-1])
         return name
     

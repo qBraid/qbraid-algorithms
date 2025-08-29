@@ -12,18 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import random
 import string
 
 from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
-
 class RodeoLibrary(GateLibrary):
+    """
+    A quantum gate library implementing the Rodeo algorithm for quantum state preparation.
+    
+    The Rodeo algorithm is a quantum algorithm used for amplitude amplification and 
+    quantum state preparation. It uses ancilla qubits and controlled operations to 
+    selectively amplify desired quantum states.
+    """
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
-    def Rodeo(self, qubits:list,t,depth: int,hamiltonian, evolution=None):
+    def rodeo(self, qubits:list,t,depth: int,hamiltonian, evolution=None):
+        """
+        Implement the Rodeo algorithm with multiple ancilla qubits.
+        
+        This method creates a quantum gate that implements the Rodeo algorithm using
+        a specified number of ancilla qubits (depth). Each ancilla qubit goes through
+        a Hadamard-controlled operation-phase-Hadamard sequence.
+        
+        Args:
+            qubits: List of qubit indices to operate on. The last qubit is treated specially.
+            t: Time evolution parameter for the phase gates
+            depth: Number of ancilla qubits to use (also determines algorithm depth)
+            hamiltonian: Hamiltonian object defining the controlled evolution
+            evolution: Optional parameter to control evolution behavior
+            
+        Returns:
+            str: Name of the created gate for potential reuse
+        """
         name = f'Rodeo{depth}_{len(qubits)}_{hamiltonian.name}'
         anc_q = self.builder.claim_qubits(depth)
         anc_c = self.builder.claim_clbits(depth)
@@ -39,8 +61,7 @@ class RodeoLibrary(GateLibrary):
         ham.call_space = " {}"
         names = string.ascii_letters
         qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+depth)]
-
-        
+ 
         s = [2*random.random()-2 for d in range(depth)]
         std.begin_gate(name,qargs,params='t')
         for i in range(depth):
@@ -54,16 +75,31 @@ class RodeoLibrary(GateLibrary):
             std.h(qargs[i])
         std.end_gate()
 
-
         p, i, d = sys.build()
         self.merge(p,i,d,name)
-
 
         self.call_gate(name,qubits[-1],anc_q+qubits[:-1],t)
         self.measure(anc_q,anc_c)
         return name
     
-    def Rodeo_MCM(self, qubits:list,t,depth: int,hamiltonian, evolution=None):
+    def rodeo_mcm(self, qubits:list,t,depth: int,hamiltonian, evolution=None):
+        """
+        Implement the Rodeo algorithm with mid-circuit measurements (MCM).
+        
+        This is an optimized version that uses only one ancilla qubit but repeats
+        the process multiple times with mid-circuit measurements. The algorithm
+        breaks early if a successful measurement is obtained.
+        
+        Args:
+            qubits: List of qubit indices to operate on. The last qubit is treated specially.
+            t: Time evolution parameter for the phase gates  
+            depth: Number of iterations to perform
+            hamiltonian: Hamiltonian object defining the controlled evolution
+            evolution: Optional parameter to control evolution behavior
+            
+        Returns:
+            str: Name of the created gate for potential reuse
+        """
         name = f'Rodeo_{len(qubits)}_{hamiltonian.name}'
         anc_q = self.builder.claim_qubits(1)
         anc_c = self.builder.claim_clbits(1)
@@ -80,7 +116,6 @@ class RodeoLibrary(GateLibrary):
             self.end_if()
             self.end_loop()
             return name
-        
         
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -102,7 +137,6 @@ class RodeoLibrary(GateLibrary):
 
         p, i, d = sys.build()
         self.merge(p,i,d,name)
-
 
         # self.begin_loop(("float",ts))
         self.begin_loop(depth)

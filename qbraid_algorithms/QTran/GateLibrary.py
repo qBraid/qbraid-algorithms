@@ -404,7 +404,7 @@ class GateLibrary:
 
 class std_gates(GateLibrary):
     """
-                    STANDARD GATES LIBRARY                             
+    STANDARD GATES LIBRARY                             
                                                                                   
     Implementation of std_lib quantum gates following OpenQASM 3.0 standards.   
                                                                                   

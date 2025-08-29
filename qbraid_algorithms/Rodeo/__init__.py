@@ -24,7 +24,7 @@ Functions
     RodeoLibrary
     
 """
-from .RodeoLibrary import RodeoLibrary
+from .rodeo import RodeoLibrary
 
-__all__ = ['RodeoLibrary']
+__all__ = ['rodeo']
 
