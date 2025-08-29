@@ -23,6 +23,9 @@ Functions
 
     GQSP
     Trotter
+    TransverseFieldIsing
+    HeisenbergXYZ
+    FermionicHubbard
 
 """
 from .gqsp import GQSP

@@ -30,12 +30,12 @@ Modules
     iqft
     qpe
     QTran
-    HHL
+    hhl
     evolution
-    matrix_embedding
+    embedding
     amplitude_amplification
-    Rodeo
-    
+    rodeo
+
 """
 
 from . import (
