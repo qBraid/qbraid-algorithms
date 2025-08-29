@@ -764,28 +764,29 @@ class TestAlgorithmStressTests:
 class TestAmplitude:
     class Za(GateLibrary):
         """Custom gate: controlled-Z on all qubits except index 2."""
-
-        def __init__(self, reg, *args, **kwargs):
+        name = "Z_on_two"
+        reg = [*range(3)]
+        def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
-            self.name = f"Z_on_two{len(reg)}"
+            self.name = f"Z_on_two{len(self.reg)}"
             names = string.ascii_letters
             qargs = [
                 names[i // len(names)] + names[i % len(names)]
-                for i in range(len(reg))
+                for i in range(len(self.reg))
             ]
 
             sys = GateBuilder()
             std = sys.import_library(std_gates)
             std.call_space = " {}"
 
-            ind = dict(zip(range(len(reg)), qargs))
+            ind = dict(zip(range(len(self.reg)), qargs))
             ind.pop(2)
 
             # Gate definition
             std.begin_gate(self.name, qargs)
             std.x(qargs[2])
-            std.controlled_op("z", (qargs[2], list(ind.values())), n=len(reg) - 1)
+            std.controlled_op("z", (qargs[2], list(ind.values())), n=len(self.reg) - 1)
             std.x(qargs[2])
             std.end_gate()
 
