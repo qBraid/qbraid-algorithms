@@ -21,3 +21,4 @@ Testing:
 direct pyqasm validation tests within builder_algorithsm have been suspended due to lack of controlled op and 
 subroutine scope support in pyqasm module
 - once those are fixed and released in new pyqasm version, "assert is_valid" checks need to be uncommented
+remove many file level lint skips caused by naming and unused test variables

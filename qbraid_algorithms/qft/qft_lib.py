@@ -11,21 +11,53 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+This module provides the QFTLibrary class for constructing and managing Quantum
+Fourier Transform (QFT) gates using the qBraid algorithms framework.
+Classes:
+    QFTLibrary(GateLibrary):
+Dependencies:
+    - string
+    - qbraid_algorithms.QTran (GateBuilder, GateLibrary, std_gates)
+"""
 
 # from QasmBuilder import FileBuilder, QasmBuilder, GateBuilder
 import string
 
+# pylint: disable=invalid-name
+# mypy: disable_error_code="call-arg"
 from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
 
 class QFTLibrary(GateLibrary):
+    """QFTLibrary provides methods to construct and manage 
+    Quantum Fourier Transform (QFT) gates, extending GateLibrary 
+    for use in quantum algorithms."""
     name = "QFT"
     def __init__(self,*args,**kwargs):
+        """
+        Initialize the QFTLibrary instance.
+
+        Args:
+            *args: Variable length argument list for parent GateLibrary.
+            **kwargs: Arbitrary keyword arguments for parent GateLibrary.
+        """
         super().__init__(*args,**kwargs)
         # self.call_space = "{}"
 
     def QFT(self, qubits:list, swap=True):
-        name = f'QFT{len(qubits)}{'S' if swap else ''}'
+        """
+        Constructs a Quantum Fourier Transform (QFT) gate for the specified qubits.
+
+        Parameters:
+            qubits (list of int): List of qubit indices (as integers) to apply the QFT on.
+            swap (bool, optional): If True, applies swap gates at the end to reverse qubit order. Defaults to True.
+
+        Behavior:
+            - Builds and registers a QFT gate with optional swaps.
+            - Calls the constructed gate on the provided qubits.
+        """
+        name = f'QFT{len(qubits)}{"S" if swap else ""}'
         if name in self.gate_ref:
             self.call_gate(name,qubits[-1],qubits[:-1])
             return
@@ -40,10 +72,10 @@ class QFTLibrary(GateLibrary):
             std.h(qargs[i])
             for j in range(i+1,len(qubits)):
                 std.call_gate("cp",qargs[j],controls=qargs[i],phases=f"pi/{2**(j-i)}")
-        if(swap):
+        if swap:
             for i in range(len(qubits)//2):
-                std.call_gate("swap",qargs[i],controls=qargs[-i-1])
-    
+                std.call_gate("swap", qargs[i], qargs[-i-1])
+
         std.end_gate()
 
         # std.begin_gate(name,qargs)
@@ -63,21 +95,6 @@ class QFTLibrary(GateLibrary):
         # std.end_loop()
         # std.end_loop()
         # std.end_subroutine()
-        p, i, d = sys.build()
-        for imps in i:
-            if imps not in self.gate_import:
-                self.gate_import.append(imps)
-            
-        for defs in d:
-            if defs[0] not in self.gate_defs:
-                self.gate_defs[defs[0]] = defs[1]
-        self.gate_defs[name] = p
-        self.gate_ref.append(name)
+
+        self.merge(*sys.build(),name)
         self.call_gate(name,qubits[-1],qubits[:-1])
-        
-
-
-
-        
-
-    

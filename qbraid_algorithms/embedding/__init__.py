@@ -20,7 +20,7 @@ Functions
 
 .. autosummary::
     :toctree: ../stubs/
-    
+
     PrepSelLibrary
     Prep
     Select
@@ -32,5 +32,4 @@ Functions
 from .prep_sel import PauliOperator, Prep, PrepSelLibrary, Select
 from .toeplitz import Diagonal, Toeplitz
 
-__all__ = ['prep_sel','Toeplitz','Prep','Select','Diagonal','PauliOperator']
-
+__all__ = ['prep_sel','Toeplitz','Prep','Select','Diagonal','PauliOperator','PrepSelLibrary']

@@ -20,11 +20,10 @@ Functions
 
 .. autosummary::
     :toctree: ../stubs/
-    
+
     RodeoLibrary
-    
+
 """
 from .rodeo import RodeoLibrary
 
 __all__ = ['RodeoLibrary']
-

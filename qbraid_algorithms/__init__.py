@@ -39,16 +39,16 @@ Modules
 """
 
 from . import (
-    hhl,
     QTran,
-    rodeo,
     amplitude_amplification,
     bernstein_vazirani,
-    evolution,
-    iqft,
     embedding,
+    evolution,
+    hhl,
+    iqft,
     qft,
     qpe,
+    rodeo,
 )
 from ._version import __version__
 

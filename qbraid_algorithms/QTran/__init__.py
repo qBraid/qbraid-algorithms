@@ -29,8 +29,9 @@ Functions
     std_gates
     
 """
-from .GateLibrary import GateLibrary, std_gates
-from .ModuleLoader import qasm_pipe
-from .QasmBuilder import FileBuilder, GateBuilder, IncludeBuilder, QasmBuilder
+# pylint: disable=invalid-name
+from .gate_library import GateLibrary, std_gates
+from .module_loader import qasm_pipe
+from .qasm_builder import FileBuilder, GateBuilder, IncludeBuilder, QasmBuilder
 
 __all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates','qasm_pipe']

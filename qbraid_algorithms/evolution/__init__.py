@@ -38,5 +38,6 @@ from .h_test_suite import (
 )
 from .trotter import Trotter
 
-__all__ = ['Trotter','GQSP','TransverseFieldIsing', 'HeisenbergXYZ', 'FermionicHubbard', 'RandomizedHamiltonian','create_test_hamiltonians']
-
+__all__ = ['Trotter','GQSP','TransverseFieldIsing',
+           'HeisenbergXYZ', 'FermionicHubbard', 
+           'RandomizedHamiltonian','create_test_hamiltonians']

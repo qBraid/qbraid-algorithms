@@ -28,7 +28,8 @@ Dependencies:
 
 author: Rhys Takahashi
 """
-
+# pylint: disable=too-many-locals
+# mypy: disable_error_code="import-untyped"
 import string
 from itertools import combinations
 
@@ -66,9 +67,8 @@ class Toeplitz(GateLibrary):
 
         # If already defined, just call it
         if name in self.gate_ref:
-            pass
-            # self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
-            # self.measure(anc_q, anc_c)
+            self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
+            self.measure(anc_q, anc_c)
             return name
 
         # Construct circulant embedding
@@ -113,10 +113,9 @@ class Toeplitz(GateLibrary):
 
         self.merge(*sys.build(), name)
         # Finalize
-        if name in self.gate_ref:
-            self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
-            self.measure(anc_q, anc_c)
-            return name
+        self.call_gate(name, qubits[-1], anc_q + qubits[:-1])
+        self.measure(anc_q, anc_c)
+        return name
 
 
 class Diagonal(GateLibrary):
@@ -249,14 +248,13 @@ class Diagonal(GateLibrary):
         self.call_gate(name, qubits[-1], qubits[:-1])
         return name
 
-    def phase_projector(self,target, depth, plot=False):
+    def phase_projector(self,target, depth):
         """
         Construct a phase projector decomposition.
 
         Args:
             target (array-like): Target diagonal.
             depth (int): Expansion depth.
-            plot (bool): If True, plot space (not implemented).
 
         Returns:
             np.ndarray: Projection coefficients.

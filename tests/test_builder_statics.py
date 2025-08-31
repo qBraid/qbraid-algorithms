@@ -15,21 +15,30 @@
 """
 Test Algorithms - Semantic Validation
 
-This module tests the implementations of several semi static algorithms which dont accept a arbitrary oracle/hamiltonian.
+This module tests the implementations of several semi static algorithms which 
+dont accept a arbitrary oracle/hamiltonian.
 Tests include:
 1. Grovers
 2. Toeplitz
 3. HHL
 """
 
+# TODO: remove unused variable lint once namespace (ie imports and defs) tests are implemented
+# ruff: noqa: F841
+# pylint: disable=C0303,unused-variable,missing-class-docstring
+# pylint: disable=missing-function-docstring,too-many-locals,duplicate-code
 import string
+
 import numpy as np
 import pyqasm as pq
-#package modules
-from qbraid_algorithms.QTran import QasmBuilder, std_gates, GateBuilder, GateLibrary
+
 from qbraid_algorithms.amplitude_amplification import AALibrary
 from qbraid_algorithms.embedding import Toeplitz
+
+#package modules
+from qbraid_algorithms.QTran import GateBuilder, GateLibrary, QasmBuilder, std_gates
 from qbraid_algorithms.rodeo import RodeoLibrary
+
 
 class Za(GateLibrary):
     """Custom gate: controlled-Z on all qubits except index 2."""
