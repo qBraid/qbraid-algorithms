@@ -30,7 +30,7 @@ Notes:
 '''
 from typing import List
 
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 
 # TODO: once again Physics notation was originally used convert to better naming
 # pylint: disable=invalid-name

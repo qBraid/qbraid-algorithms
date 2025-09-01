@@ -30,7 +30,7 @@ import string
 import numpy as np
 from scipy.optimize import minimize
 
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 
 
 class PrepSelLibrary(GateLibrary):

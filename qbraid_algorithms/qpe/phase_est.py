@@ -30,7 +30,7 @@ from qbraid_algorithms.qft import QFTLibrary
 # pylint: disable=arguments-differ
 # mypy: disable_error_code="override,call-arg"
 # from GateLibrary import GateLibrary, std_gates
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 
 
 class PhaseEstimationLibrary(GateLibrary):

@@ -42,7 +42,7 @@ from qbraid_algorithms.evolution import GQSP, Trotter, create_test_hamiltonians
 from qbraid_algorithms.qpe import PhaseEstimationLibrary
 
 # Import modules
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, QasmBuilder, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, QasmBuilder, std_gates
 
 try:
     import pyqasm as pq

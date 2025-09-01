@@ -33,7 +33,7 @@ Key features:
 # TODO: change names from physics notation to python standard naming convention
 # pylint: disable=invalid-name,too-many-positional-arguments
 
-from qbraid_algorithms.QTran import GateLibrary, std_gates
+from qbraid_algorithms.qtran import GateLibrary, std_gates
 
 
 class Trotter(GateLibrary):

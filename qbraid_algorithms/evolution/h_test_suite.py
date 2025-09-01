@@ -43,7 +43,7 @@ import random
 # to subscript standard but incomplete in transfer
 import string
 
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 
 
 class TransverseFieldIsing(GateLibrary):

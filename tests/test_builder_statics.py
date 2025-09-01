@@ -36,7 +36,7 @@ from qbraid_algorithms.amplitude_amplification import AALibrary
 from qbraid_algorithms.embedding import Toeplitz
 
 #package modules
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, QasmBuilder, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, QasmBuilder, std_gates
 from qbraid_algorithms.rodeo import RodeoLibrary
 
 

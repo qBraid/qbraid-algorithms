@@ -36,7 +36,7 @@ import pytest
 from qbraid_algorithms.evolution import create_test_hamiltonians
 
 # Import your modules (adjust paths as needed)
-from qbraid_algorithms.QTran import GateBuilder, QasmBuilder, std_gates
+from qbraid_algorithms.qtran import GateBuilder, QasmBuilder, std_gates
 
 try:
     import pyqasm as pq

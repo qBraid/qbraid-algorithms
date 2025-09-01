@@ -23,7 +23,7 @@ from pathlib import Path
 import pyqasm
 from pyqasm.modules.base import QasmModule
 
-from qbraid_algorithms.QTran import QasmBuilder
+from qbraid_algorithms.qtran import QasmBuilder
 from qbraid_algorithms.utils import _prep_qasm_file
 
 from .qft_lib import QFTLibrary

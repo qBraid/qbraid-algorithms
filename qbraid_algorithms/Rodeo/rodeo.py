@@ -22,14 +22,14 @@ Classes:
 Dependencies:
     - random
     - string
-    - qbraid_algorithms.QTran (GateBuilder, GateLibrary, std_gates)
+    - qbraid_algorithms.qtran (GateBuilder, GateLibrary, std_gates)
 '''
 import random
 import string
 
 # pylint: disable=too-many-positional-arguments,too-many-locals
 # mypy: disable_error_code="call-arg"
-from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
+from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 
 
 class RodeoLibrary(GateLibrary):

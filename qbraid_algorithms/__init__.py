@@ -29,7 +29,7 @@ Modules
     qft
     iqft
     qpe
-    QTran
+    qtran
     hhl
     evolution
     embedding
@@ -39,7 +39,7 @@ Modules
 """
 
 from . import (
-    QTran,
+    qtran,
     amplitude_amplification,
     bernstein_vazirani,
     embedding,
@@ -58,7 +58,7 @@ __all__ = [
     "iqft",
     "bernstein_vazirani",
     "qpe",
-    "QTran",
+    "qtran",
     'evolution',
     'embedding',
     'amplitude_amplification',
