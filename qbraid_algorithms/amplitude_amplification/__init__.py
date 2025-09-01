@@ -22,7 +22,8 @@ Functions
     :toctree: ../stubs/
 
     AALibrary
-    
+
+
 """
 
 from .amp_ampl import AALibrary
