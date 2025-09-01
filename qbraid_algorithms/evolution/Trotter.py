@@ -106,7 +106,7 @@ class Trotter(GateLibrary):
         # BUG FIX: More robust variable naming and type specification
         uk_var = std.add_var("suzuki_coeff",
                            assignment="1.0/(4.0 - pow(4.0, 1.0/(2.0*recursion_depth - 1.0)))",
-                           type="float")
+                           qtype="float")
 
         # Suzuki's 5-step symmetric decomposition:
         # S_k = U_k * S_{k-1} * U_k * S_{k-1} * (1-4*U_k) * S_{k-1} * U_k * S_{k-1} * U_k * S_{k-1}
@@ -216,7 +216,7 @@ class Trotter(GateLibrary):
         self.gate_ref.append(name)
 
         # Apply Trotter steps
-        dt_var = std.add_var("dt", assignment=f"time/{steps}", type="float")
+        dt_var = std.add_var("dt", assignment=f"time/{steps}", qtype="float")
 
         for step in range(steps):
             std.comment(f"Trotter step {step + 1}")

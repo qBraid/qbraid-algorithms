@@ -23,8 +23,7 @@ and Pauli string decomposition using quantum compilation techniques.
 #lambda error suppressed as a single parameter automated generation of a 2d numpy matrix is too obtuse a function call
 # TODO: fix too many locals, unused variables too but thats more of a loop control varaible problem
 # pylint: disable=too-many-locals,unused-variable
-# mypy: disable_error_code="call-arg"
-# mypy: disable_error_code="import-untyped"
+# mypy: disable_error_code="call-arg,import-untyped"
 import itertools
 import string
 

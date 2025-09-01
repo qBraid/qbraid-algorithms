@@ -28,8 +28,7 @@ from qbraid_algorithms.qft import QFTLibrary
 # TODO: regularize application of inverse op to another name for abstract hamiltonian
 # or let this be acceptable behavior
 # pylint: disable=arguments-differ
-# mypy: disable_error_code="call-arg"
-# mypy: disable_error_code="override"
+# mypy: disable_error_code="override,call-arg"
 # from GateLibrary import GateLibrary, std_gates
 from qbraid_algorithms.QTran import GateBuilder, GateLibrary, std_gates
 
