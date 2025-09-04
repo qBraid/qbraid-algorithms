@@ -137,7 +137,7 @@ class GateLibrary:
                   f"make sure that this isn't a floating reference / malformed statement, "
                   f"or is at least previously defined within untracked environment definitions")
 
-        call = f"{capture + " = " if capture is not None else ""}{subroutine}({", ".join(str(a) for a in parameters)});"
+        call = f"{capture + ' = ' if capture is not None else ''}{subroutine}({', '.join(str(a) for a in parameters)});"
         self.program(call)
 
 
@@ -265,7 +265,7 @@ class GateLibrary:
         """
         if name in self.gate_ref:
             print(f"warning: gate {name} replacing existing namespace")
-        call = f"gate {name}{"("+",".join(params)+")" if params is not None else ""} {",".join(qargs)}" +"{"
+        call = f"gate {name}{'('+','.join(params)+')' if params is not None else ''} {','.join(qargs)}" +"{"
         self.program(call)
         self.builder.scope += 1
 
@@ -286,7 +286,7 @@ class GateLibrary:
         """
         if name in self.gate_ref:
             print(f"warning:  subroutine {name} replacing existing namespace")
-        call = f"def {name}({",".join(parameters)}) {" -> " + return_type if return_type is not None else ""}" + "{"
+        call = f"def {name}({','.join(parameters)}) {' -> ' + return_type if return_type is not None else ''}" + "{"
         self.program(call)
         self.builder.scope += 1
 
@@ -379,7 +379,7 @@ class GateLibrary:
         '''
         if name in self.gate_ref:
             print(f"warning:  gate {name} replacing existing namespace")
-        call = f"{qtype if qtype is not None else "let"} {name} {f'= {assignment}' if assignment is not None else ""};"
+        call = f"{qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
 
