@@ -38,18 +38,6 @@ Modules
 
 """
 
-from . import (
-    qtran,
-    amplitude_amplification,
-    bernstein_vazirani,
-    embedding,
-    evolution,
-    hhl,
-    iqft,
-    qft,
-    qpe,
-    rodeo,
-)
 from ._version import __version__
 
 __all__ = [
