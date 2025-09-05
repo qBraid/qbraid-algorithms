@@ -24,15 +24,20 @@ Modules
 
 .. autosummary::
     :toctree: ../stubs/
-
+    
     bernstein_vazirani
     qft
     iqft
     qpe
+    qtran
+    hhl
+    evolution
+    embedding
+    amplitude_amplification
+    rodeo
 
 """
 
-from . import bernstein_vazirani, iqft, qft, qpe
 from ._version import __version__
 
 __all__ = [
@@ -41,4 +46,10 @@ __all__ = [
     "iqft",
     "bernstein_vazirani",
     "qpe",
+    "qtran",
+    'evolution',
+    'embedding',
+    'amplitude_amplification',
+    'hhl',
+    'rodeo'
 ]

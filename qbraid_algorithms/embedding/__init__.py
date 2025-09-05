@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
+Module providing Several different implementations of block encoding
 
 Functions
 ----------
@@ -21,14 +21,15 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    load_program
-    generate_subroutine
-    get_result
-
+    PrepSelLibrary
+    Prep
+    Select
+    PauliOperator
+    Toeplitz
+    Diagonal
 
 """
+from .prep_sel import PauliOperator, Prep, PrepSelLibrary, Select
+from .toeplitz import Diagonal, Toeplitz
 
-from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
-
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+__all__ = ['prep_sel','Toeplitz','Prep','Select','Diagonal','PauliOperator','PrepSelLibrary']

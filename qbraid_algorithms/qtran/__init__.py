@@ -13,22 +13,25 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
+Module providing Qasm file generator Qasmbuilder, and base class GateLibrary acting as a macro system on top
 
 Functions
 ----------
 
 .. autosummary::
     :toctree: ../stubs/
-
-    load_program
-    generate_subroutine
-    get_result
-
-
+    
+    FileBuilder
+    GateBuilder
+    QasmBuilder
+    IncludeBuilder  
+    GateLibrary
+    std_gates
+    
 """
+# pylint: disable=invalid-name
+from .gate_library import GateLibrary, std_gates
+from .module_loader import qasm_pipe
+from .qasm_builder import FileBuilder, GateBuilder, IncludeBuilder, QasmBuilder
 
-from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
-
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+__all__ = ['FileBuilder', 'QasmBuilder','GateBuilder','IncludeBuilder','GateLibrary','std_gates','qasm_pipe']

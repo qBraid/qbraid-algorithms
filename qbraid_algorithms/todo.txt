@@ -1,0 +1,24 @@
+
+QasmBuilder:
+finish scoping and validate building import file generation
+
+GateLibrary:
+look into better controlled application 
+- ie some static std_gate calls only accept a target. Current workaround is to directly call the gate name. 
+- - look at either adding args/kwargs to static gate passthrough or having behavior returning gate name on call with null
+- - a decorator might be another way
+reformalize ancilla claiming
+- probable temp practice is that any function that can claim ancilla must work within root file (base builder) 
+scope as a subroutine rather than gate, means that only update would be safety checking certain calls when not established 
+in header (ie defined within body so ordering of definitions may be wrong)
+- would also mean updating qpe, select/prep as they are in gate formalism currently due to lack of rendering support for subroutines
+
+Ambiguous:
+pragma annotations in general
+-specifically one for 0 state ancilla postselection?
+
+Testing:
+direct pyqasm validation tests within builder_algorithsm have been suspended due to lack of controlled op and 
+subroutine scope support in pyqasm module
+- once those are fixed and released in new pyqasm version, "assert is_valid" checks need to be uncommented
+remove many file level lint skips caused by naming and unused test variables

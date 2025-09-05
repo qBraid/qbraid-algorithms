@@ -18,13 +18,15 @@ Module providing Quantum Fourier Transform (QFT) algorithm implementation.
 """
 import os
 import shutil
-import tempfile
 from pathlib import Path
 
 import pyqasm
 from pyqasm.modules.base import QasmModule
 
+from qbraid_algorithms.qtran import QasmBuilder
 from qbraid_algorithms.utils import _prep_qasm_file
+
+from .qft_lib import QFTLibrary
 
 
 def load_program(num_qubits: int) -> QasmModule:
@@ -36,28 +38,15 @@ def load_program(num_qubits: int) -> QasmModule:
     Returns:
         (PyQasm Module) pyqasm module containing the QFT circuit
     """
-    # Load the QFT QASM files into a staging directory
-    temp_dir = tempfile.mkdtemp()
-    qft_src = Path(__file__).parent / "qft.qasm"
-    qft_sub_src = Path(__file__).parent / "qft_subroutine.qasm"
-    qft_dst = os.path.join(temp_dir, "qft.qasm")
-    qft_sub_dst = os.path.join(temp_dir, "qft_subroutine.qasm")
-    shutil.copy(qft_src, qft_dst)
-    shutil.copy(qft_sub_src, qft_sub_dst)
-
-    # Replace variable placeholders with user-defined parameters
-    replacements = {"QFT_SIZE": str(num_qubits)}
-    _prep_qasm_file(qft_sub_dst, replacements)
-    _prep_qasm_file(qft_dst, replacements)
 
     # Load the algorithm
-    module = pyqasm.load(qft_dst)
+    sys = QasmBuilder(qubits=num_qubits)
+    qft = sys.import_library(QFTLibrary)
+    qft.QFT([*range(num_qubits)])
+    module = pyqasm.loads(sys.build())
 
-    # Delete the created files
-    shutil.rmtree(temp_dir)
 
     return module
-
 
 def generate_subroutine(
     num_qubits: int, quiet: bool = False, path: str | None = None

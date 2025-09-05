@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
+Module providing Amplitude Amplification implementation.
 
 Functions
 ----------
@@ -21,14 +21,12 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    load_program
-    generate_subroutine
-    get_result
-
+    AALibrary
 
 """
 
-from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
+from .amp_ampl import AALibrary
 
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+__all__ = [
+    "AALibrary"
+]

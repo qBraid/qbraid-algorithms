@@ -13,22 +13,16 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
-
-Functions
-----------
-
-.. autosummary::
-    :toctree: ../stubs/
-
-    load_program
-    generate_subroutine
-    get_result
-
-
+Tests for Bell's inequality module.
 """
 
-from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
+from pyqasm.modules.base import QasmModule
 
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+from qbraid_algorithms import bells_inequality
+
+
+def test_load_program_returns_correct_type():
+    """Test that load_program returns a pyqasm module object."""
+    circuit = bells_inequality.load_program()
+    # Check that it returns a valid Qasm# module module
+    assert isinstance(circuit, QasmModule), f"Expected QasmModule, got {type(circuit)}"

@@ -13,22 +13,23 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
+Bell's Inequality Experiment Implementation
 
-Functions
-----------
-
-.. autosummary::
-    :toctree: ../stubs/
-
-    load_program
-    generate_subroutine
-    get_result
-
-
+Simple functions for loading and running Bell's inequality circuits.
 """
 
-from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
+from pathlib import Path
 
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+import pyqasm
+from pyqasm.modules.base import QasmModule
+
+
+def load_program() -> QasmModule:
+    """
+    Load the Bell's inequality circuit as a pyqasm module.
+    
+    Returns:
+        pyqasm module containing the Bell's inequality circuit
+    """
+    qasm_path = Path(__file__).parent / "bells_inequality.qasm"
+    return pyqasm.load(str(qasm_path))

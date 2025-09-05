@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation (QPE) algorithm implementation.
+Module providing QFT algorithmic primitive implementation.
 
 Functions
 ----------
@@ -21,14 +21,9 @@ Functions
 .. autosummary::
     :toctree: ../stubs/
 
-    load_program
-    generate_subroutine
-    get_result
-
+    RodeoLibrary
 
 """
+from .rodeo import RodeoLibrary
 
-from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
-
-__all__ = ["load_program", "generate_subroutine", "get_result",'PhaseEstimationLibrary']
+__all__ = ['RodeoLibrary']
