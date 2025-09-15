@@ -70,7 +70,7 @@ To load an algorithm as a PyQASM module, use the `load_algorithm` function from 
 ```python
 from qbraid_algorithms import qft
 
-qft_module = qft.load_algorithm(3) # Load QFT for 3 qubits
+qft_module = qft.load_program(3) # Load QFT for 3 qubits
 ```
 
 Now, you can perform operations with the PyQASM module, such as unrolling, and
