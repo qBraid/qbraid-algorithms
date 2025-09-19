@@ -13,8 +13,21 @@
 # limitations under the License.
 
 """
-Module providing Quantum Fourier Transform (QFT) algorithm implementation.
+Quantum Fourier Transform (QFT) Algorithm Implementation
 
+This module provides a complete implementation of the Quantum Fourier Transform,
+a fundamental building block for many quantum algorithms.
+
+The QFT transforms quantum states from the computational basis to the Fourier basis
+by applying Hadamard gates and controlled phase rotations. It's essential for
+algorithms like Shor's algorithm and quantum phase estimation, providing the
+quantum analogue of the classical discrete Fourier transform.
+
+Formulation:
+    The QFT transforms a quantum state |j⟩ to |ψ⟩ = 1/√N Σₖ₌₀^(N-1) e^(2πijk/N)|k⟩
+    where N = 2ⁿ for n qubits. The circuit implements this using Hadamard gates H
+    and controlled phase rotations R_k with phase φ = 2π/2^k. The total circuit
+    depth is O(n²) with O(n²) gates.
 """
 import os
 import shutil

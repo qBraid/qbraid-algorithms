@@ -13,8 +13,21 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation algorithm implementation.
+Quantum Phase Estimation (QPE) Algorithm Implementation
 
+This module provides a complete implementation of the Quantum Phase Estimation algorithm,
+a fundamental quantum algorithm that estimates the eigenvalues of unitary operators.
+
+QPE estimates the phase φ of an eigenvalue e^(2πiφ) by preparing ancilla qubits in
+superposition, applying controlled powers of the unitary operator, then using the
+inverse quantum Fourier transform to extract the phase. It's a key subroutine in
+Shor's algorithm, quantum simulation, and quantum machine learning.
+
+Mathematical Formulation:
+    Given a unitary operator U with eigenstate |ψ⟩ such that U|ψ⟩ = e^(2πiφ)|ψ⟩, QPE
+    prepares the state 1/√(2^t) Σⱼ₌₀^(2^t-1) |j⟩|ψ⟩, applies controlled-U^(2^j) operations,
+    then applies IQFT to the first register. The final measurement yields φ with
+    precision t bits and success probability ≥ 4/π² ≈ 0.405.
 """
 import os
 import shutil

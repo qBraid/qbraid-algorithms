@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Module providing Inverse Quantum Fourier Transform (IQFT) algorithm implementation.
+Inverse Quantum Fourier Transform (IQFT) Algorithm Implementation
 
 """
 import os

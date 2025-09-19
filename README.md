@@ -65,7 +65,7 @@ you can generate .qasm files to use them as subroutines in your own circuits.
 
 ### Loading Algorithms as PyQASM Modules
 
-To load an algorithm as a PyQASM module, use the `load_algorithm` function from the `qbraid_algorithms` package, passing algorithm-specific parameters. For example, to load the Quantum Fourier Transform (QFT) algorithm:
+To load an algorithm as a PyQASM module, use the `load_program` function from the `qbraid_algorithms` package, passing algorithm-specific parameters. For example, to load the Quantum Fourier Transform (QFT) algorithm:
 
 ```python
 from qbraid_algorithms import qft

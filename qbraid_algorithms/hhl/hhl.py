@@ -13,11 +13,8 @@
 # limitations under the License.
 
 """
-HHLLibrary class provides an implementation of the HHL (Harrow-Hassidim-Lloyd) quantum algorithm
- for solving linear systems using phase estimation techniques.
-Methods:
-    HHL(a: list, b: list, clock: list):
-        Implements the main steps of the HHL algorithm:
+Harrow-Hassidim-Lloyd (HHL) Algorithm Implementation
+
 """
 
 # Importing package modules
@@ -26,10 +23,10 @@ from qbraid_algorithms.qpe import PhaseEstimationLibrary
 
 
 class HHLLibrary(PhaseEstimationLibrary):
-    '''HHL library using base Phase Estimation implementation'''
+    """HHL library using base Phase Estimation implementation"""
 
     def HHL(self, a: list, b: list, clock: list):
-        '''
+        """
         Main implementation of the HHL algorithm
 
         Args:
@@ -39,7 +36,7 @@ class HHLLibrary(PhaseEstimationLibrary):
 
         Returns:
             None
-        '''
+        """
         sys = self.builder
         # Access to the quantum circuit builder (assumed to be defined in the parent class)
 
@@ -59,17 +56,17 @@ class HHLLibrary(PhaseEstimationLibrary):
         anc_c = sys.claim_clbits(1)
         # Allocate one classical bit for measurement result storage
 
-        Phase.phase_estimation(b,clock,a)
+        Phase.phase_estimation(b, clock, a)
         # Apply the phase estimation routine with registers (b, clock, a)
 
-        for i in range(len(clock)-1):
+        for i in range(len(clock) - 1):
             # Apply controlled rotations depending on clock qubits
             # Controlled rotation around Y-axis by angle pi/(2^{i+1}), where i is the clock qubit index
-            self.controlled_op("ry", (anc_q[0], clock[i], f'pi/(2^{i+1})'))
+            self.controlled_op("ry", (anc_q[0], clock[i], f"pi/(2^{i+1})"))
             # Controlled rotation around Y-axis, scaling by power of 2 (pi / 2^(i+1))
 
-        Phase.inverse_op(b,clock,a)
+        Phase.inverse_op(b, clock, a)
         # Apply the inverse of phase estimation to uncompute and restore registers
 
-        self.measure(anc_q,anc_c)
+        self.measure(anc_q, anc_c)
         # Measure the ancilla qubit and store result in the classical bit

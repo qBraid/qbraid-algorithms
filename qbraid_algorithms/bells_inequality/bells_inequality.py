@@ -13,9 +13,8 @@
 # limitations under the License.
 
 """
-Bell's Inequality Experiment Implementation
+Bell's Inequality Experiment algorithm implementation
 
-Simple functions for loading and running Bell's inequality circuits.
 """
 
 from pathlib import Path
@@ -27,7 +26,7 @@ from pyqasm.modules.base import QasmModule
 def load_program() -> QasmModule:
     """
     Load the Bell's inequality circuit as a pyqasm module.
-    
+
     Returns:
         pyqasm module containing the Bell's inequality circuit
     """

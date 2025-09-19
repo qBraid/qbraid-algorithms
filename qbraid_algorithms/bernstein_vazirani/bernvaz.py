@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Bernstein-Vazirani algorithm implementation.
+Bernstein-Vazirani Algorithm Implementation
 
 """
 import os

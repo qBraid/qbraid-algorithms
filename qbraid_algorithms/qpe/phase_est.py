@@ -13,12 +13,8 @@
 # limitations under the License.
 
 """
-PhaseEstLibrary
+Quantum Phase Estimation Algorithm Implementation
 
-This module defines the PhaseEstimationLibrary class, which provides methods for
-constructing quantum phase estimation circuits. Supports both static and time-dependent
-Hamiltonians, and is designed for direct implementation of classical phase estimation
-algorithms. Iterative phase estimation is planned via the Rodeo package.
 """
 
 import string
@@ -34,15 +30,18 @@ from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 
 
 class PhaseEstimationLibrary(GateLibrary):
-    '''
+    """
     Library to implement phase estimation circuits directly related to classical
     phase estimation algorithms. Iterative phase estimation will be supported via
     the Rodeo package. This library supports both static and time-dependent Hamiltonians.
-    '''
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    """
 
-    def phase_estimation(self, qubits:list,spectra:list,hamiltonian, evolution=None):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def phase_estimation(
+        self, qubits: list, spectra: list, hamiltonian, evolution=None
+    ):
         """
         Implements the quantum phase estimation algorithm using the provided qubits,
         ancilla clock register (spectra), and Hamiltonian.
@@ -63,9 +62,9 @@ class PhaseEstimationLibrary(GateLibrary):
         # yet established within this system and will need to be rewritten when that's established.
         # TODO: Change to work within subroutine scope for improved modularity.
 
-        name = f'P_EST_{len(qubits)}_{hamiltonian.name}'
+        name = f"P_EST_{len(qubits)}_{hamiltonian.name}"
         if name in self.gate_ref:
-            self.call_gate(name,spectra[-1],qubits+spectra[:-1])
+            self.call_gate(name, spectra[-1], qubits + spectra[:-1])
             return name
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -74,29 +73,34 @@ class PhaseEstimationLibrary(GateLibrary):
         qft = sys.import_library(QFTLibrary)
         qft.call_space = " {}"
         names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+len(spectra))]
+        qargs = [
+            names[int(i / len(names))] + names[i % len(names)]
+            for i in range(len(qubits) + len(spectra))
+        ]
         # std.begin_gate(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
-        std.begin_gate(name,qargs)
+        std.begin_gate(name, qargs)
         for i in range(len(spectra)):
             if evolution is not None:
-                ham.controlled(evolution*2**i,qargs[:len(qubits)],qargs[len(qubits)+i])
+                ham.controlled(
+                    evolution * 2**i, qargs[: len(qubits)], qargs[len(qubits) + i]
+                )
             else:
                 for _ in range(2**i):
-                    ham.controlled(qargs[:len(qubits)],qargs[len(qubits)+i])
-        qft.QFT(qargs[len(qubits):])
+                    ham.controlled(qargs[: len(qubits)], qargs[len(qubits) + i])
+        qft.QFT(qargs[len(qubits) :])
         std.end_gate()
 
-        self.merge(*sys.build(),name)
-        self.call_gate(name,spectra[-1],qubits+spectra[:-1])
+        self.merge(*sys.build(), name)
+        self.call_gate(name, spectra[-1], qubits + spectra[:-1])
         return name
 
-    def inverse_op(self, qubits:list,spectra:list,hamiltonian, evolution=None):
+    def inverse_op(self, qubits: list, spectra: list, hamiltonian, evolution=None):
         """
         Implements the inverse (reversed) sequence for the application of phase estimation.
         """
-        name = f'Pest_INV_{len(qubits)}_{hamiltonian.name}'
+        name = f"Pest_INV_{len(qubits)}_{hamiltonian.name}"
         if name in self.gate_ref:
-            self.call_gate(name,spectra[-1],qubits+spectra[:-1])
+            self.call_gate(name, spectra[-1], qubits + spectra[:-1])
             return name
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -106,19 +110,24 @@ class PhaseEstimationLibrary(GateLibrary):
         qft.call_space = " {}"
 
         names = string.ascii_letters
-        qargs = [names[int(i/len(names))]+names[i%len(names)] for i in range(len(qubits)+len(spectra))]
+        qargs = [
+            names[int(i / len(names))] + names[i % len(names)]
+            for i in range(len(qubits) + len(spectra))
+        ]
         # std.begin_gate(name,[f"qubit[{len(qubits)}] a",f"qubit[{len(spectra)}] b"])
-        std.begin_gate(name,qargs)
-        qft.inverse_op(qft.QFT, (qargs[len(qubits):],))
+        std.begin_gate(name, qargs)
+        qft.inverse_op(qft.QFT, (qargs[len(qubits) :],))
         for i in reversed(range(len(spectra))):
             if evolution is not None:
-                ham.controlled(-evolution*2**i,qargs[:len(qubits)],qargs[len(qubits)+i])
+                ham.controlled(
+                    -evolution * 2**i, qargs[: len(qubits)], qargs[len(qubits) + i]
+                )
             else:
                 # Apply controlled gates in reverse order for proper inversion
                 for _ in range(2**i):
-                    ham.controlled(qargs[:len(qubits)],qargs[len(qubits)+i])
+                    ham.controlled(qargs[: len(qubits)], qargs[len(qubits) + i])
         std.end_gate()
 
-        self.merge(*sys.build(),name)
-        self.call_gate(name,spectra[-1],qubits+spectra[:-1])
+        self.merge(*sys.build(), name)
+        self.call_gate(name, spectra[-1], qubits + spectra[:-1])
         return name

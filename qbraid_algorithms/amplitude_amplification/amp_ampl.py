@@ -11,23 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-'''
-Amplitude Amplification Library for Quantum Algorithms
-This module implements amplitude amplification techniques for quantum algorithms,
-including Grover's algorithm and general amplitude amplification. It provides
-the `AALibrary` class, which extends `GateLibrary` to offer reusable quantum
-subroutines for amplifying the probability amplitudes of desired quantum states.
-Classes:
-    AALibrary(GateLibrary):
-        Implements Grover's algorithm and general amplitude amplification.
-Usage:
-    - Use `grover` for unstructured search problems.
-    - Use `amp_ampl` for general amplitude amplification with arbitrary oracles and state preparation.
-Notes:
-    - The library uses subroutine-based implementations for compact qasm code generation.
-    - Multi-controlled Z gates are used for phase inversion in the diffusion operator.
-    - The code is designed to be extensible for other amplitude amplification algorithms.
-'''
+"""
+Amplitude Amplification algorithm implementation
+
+"""
 from typing import List
 
 from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
@@ -36,13 +23,15 @@ from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 # pylint: disable=invalid-name
 # mypy: disable_error_code="call-arg"
 
+
 class AALibrary(GateLibrary):
     """
-    Amplitude Amplification Library implementing Grover's algorithm and general amplitude amplification.
+    Amplitude Amplification Library that implements Grover's algorithm and general amplitude amplification
 
     This library provides quantum algorithms for amplitude amplification, including:
-    - Grover's algorithm for unstructured search
-    - General amplitude amplification for arbitrary oracles
+
+        - Grover's algorithm for unstructured search
+        - General amplitude amplification for arbitrary oracles
 
     Both algorithms use the principle of selective phase rotation to amplify desired
     quantum state amplitudes while suppressing unwanted ones.
@@ -66,8 +55,8 @@ class AALibrary(GateLibrary):
         The algorithm structure:
         1. Initialize qubits in superposition with Hadamard gates
         2. Repeat depth times:
-           - Apply oracle H (marks target states)
-           - Apply diffusion operator (inverts amplitudes about average)
+            - Apply oracle H (marks target states)
+            - Apply diffusion operator (inverts amplitudes about average)
 
         Args:
             H: Oracle/Hamiltonian that marks target states
@@ -75,7 +64,7 @@ class AALibrary(GateLibrary):
             depth: Number of Grover iterations to perform
         """
         # Generate unique subroutine name based on parameters
-        name = f'Grover{len(qubits)}{H.name}{depth}'
+        name = f"Grover{len(qubits)}{H.name}{depth}"
 
         # Check if subroutine already exists to avoid regeneration
         if name in self.gate_ref:
@@ -131,8 +120,10 @@ class AALibrary(GateLibrary):
         std_library.comment("Z0")
         std_library.x(register)  # Flip all qubits
         # Multi-controlled Z gate (phase flip when all qubits are |1⟩)
-        std_library.controlled_op("z",(f"{register}[0]", [f"{register}[{i}]" for i in range(len(qubits) - 1)]),
-        n=len(qubits) - 1
+        std_library.controlled_op(
+            "z",
+            (f"{register}[0]", [f"{register}[{i}]" for i in range(len(qubits) - 1)]),
+            n=len(qubits) - 1,
         )
         std_library.x(register)  # Flip back
         std_library.h(register)
@@ -174,7 +165,7 @@ class AALibrary(GateLibrary):
             There's a bug in the original code where 'z' is used instead of 'Z'
             in the name generation. This is preserved to maintain exact logic.
         """
-        name = f'AmplAmp{len(qubits)}{Z.name}{depth}'
+        name = f"AmplAmp{len(qubits)}{Z.name}{depth}"
 
         # Check if subroutine already exists
         if name in self.gate_ref:
@@ -248,7 +239,7 @@ class AALibrary(GateLibrary):
         std_library.controlled_op(
             "z",
             (f"{register}[0]", [f"{register}[{i}]" for i in range(len(qubits) - 1)]),
-            n=len(qubits) - 1
+            n=len(qubits) - 1,
         )
         std_library.x(register)
 
