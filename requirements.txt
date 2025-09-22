@@ -1,4 +1,4 @@
-qbraid==0.9.9
+qbraid==0.9.10
 pyqasm>=0.5.0,<0.6.0
 sympy>=1.14.0
 scipy>=1.16.0
