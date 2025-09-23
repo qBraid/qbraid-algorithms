@@ -49,7 +49,7 @@ class GQSP(GateLibrary):
     """
 
     # Class-level symbolic matrix for GQSP operations
-    U = sp.Matrix([[sp.Symbol("id"), 0], [0, sp.Symbol('H')]])
+    U = sp.Matrix([[sp.Symbol("id"), 0], [0, sp.Symbol("H")]])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -67,7 +67,7 @@ class GQSP(GateLibrary):
         Returns:
             Gate name
         """
-        name = f'GQSP_{depth}_{hamiltonian.name}'
+        name = f"GQSP_{depth}_{hamiltonian.name}"
 
         # Claim ancilla resources
         anc_q = self.builder.claim_qubits(1)
@@ -75,7 +75,7 @@ class GQSP(GateLibrary):
 
         # Use existing gate if available
         if name in self.gate_ref:
-            self.call_gate(name,qubits[-1],anc_q+qubits[:-1],phases=phases)
+            self.call_gate(name, qubits[-1], anc_q + qubits[:-1], phases=phases)
             self.measure(anc_q, anc_c)
             return name  # BUG FIX: Add return statement
 
@@ -86,8 +86,10 @@ class GQSP(GateLibrary):
 
         # Generate unique qubit and parameter names
         names = string.ascii_letters
-        qargs = [names[i // len(names)] + names[i % len(names)]
-                for i in range(len(qubits) + 1)]
+        qargs = [
+            names[i // len(names)] + names[i % len(names)]
+            for i in range(len(qubits) + 1)
+        ]
         angles = [f"θ{names[i]}" for i in range(depth * 2 + 1)]
 
         std.begin_gate(name, qargs, params=angles)
@@ -110,7 +112,7 @@ class GQSP(GateLibrary):
 
         # Register and apply gate
         self.merge(*sys.build(), name)
-        self.call_gate(name,qubits[-1],anc_q+qubits[:-1],phases=phases)
+        self.call_gate(name, qubits[-1], anc_q + qubits[:-1], phases=phases)
         self.measure(anc_q, anc_c)
         return name
 
@@ -127,16 +129,17 @@ class GQSP(GateLibrary):
             Symbolic matrix expression for GQSP circuit
         """
         # Y-rotation matrix
-        r = sp.Symbol(f'r{depth}')
-        qr = sp.Matrix([[sp.cos(r/2), -sp.sin(r/2)],
-                       [sp.sin(r/2), sp.cos(r/2)]])
+        r = sp.Symbol(f"r{depth}")
+        qr = sp.Matrix(
+            [[sp.cos(r / 2), -sp.sin(r / 2)], [sp.sin(r / 2), sp.cos(r / 2)]]
+        )
 
         # Base case: just apply rotation
         if depth <= 0:
             return qr * mat
 
         # Phase rotation matrix
-        p = sp.Symbol(f'p{depth}')
+        p = sp.Symbol(f"p{depth}")
         rp = sp.Matrix([[1, 0], [0, sp.exp(1j * p)]])
 
         # Recursive GQSP construction
@@ -162,8 +165,9 @@ class GQSP(GateLibrary):
         time = np.linspace(-1, 1, 50)
 
         # Target polynomial coefficients (Taylor series approximation)
-        poly = np.flip(np.power(1j, range(depth + 1)) /
-                      scp.special.factorial(range(depth + 1)))  # BUG FIX: Use scp
+        poly = np.flip(
+            np.power(1j, range(depth + 1)) / scp.special.factorial(range(depth + 1))
+        )  # BUG FIX: Use scp
 
         # Extract and sort symbolic variables
         syms = expr.free_symbols
@@ -195,7 +199,9 @@ class GQSP(GateLibrary):
             resolved = expr.subs(param_dict)
 
             # Create numerical evaluator
-            evaluator = sp.lambdify(srefs[0], resolved, "numpy")  # srefs[0] should be 'H'
+            evaluator = sp.lambdify(
+                srefs[0], resolved, "numpy"
+            )  # srefs[0] should be 'H'
 
             try:
                 series = evaluator(time)
@@ -205,7 +211,7 @@ class GQSP(GateLibrary):
                     series = series / np.abs(series[0])
 
                 # Compute mean squared error
-                diff = np.sum(np.abs(series - ref)**2)
+                diff = np.sum(np.abs(series - ref) ** 2)
                 return float(diff)  # BUG FIX: Ensure scalar return
 
             except (ValueError, TypeError, ZeroDivisionError):
@@ -215,7 +221,7 @@ class GQSP(GateLibrary):
         return cost, names
 
     @staticmethod
-    def find_gqsp_spectrum( depth):
+    def find_gqsp_spectrum(depth):
         """
         Find optimal GQSP parameters across a spectrum of time values.
 
@@ -245,9 +251,12 @@ class GQSP(GateLibrary):
                 cost_func = GQSP.gen_cost(depth, t)[0]
 
                 # Optimize parameters
-                result = minimize(cost_func, x0=x_prev,
-                                method='BFGS',  # BUG FIX: Specify optimization method
-                                options={'maxiter': 1000})
+                result = minimize(
+                    cost_func,
+                    x0=x_prev,
+                    method="BFGS",  # BUG FIX: Specify optimization method
+                    options={"maxiter": 1000},
+                )
 
                 if result.success:
                     fits.append(result.x)

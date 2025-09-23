@@ -65,12 +65,12 @@ you can generate .qasm files to use them as subroutines in your own circuits.
 
 ### Loading Algorithms as PyQASM Modules
 
-To load an algorithm as a PyQASM module, use the `load_program` function from the `qbraid_algorithms` package, passing algorithm-specific parameters. For example, to load the Quantum Fourier Transform (QFT) algorithm:
+To load an algorithm as a PyQASM module, use the `generate_program` function from the `qbraid_algorithms` package, passing algorithm-specific parameters. For example, to load the Quantum Fourier Transform (QFT) algorithm:
 
 ```python
 from qbraid_algorithms import qft
 
-qft_module = qft.load_program(3) # Load QFT for 3 qubits
+qft_module = qft.generate_program(3) # Load QFT for 3 qubits
 ```
 
 Now, you can perform operations with the PyQASM module, such as unrolling, and
@@ -84,15 +84,15 @@ qasm_str = pyqasm.dumps(qft_module)
 ### Loading Algorithms as `.qasm` Files
 
 In order to utilize algorithms as subroutines in your own circuits, use the
-`generate_subroutine` function for your desired algorithm. By passing algorithm-specific parameters, and optionally a desired output path, you can
+`save_to_qasm` function for your desired algorithm. By passing algorithm-specific parameters, and optionally a desired output path, you can
 generate a .qasm file containing a subroutine for the paramterized circuit. For
 example, to generate a QFT subroutine for 4 qubits:
 
 ```python
 from qbraid_algorithms import qft, iqft
 path = "path/to/output" # Specify your desired output path
-qft.generate_subroutine(4) # Generate 4-qubit QFT in the current directory
-iqft.generate_subroutine(4, path=path) # Generate 4-qubit IQFT in specified path
+qft.save_to_qasm(4) # Generate 4-qubit QFT in the current directory
+iqft.save_to_qasm(4, path=path) # Generate 4-qubit IQFT in specified path
 
 ```
 
@@ -101,7 +101,7 @@ To utilize the generated subroutine in your own circuit, include the generated
 when generating the subroutine. For example, after running
 
 ```python
-qft.generate_subroutine(4)
+qft.save_to_qasm(4)
 ```
 
 you can append `include "qft.qasm";` to your OpenQASM file, and call the

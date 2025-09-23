@@ -31,6 +31,8 @@ Key (Base) Features:
 Class Extensions:
 - std_gates
 """
+
+
 # pylint: disable=too-many-positional-arguments,invalid-name
 # im sticking to std_gates as it needs to be viewed as a default name and matches the qasm name
 class GateLibrary:
@@ -47,7 +49,9 @@ class GateLibrary:
 
     """
 
-    def __init__(self, gate_import, gate_ref, gate_defs, program_append, builder, annotated=False):
+    def __init__(
+        self, gate_import, gate_ref, gate_defs, program_append, builder, annotated=False
+    ):
         """
         Initialize the gate library with necessary components.
 
@@ -59,15 +63,17 @@ class GateLibrary:
             builder: Reference to the circuit builder
             annotated: Whether to use annotated syntax
         """
-        self.gate_import = gate_import      # Libraries to import
-        self.gate_ref = gate_ref           # Available gate names
-        self.gate_defs = gate_defs         # Gate definitions dictionary
-        self.program = program_append      # Function to append code
-        self.builder = builder             # Circuit builder reference
-        self.annotated = annotated         # Annotation flag
-        self.prefix = ""                   # Gate modifier (e.g., "ctrl @")
-        self.call_space = "qb[{}]"         # for namespace (e.g. global qubit register vs gate aliases)
-        self.name = "GATE_LIB"             # Library identifier
+        self.gate_import = gate_import  # Libraries to import
+        self.gate_ref = gate_ref  # Available gate names
+        self.gate_defs = gate_defs  # Gate definitions dictionary
+        self.program = program_append  # Function to append code
+        self.builder = builder  # Circuit builder reference
+        self.annotated = annotated  # Annotation flag
+        self.prefix = ""  # Gate modifier (e.g., "ctrl @")
+        self.call_space = (
+            "qb[{}]"  # for namespace (e.g. global qubit register vs gate aliases)
+        )
+        self.name = "GATE_LIB"  # Library identifier
 
     def call_gate(self, gate, target, controls=None, phases=None, prefix=""):
         """
@@ -87,23 +93,25 @@ class GateLibrary:
         """
         # Validate gate exists in current scope
         if gate not in self.gate_ref:
-            print(f"stdgates: gate {gate} is not part of visible scope, "
-                  f"make sure that this isn't a floating reference / malformed statement, "
-                  f"or is at least previously defined within untracked environment definitions")
+            print(
+                f"stdgates: gate {gate} is not part of visible scope, "
+                f"make sure that this isn't a floating reference / malformed statement, "
+                f"or is at least previously defined within untracked environment definitions"
+            )
 
         # Build gate call string
         call = prefix + str(gate)
 
         # Add phase parameters if provided
         if phases is not None:
-            call += '('
+            call += "("
             if isinstance(phases, list):
                 call += str(phases[0])  # Fixed: was phase[0]
                 for phase in phases[1:]:
                     call += f",{phase}"
             else:
                 call += str(phases)
-            call += ')'
+            call += ")"
         call += " "
         # Add control qubits if provided
         if controls is not None:
@@ -112,13 +120,13 @@ class GateLibrary:
                     call += self.call_space.format(control) + ","
 
             else:
-                call += self.call_space.format(controls) + ','
+                call += self.call_space.format(controls) + ","
 
         # Add target qubit and complete the statement
         call += self.call_space.format(target) + ";"
         self.program(self.prefix + call)
 
-    def call_subroutine(self,subroutine,parameters,capture=None):
+    def call_subroutine(self, subroutine, parameters, capture=None):
         """
         SUBROUTINE APPLICATION
 
@@ -133,13 +141,14 @@ class GateLibrary:
             parameters: list of all parameters to apply
         """
         if subroutine not in self.gate_ref:
-            print(f"stdgates: subroutine {subroutine} is not part of visible scope, "
-                  f"make sure that this isn't a floating reference / malformed statement, "
-                  f"or is at least previously defined within untracked environment definitions")
+            print(
+                f"stdgates: subroutine {subroutine} is not part of visible scope, "
+                f"make sure that this isn't a floating reference / malformed statement, "
+                f"or is at least previously defined within untracked environment definitions"
+            )
 
         call = f"{capture + ' = ' if capture is not None else ''}{subroutine}({', '.join(str(a) for a in parameters)});"
         self.program(call)
-
 
     def measure(self, qubits: list, clbits: list):
         """
@@ -234,7 +243,13 @@ class GateLibrary:
                     # Float range with explicit values
                     base = "float"
                     r = int(iterator[2])
-                    dom = "{" + str([iterator[0] + float(i)/(r-1) for i in range(r)])[1:-1] + "}"
+                    dom = (
+                        "{"
+                        + str([iterator[0] + float(i) / (r - 1) for i in range(r)])[
+                            1:-1
+                        ]
+                        + "}"
+                    )
         elif isinstance(iterator, str):
             # Custom loop syntax
             call = "for " + iterator + "{"
@@ -265,10 +280,12 @@ class GateLibrary:
         """
         if name in self.gate_ref:
             print(f"warning: gate {name} replacing existing namespace")
-        call = f"gate {name}{'('+','.join(params)+')' if params is not None else ''} {','.join(qargs)}" +"{"
+        call = (
+            f"gate {name}{'('+','.join(params)+')' if params is not None else ''} {','.join(qargs)}"
+            + "{"
+        )
         self.program(call)
         self.builder.scope += 1
-
 
     def begin_subroutine(self, name, parameters: list[str], return_type=None):
         """
@@ -286,7 +303,10 @@ class GateLibrary:
         """
         if name in self.gate_ref:
             print(f"warning:  subroutine {name} replacing existing namespace")
-        call = f"def {name}({','.join(parameters)}) {' -> ' + return_type if return_type is not None else ''}" + "{"
+        call = (
+            f"def {name}({','.join(parameters)}) {' -> ' + return_type if return_type is not None else ''}"
+            + "{"
+        )
         self.program(call)
         self.builder.scope += 1
 
@@ -327,7 +347,9 @@ class GateLibrary:
         """
         if isinstance(gate_call, str):
             # Direct gate name - call with control prefix
-            self.call_gate(gate_call, *params, prefix=f"ctrl{'' if n == 0 else f'({n})'} @ ")
+            self.call_gate(
+                gate_call, *params, prefix=f"ctrl{'' if n == 0 else f'({n})'} @ "
+            )
         else:
             # Gate function - set modifier and call
             self.prefix = f"ctrl{'' if n<2 else f'({n})'} @ "
@@ -369,21 +391,21 @@ class GateLibrary:
         self.gate_defs[name] = gate_def
         self.gate_ref.append(name)
 
-    def add_var(self,name,assignment = None,qtype= None):
-        '''
+    def add_var(self, name, assignment=None, qtype=None):
+        """
         simple stub for programatically adding a variable
 
         Args:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
-        '''
+        """
         if name in self.gate_ref:
             print(f"warning:  gate {name} replacing existing namespace")
         call = f"{qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
 
-    def merge(self,program,imports,definitions,name):
+    def merge(self, program, imports, definitions, name):
         """
         Merges data from a built library/GateBuilder into the current library bases scope
         Args:
@@ -416,12 +438,33 @@ class std_gates(GateLibrary):
     """
 
     # Standard gate set from OpenQASM 3.0 specification
-    gates = ["phase", "x", "y", "z", "h", "s", "sdg", "sx",
-             'rx','ry','rz', 'p',
-             'cx', 'cy', 'cz', 'cp', 'crx', 'cry', 'crz', 'cnot',
-             'swap', 'ccx', 'cswap']
+    gates = [
+        "phase",
+        "x",
+        "y",
+        "z",
+        "h",
+        "s",
+        "sdg",
+        "sx",
+        "rx",
+        "ry",
+        "rz",
+        "p",
+        "cx",
+        "cy",
+        "cz",
+        "cp",
+        "crx",
+        "cry",
+        "crz",
+        "cnot",
+        "swap",
+        "ccx",
+        "cswap",
+    ]
 
-    name = 'stdgates.inc'  # Standard library file name
+    name = "stdgates.inc"  # Standard library file name
 
     def __init__(self, *args, **kwargs):
         """Initialize standard gates library and register all gates."""
@@ -445,52 +488,51 @@ class std_gates(GateLibrary):
 
     def x(self, targ):
         """Apply Pauli-X gate (bit flip): !0⟩> !1⟩, !1⟩> !0⟩"""
-        self.call_gate('x', targ)
+        self.call_gate("x", targ)
 
     def y(self, targ):
         """Apply Pauli-Y gate: !0⟩>i!1⟩, !1⟩>-i!0⟩"""
-        self.call_gate('y', targ)
+        self.call_gate("y", targ)
 
     def z(self, targ):
         """Apply Pauli-Z gate (phase flip): !0⟩> !0⟩, !1⟩>-!1⟩"""
-        self.call_gate('z', targ)
+        self.call_gate("z", targ)
 
     def h(self, targ):
         """Apply Hadamard gate: creates superposition"""
-        self.call_gate('h', targ)
+        self.call_gate("h", targ)
 
     def s(self, targ):
         """Apply S gate (phase): !1⟩>i!1⟩"""
-        self.call_gate('s', targ)
+        self.call_gate("s", targ)
 
     def sdg(self, targ):
         """Apply S-dagger gate (inverse phase): !1⟩>-i!1⟩"""
-        self.call_gate('sdg', targ)
+        self.call_gate("sdg", targ)
 
     def sx(self, targ):
         """Apply square root of X gate"""
-        self.call_gate('sx', targ)
+        self.call_gate("sx", targ)
 
-    def rx(self,theta,targ):
+    def rx(self, theta, targ):
         """Apply rx gate"""
         self.call_gate("rx", targ, phases=theta)
 
-    def ry(self,theta,targ):
+    def ry(self, theta, targ):
         """Apply ry gate"""
         self.call_gate("ry", targ, phases=theta)
 
-    def rz(self,theta,targ):
+    def rz(self, theta, targ):
         """Apply rz gate"""
         self.call_gate("rz", targ, phases=theta)
-
 
     # ═══════════════════════════════════════════════════════════════════════════
     #                           Two-QUBIT GATES
     # ═══════════════════════════════════════════════════════════════════════════
-    def cnot(self,control,targ):
-        '''Apply CNOT gate'''
-        self.call_gate("cnot",targ,controls=control)
+    def cnot(self, control, targ):
+        """Apply CNOT gate"""
+        self.call_gate("cnot", targ, controls=control)
 
-    def cry(self,theta,control,targ):
+    def cry(self, theta, control, targ):
         """Apply controlled ry gate"""
-        self.call_gate("cry", targ,controls=control, phases=theta)
+        self.call_gate("cry", targ, controls=control, phases=theta)

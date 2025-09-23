@@ -75,18 +75,18 @@ Quantum Phase Estimation (QPE)
     .. autosummary::
         :toctree: ../stubs/
 
-        load_program
-        generate_subroutine
+        generate_program
+        save_to_qasm
         get_result
 
 """
 
 from .phase_est import PhaseEstimationLibrary
-from .qpe import generate_subroutine, get_result, load_program
+from .qpe import generate_program, get_result, save_to_qasm
 
 __all__ = [
-    "load_program",
-    "generate_subroutine",
+    "generate_program",
+    "save_to_qasm",
     "get_result",
     "PhaseEstimationLibrary",
 ]

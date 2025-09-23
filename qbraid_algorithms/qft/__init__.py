@@ -81,12 +81,12 @@ Quantum Fourier Transform (QFT)
     .. autosummary::
         :toctree: ../stubs/
 
-        load_program
-        generate_subroutine
+        generate_program
+        save_to_qasm
 
 """
 
-from .qft import generate_subroutine, load_program
+from .qft import generate_program, save_to_qasm
 from .qft_lib import QFTLibrary
 
-__all__ = ["load_program", "generate_subroutine", "QFTLibrary"]
+__all__ = ["generate_program", "save_to_qasm", "QFTLibrary"]

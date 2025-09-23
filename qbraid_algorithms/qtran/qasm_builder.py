@@ -62,11 +62,11 @@ class FileBuilder:
         - Empty program string for accumulating generated code
         - Zero scope level for proper indentation tracking
         """
-        self.imports = []      # List of library names to import (e.g., "std_gates.inc")
-        self.gate_defs = {}    # Dictionary mapping gate names to definition strings
-        self.gate_refs = []    # List of available gate names for validation
-        self.program = ""      # Accumulated OpenQASM program code
-        self.scope = 0         # Current indentation/nesting level
+        self.imports = []  # List of library names to import (e.g., "std_gates.inc")
+        self.gate_defs = {}  # Dictionary mapping gate names to definition strings
+        self.gate_refs = []  # List of available gate names for validation
+        self.program = ""  # Accumulated OpenQASM program code
+        self.scope = 0  # Current indentation/nesting level
 
     def import_library(self, lib_class, annotated=False):
         """
@@ -89,12 +89,12 @@ class FileBuilder:
             program.x(0)  # Apply X gate to qubit 0
         """
         return lib_class(
-            gate_import=self.imports,     # Share import list with library
-            gate_ref=self.gate_refs,      # Share gate references for validation
-            gate_defs=self.gate_defs,     # Share gate definitions dictionary
+            gate_import=self.imports,  # Share import list with library
+            gate_ref=self.gate_refs,  # Share gate references for validation
+            gate_defs=self.gate_defs,  # Share gate definitions dictionary
             program_append=self.program_append,  # Provide code appending function
-            builder=self,                 # Pass reference to this builder
-            annotated=annotated          # Set annotation mode
+            builder=self,  # Pass reference to this builder
+            annotated=annotated,  # Set annotation mode
         )
 
     def program_append(self, line):
@@ -112,7 +112,7 @@ class FileBuilder:
             Indentation is automatically applied based on self.scope.
             Each scope level contributes one tab character.
         """
-        self.program += self.scope * '\t' + line + "\n"
+        self.program += self.scope * "\t" + line + "\n"
 
 
 class GateBuilder(FileBuilder):
@@ -133,7 +133,7 @@ class GateBuilder(FileBuilder):
     def import_library(self, lib_class, annotated=False):
         ret = super().import_library(lib_class, annotated)
         ret.call_space = " {}"
-        return  ret
+        return ret
 
     def build(self):
         """
@@ -151,8 +151,10 @@ class GateBuilder(FileBuilder):
             Prints warning if scope is not zero (unclosed blocks)
         """
         if self.scope != 0:
-            print("Warning (GateBuilder): built qasm has unclosed scope, "
-                  "string will fail compile in native")
+            print(
+                "Warning (GateBuilder): built qasm has unclosed scope, "
+                "string will fail compile in native"
+            )
         return self.program, self.imports, self.gate_defs
 
 
@@ -277,14 +279,18 @@ class QasmBuilder(FileBuilder):
             Prints warning if scope is not zero (unclosed blocks)
         """
         if self.scope != 0:
-            print("Warning (QasmBuilder): built qasm has unclosed scope, "
-                  "string will fail compile in native")
+            print(
+                "Warning (QasmBuilder): built qasm has unclosed scope, "
+                "string will fail compile in native"
+            )
 
         # Start with version header
         qasm_code = self.qasm_header
 
         # Add all library includes
-        qasm_code += "\n".join(f"include \"{import_line}\";" for import_line in self.imports)
+        qasm_code += "\n".join(
+            f'include "{import_line}";' for import_line in self.imports
+        )
 
         # Add qubit declaration
         circuit_def = f"qubit[{int(self.qubits)}] qb;\n"
@@ -342,14 +348,18 @@ class IncludeBuilder(FileBuilder):
             Prints warning if scope is not zero (unclosed blocks)
         """
         if self.scope != 0:
-            print("Warning (IncludeBuilder): built include has unclosed scope, "
-                  "string will fail compile in native")
+            print(
+                "Warning (IncludeBuilder): built include has unclosed scope, "
+                "string will fail compile in native"
+            )
 
         # Initialize with empty string (note: original code had bug with undefined qasm_code)
         qasm_code = ""
 
         # Add all library includes
-        qasm_code += "\n".join(f"include \"{import_line}\";" for import_line in self.imports)
+        qasm_code += "\n".join(
+            f'include "{import_line}";' for import_line in self.imports
+        )
 
         # Add all gate definitions
         for gate_def in self.gate_defs.values():

@@ -26,7 +26,7 @@ from pyqasm.modules.base import QasmModule
 from qbraid_algorithms.utils import _prep_qasm_file
 
 
-def load_program(num_qubits: int) -> QasmModule:
+def generate_program(num_qubits: int) -> QasmModule:
     """
     Load the Inverse Quantum Fourier Transform circuit as a pyqasm module.
 
@@ -38,8 +38,8 @@ def load_program(num_qubits: int) -> QasmModule:
     """
     # Load the IQFT QASM files into a staging directory
     temp_dir = tempfile.mkdtemp()
-    iqft_src = Path(__file__).parent / "iqft.qasm"
-    iqft_sub_src = Path(__file__).parent / "iqft_subroutine.qasm"
+    iqft_src = Path(__file__).parent.parent / "qasm_resources/iqft.qasm"
+    iqft_sub_src = Path(__file__).parent.parent / "qasm_resources/iqft_subroutine.qasm"
     iqft_dst = os.path.join(temp_dir, "iqft.qasm")
     iqft_sub_dst = os.path.join(temp_dir, "iqft_subroutine.qasm")
     shutil.copy(iqft_src, iqft_dst)
@@ -59,9 +59,7 @@ def load_program(num_qubits: int) -> QasmModule:
     return module
 
 
-def generate_subroutine(
-    num_qubits: int, quiet: bool = False, path: str | None = None
-) -> None:
+def save_to_qasm(num_qubits: int, quiet: bool = False, path: str | None = None) -> None:
     """
     Creates an IQFT subroutine module with user-defined number of qubits.
 
@@ -75,7 +73,7 @@ def generate_subroutine(
         None
     """
     # Copy the IQFT subroutine QASM file to the specified or current working directory
-    iqft_src = Path(__file__).parent / "iqft_subroutine.qasm"
+    iqft_src = Path(__file__).parent.parent / "qasm_resources/iqft_subroutine.qasm"
     if path is None:
         iqft_dst = os.path.join(os.getcwd(), "iqft.qasm")
     else:

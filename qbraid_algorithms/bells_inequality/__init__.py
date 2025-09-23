@@ -56,12 +56,12 @@ Bell's Inequality Experiment
     .. autosummary::
        :toctree: ../stubs/
 
-       load_program
+       generate_program
 
 """
 
-from .bells_inequality import load_program
+from .bells_inequality import generate_program
 
 __all__ = [
-    "load_program",
+    "generate_program",
 ]

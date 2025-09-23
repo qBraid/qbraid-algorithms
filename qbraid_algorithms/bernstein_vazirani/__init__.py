@@ -55,11 +55,11 @@ Bernstein-Vazirani Algorithm
     .. autosummary::
         :toctree: ../stubs/
 
-        load_program
-        generate_subroutine
+        generate_program
+        save_to_qasm
         generate_oracle
 """
 
-from .bernvaz import generate_oracle, generate_subroutine, load_program
+from .bernvaz import generate_oracle, generate_program, save_to_qasm
 
-__all__ = ["load_program", "generate_subroutine", "generate_oracle"]
+__all__ = ["generate_program", "save_to_qasm", "generate_oracle"]

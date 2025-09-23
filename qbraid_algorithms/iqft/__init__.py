@@ -63,11 +63,11 @@ Inverse Quantum Fourier Transform (IQFT)
     .. autosummary::
         :toctree: ../stubs/
 
-        load_program
-        generate_subroutine
+        generate_program
+        save_to_qasm
 
 """
 
-from .iqft import generate_subroutine, load_program
+from .iqft import generate_program, save_to_qasm
 
-__all__ = ["load_program", "generate_subroutine"]
+__all__ = ["generate_program", "save_to_qasm"]
