@@ -33,11 +33,10 @@ def generate_program(bitstring: Union[str, list[int]]) -> QasmModule:
     Load the Bernstein-Vazirani circuit as a pyqasm module.
 
     Args:
-        bitstring (Union[str, list[int]]): The hidden bitstring `s` as a string of '0's
-        and '1's
+        bitstring (Union[str, list[int]]): The hidden bitstring `s` as a string of '0's and '1's
 
     Returns:
-        (PyQasm Module) pyqasm module containing the Bernstein-Vazirani circuit
+        PyQASM module containing the Bernstein-Vazirani circuit
     """
 
     # Load the Bernstein-Vazirani QASM files into a staging directory

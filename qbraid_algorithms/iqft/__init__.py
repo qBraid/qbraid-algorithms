@@ -53,7 +53,7 @@ Inverse Quantum Fourier Transform (IQFT)
         1 & 1 & 1 & \\cdots & 1 \\\\
         1 & \\omega_n^{-1} & \\omega_n^{-2} & \\cdots & \\omega_n^{-(2^n-1)} \\\\
         \\vdots & \\vdots & \\vdots & \\ddots & \\vdots \\\\
-        1 & \\omega_n^{-(2^n-1)} & \\omega_n^{-2(2^n-1)} & \\cdots & \\omega_n^{-(2^n-1)^2}
+        1 & \\omega_n^{-(2^n-1)} & \\omega_n^{-2(2^n-1)} & \\cdots & \\omega_n^{-(2^n-1)(2^n-1)}
         \\end{pmatrix}`
 
 

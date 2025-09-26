@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Quantum Fourier Transform (QFT) Algorithm Implementation
+Quantum Fourier Transform (QFT) Library Implementation
 
 """
 

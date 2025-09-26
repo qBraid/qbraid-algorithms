@@ -38,8 +38,9 @@ def qasm_pipe(func: Callable) -> Callable:
     then writes the function's (file_name, program_string) output to a .qasm file.
 
     The decorated function should:
-    1. Accept 'path' and 'quiet' as keyword arguments
-    2. Return a tuple of (file_name, program_string)
+
+        1. Accept 'path' and 'quiet' as keyword arguments
+        2. Return a tuple of (file_name, program_string)
 
     The decorator will create a file named "{file_name}.qasm" and write the program_string to it.
     """

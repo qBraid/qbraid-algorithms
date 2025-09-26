@@ -22,11 +22,12 @@ a base framework for macroing gate, import, and algorithm generation and is
 built to inject definitions into whatever FileBuilder class it is connected to.
 
 Key (Base) Features:
-- Gate application with controls and phases
-- Measurements and classical bit operations
-- Control flow (loops, conditionals)
-- Gate and subroutine definitions
-- Code generation and scope management
+
+    - Gate application with controls and phases
+    - Measurements and classical bit operations
+    - Control flow (loops, conditionals)
+    - Gate and subroutine definitions
+    - Code generation and scope management
 
 Class Extensions:
 - std_gates
@@ -41,11 +42,12 @@ class GateLibrary:
 
     Core class for quantum gate operations and circuit building.
     Provides fundamental operations for:
-    - Gate application with controls and phases
-    - Measurements and classical bit operations
-    - Control flow (loops, conditionals)
-    - Gate and subroutine definitions
-    - Code generation and scope management
+
+        - Gate application with controls and phases
+        - Measurements and classical bit operations
+        - Control flow (loops, conditionals)
+        - Gate and subroutine definitions
+        - Code generation and scope management
 
     """
 
@@ -210,10 +212,11 @@ class GateLibrary:
         LOOPS
 
         Start a loop block with various iteration patterns:
-        - int: for int i in [0:n]
-        - (start, end): for int i in [start:end]
-        - (start, step, end): for int i in [start:end:step]
-        - string: custom loop syntax
+
+            - int: for int i in [0:n]
+            - (start, end): for int i in [start:end]
+            - (start, step, end): for int i in [start:end:step]
+            - string: custom loop syntax
 
         Args:
             iterator: Loop specification (int, tuple, or string)
@@ -432,9 +435,10 @@ class std_gates(GateLibrary):
     Implementation of std_lib quantum gates following OpenQASM 3.0 standards.
 
     Available Gates:
-    - Single-qubit: phase, x, y, z, h, s, sdg, sx
-    - Two-qubit: cx, cy, cz, cp, crx, cry, crz, swap
-    - Multi-qubit: ccx (Toffoli), cswap (Fredkin)
+
+        - Single-qubit: phase, x, y, z, h, s, sdg, sx
+        - Two-qubit: cx, cy, cz, cp, crx, cry, crz, swap
+        - Multi-qubit: ccx (Toffoli), cswap (Fredkin)
     """
 
     # Standard gate set from OpenQASM 3.0 specification

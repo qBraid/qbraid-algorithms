@@ -32,8 +32,8 @@ from qbraid_algorithms.qtran import GateBuilder, GateLibrary, std_gates
 class PhaseEstimationLibrary(GateLibrary):
     """
     Library to implement phase estimation circuits directly related to classical
-    phase estimation algorithms. Iterative phase estimation will be supported via
-    the Rodeo package. This library supports both static and time-dependent Hamiltonians.
+    phase estimation algorithms.
+
     """
 
     def __init__(self, *args, **kwargs):
