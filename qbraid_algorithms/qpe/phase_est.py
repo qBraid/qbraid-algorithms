@@ -69,6 +69,11 @@ class PhaseEstimationLibrary(GateLibrary):
         sys = GateBuilder()
         std = sys.import_library(std_gates)
         ham = sys.import_library(hamiltonian)
+        if ham.reg_size > len(qubits):
+            raise ValueError(
+                f"Hamiltonian '{hamiltonian.name}' has more qubits ({ham.reg_size})"
+                f"than the input state ({len(qubits)})"
+            )
         ham.call_space = " {}"
         qft = sys.import_library(QFTLibrary)
         qft.call_space = " {}"

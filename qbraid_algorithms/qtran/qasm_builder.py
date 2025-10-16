@@ -297,6 +297,8 @@ class QasmBuilder(FileBuilder):
         qasm_code += "\n".join(
             f'include "{import_line}";' for import_line in self.imports
         )
+        if self.imports:  # Add newline after includes if there are any
+            qasm_code += "\n"
 
         # Add qubit declaration
         circuit_def = f"qubit[{int(self.qubits)}] qb;\n"
