@@ -8,8 +8,8 @@ assignees: ''
 ---
 
 **Required functions to implement:**
-- [ ] `load_program()` - Load complete executable circuit
-- [ ] `generate_subroutine()` - Generate reusable subroutine
+- [ ] `generate_program()` - Load complete executable circuit
+- [ ] `save_to_qasm()` - Generate reusable subroutine
 - [ ] Additional functions: _______________
 
 **CLI integration needed:**

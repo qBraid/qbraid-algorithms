@@ -64,7 +64,6 @@ class Trotter(GateLibrary):
         # Generate unique subroutine name
         name = f"trot_suz_{len(qubits)}_{Hp.name}_{Hq.name}_{depth}"  # BUG FIX: Include depth in name
 
-
         qubit_list = "{" + ",".join([str(q) for q in qubits]) + "}"
         # Use existing subroutine if available
         if name in self.gate_ref:
@@ -80,7 +79,9 @@ class Trotter(GateLibrary):
         # Define subroutine signature
         qubit_array_param = f"qubit[{len(qubits)}] qubits"
 
-        std.begin_subroutine(name, [qubit_array_param, "float time", "int recursion_depth"])
+        std.begin_subroutine(
+            name, [qubit_array_param, "float time", "int recursion_depth"]
+        )
 
         # Register subroutine to prevent infinite recursion
         self.gate_ref.append(name)  # BUG FIX: Should use set or dict for O(1) lookup
@@ -104,9 +105,11 @@ class Trotter(GateLibrary):
         # Recursive case: Suzuki's symmetric decomposition
         # Calculate Suzuki coefficient: Uk = 1/(4 - 4^(1/(2k-1)))
         # BUG FIX: More robust variable naming and type specification
-        uk_var = std.add_var("suzuki_coeff",
-                           assignment="1.0/(4.0 - pow(4.0, 1.0/(2.0*recursion_depth - 1.0)))",
-                           qtype="float")
+        uk_var = std.add_var(
+            "suzuki_coeff",
+            assignment="1.0/(4.0 - pow(4.0, 1.0/(2.0*recursion_depth - 1.0)))",
+            qtype="float",
+        )
 
         # Suzuki's 5-step symmetric decomposition:
         # S_k = U_k * S_{k-1} * U_k * S_{k-1} * (1-4*U_k) * S_{k-1} * U_k * S_{k-1} * U_k * S_{k-1}
@@ -119,7 +122,9 @@ class Trotter(GateLibrary):
         std.call_subroutine(name, ["qubits", f"{uk_var}*time", "recursion_depth-1"])
 
         # Middle (1-4*U_k) * S_{k-1} step (this is the negative weight step)
-        std.call_subroutine(name, ["qubits", f"(1.0-4.0*{uk_var})*time", "recursion_depth-1"])
+        std.call_subroutine(
+            name, ["qubits", f"(1.0-4.0*{uk_var})*time", "recursion_depth-1"]
+        )
 
         # Fourth U_k * S_{k-1} step
         std.call_subroutine(name, ["qubits", f"{uk_var}*time", "recursion_depth-1"])
@@ -153,12 +158,16 @@ class Trotter(GateLibrary):
 
         if len(hamiltonians) == 2:
             self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
+
             class Ha(Trotter):
-                '''casting class to abstract hamiltonian interface operation'''
+                """casting class to abstract hamiltonian interface operation"""
+
                 name = f"M_trot_suz_{abs(hash(hamiltonians[0].name))}_{abs(hash(hamiltonians[1].name))}"
-                def apply(self,t,qubits):
+
+                def apply(self, t, qubits):
                     """abstract hamiltonian apply"""
                     self.trot_suz(qubits, t, hamiltonians[0], hamiltonians[1], depth)
+
             return Ha
 
         # For multiple Hamiltonians, use binary tree approach
@@ -168,18 +177,30 @@ class Trotter(GateLibrary):
         right_hams = hamiltonians[mid:]
 
         # Create composite Hamiltonian subroutines
-        left = self.multi_trot_suz(qubits, t, left_hams, depth) if len(left_hams) > 1 else left_hams[0]
-        right = self.multi_trot_suz(qubits, t, right_hams, depth) if len(right_hams) > 1 else right_hams[0]
+        left = (
+            self.multi_trot_suz(qubits, t, left_hams, depth)
+            if len(left_hams) > 1
+            else left_hams[0]
+        )
+        right = (
+            self.multi_trot_suz(qubits, t, right_hams, depth)
+            if len(right_hams) > 1
+            else right_hams[0]
+        )
 
         # Apply Trotter to the two composite groups
         self.trot_suz(qubits, t, left, right, depth)
         m_name = f"M_trot_suz_{abs(hash(left.name))}_{abs(hash(right.name))}"
+
         class Hb(Trotter):
-            '''casting class to abstract hamiltonian interface operation'''
+            """casting class to abstract hamiltonian interface operation"""
+
             name = m_name
-            def apply(self,t,qubits):
+
+            def apply(self, t, qubits):
                 """abstract hamiltonian apply"""
                 self.trot_suz(qubits, t, left, right, depth)
+
         return Hb
 
     def trot_linear(self, qubits, t, hamiltonians, steps=1):

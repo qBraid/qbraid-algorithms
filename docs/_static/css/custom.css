@@ -17,15 +17,11 @@
   --font-color4: #ffffff;
   --brand-color0: #46096f;
   --brand-color1: #df0982;
-  --active-gradient0: linear-gradient(
-    45deg,
-    var(--brand-color1),
-    var(--brand-color0)
-  );
-  --active-gradient1: linear-gradient(
-    rgb(135, 0, 202) -41.11%,
-    rgba(216, 164, 250, 0.92) 197.13%
-  );
+  --active-gradient0: linear-gradient(45deg,
+      var(--brand-color1),
+      var(--brand-color0));
+  --active-gradient1: linear-gradient(rgb(135, 0, 202) -41.11%,
+      rgba(216, 164, 250, 0.92) 197.13%);
 }
 
 .wy-body-for-nav {
@@ -44,14 +40,14 @@
   color: var(--font-color0);
 }
 
-.wy-side-nav-search > a {
+.wy-side-nav-search>a {
   color: var(--font-color0);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.wy-side-nav-search > a::before {
+.wy-side-nav-search>a::before {
   content: "";
   background-image: url(../logo.png);
   background-size: contain;
@@ -64,7 +60,7 @@
   color: var(--font-color2) !important;
 }
 
-.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.current>a,
 .wy-menu-vertical li.on a {
   background-image: var(--active-gradient0);
   background-size: 150%;
@@ -73,14 +69,14 @@
   transition: background-position 150ms ease;
 }
 
-.wy-menu-vertical li.current > a:hover,
+.wy-menu-vertical li.current>a:hover,
 .wy-menu-vertical li.on a:hover {
   background-image: var(--active-gradient0);
   background-size: 150%;
   background-position: right;
 }
 
-.wy-menu-vertical li.current > a:hover button.toctree-expand,
+.wy-menu-vertical li.current>a:hover button.toctree-expand,
 .wy-menu-vertical li.on a:hover button.toctree-expand {
   color: var(--font-color3);
 }
@@ -104,7 +100,7 @@
 }
 
 /* headers */
-.rst-content .toctree-wrapper > p.caption,
+.rst-content .toctree-wrapper>p.caption,
 h1,
 h2,
 h3,
@@ -117,12 +113,22 @@ legend {
   color: var(--brand-color0);
 }
 
+
+/* Style h1 headers only on API and stubs pages */
+html[data-content_root="../"] h1 {
+  opacity: 0.5 !important;
+  color: #000000 !important;
+  font-size: 100% !important;
+  font-weight: normal !important;
+  font-style: italic !important;
+}
+
 .wy-menu-vertical header,
 .wy-menu-vertical p.caption {
   color: var(--brand-color0);
 }
 
-.wy-menu-vertical li.current > a button.toctree-expand,
+.wy-menu-vertical li.current>a button.toctree-expand,
 .wy-menu-vertical li.on a button.toctree-expand {
   color: var(--font-color4);
 }
@@ -137,7 +143,7 @@ legend {
   transition: transform 150ms ease;
 }
 
-.card > h3 {
+.card>h3 {
   color: var(--font-color0);
 }
 
@@ -221,17 +227,6 @@ legend {
   font-family: "Source Sans Pro", sans-serif;
 }
 
-/* Foot note */
-.rst-content .seealso .admonition-title {
-  background: var(--active-gradient0);
-}
-
-.rst-content .seealso {
-  background: var(--layout-color0);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
 /* common elements */
 .rst-content p a {
   -webkit-text-fill-color: transparent;
@@ -241,7 +236,7 @@ legend {
   background-clip: text;
 }
 
-.wy-breadcrumbs > li.wy-breadcrumbs-aside > a {
+.wy-breadcrumbs>li.wy-breadcrumbs-aside>a {
   -webkit-text-fill-color: transparent;
   text-fill-color: transparent;
   background: var(--active-gradient0);
@@ -266,4 +261,126 @@ a .rst-content code,
 a .rst-content tt {
   -webkit-text-fill-color: var(--brand-color0);
   text-fill-color: var(--brand-color0);
+}
+
+/* =============================================================================
+   ADMONITION BOXES STYLING
+   ============================================================================= */
+
+/* Shared border radius for enhanced elements */
+.rst-content .note-enhanced,
+.rst-content .seealso,
+.rst-content .seealso table.autosummary {
+  border-radius: 10px;
+}
+
+/* Note Enhanced Boxes */
+.rst-content .note-enhanced {
+  font-size: 1.5em;
+  background: white;
+  box-shadow: 0 4px 18px rgba(70, 9, 111, 0.50);
+}
+
+.rst-content .note-enhanced .admonition-title {
+  border-radius: 10px 10px 0 0;
+  background: var(--active-gradient0);
+  color: #ffffff !important;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  padding: 12px 16px;
+}
+
+.rst-content .note-enhanced .admonition-title::before {
+  display: none !important;
+}
+
+/* Seealso Boxes */
+.rst-content .seealso {
+  font-size: 1.1em;
+  background: white;
+  box-shadow: 0 4px 18px rgba(70, 9, 111, 0.50);
+}
+
+/* Reduce line spacing in formulation sections */
+.rst-content .seealso p {
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+.rst-content .seealso ol,
+.rst-content .seealso ul {
+  margin-bottom: 0.5em;
+}
+
+.rst-content .seealso li {
+  margin-bottom: 0.3em;
+  line-height: 1.3;
+}
+
+.rst-content .seealso .math {
+  margin: 0.2em 0;
+  line-height: 1.2;
+}
+
+.rst-content .seealso .admonition-title {
+  border-radius: 10px 10px 0 0;
+  padding-top: 16px;
+  background: white;
+  color: var(--brand-color0) !important;
+  font-weight: bold;
+}
+
+.rst-content .seealso.note-enhanced-size .admonition-title::before,
+.rst-content .left-box .admonition-title::before,
+.rst-content .right-box .admonition-title::before {
+  display: none !important;
+}
+
+.rst-content .seealso.note-enhanced-size>.admonition-title {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Tables */
+.rst-content .seealso table.autosummary {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-width: 2px !important;
+}
+
+/* =============================================================================
+   SIDE-BY-SIDE ALGORITHM LAYOUT
+   ============================================================================= */
+
+/* Container Layout */
+.side-by-side {
+  display: flex;
+}
+
+.left-box,
+.right-box {
+  flex-direction: column;
+}
+
+/* Algorithm Boxes */
+.rst-content .left-box .note,
+.rst-content .right-box .note {
+  background: white !important;
+  overflow: hidden !important;
+}
+
+/* Algorithm Titles */
+.left-box .admonition-title,
+.right-box .admonition-title {
+  text-align: center;
+  font-size: 1em !important;
+}
+
+/* =============================================================================
+   PAGE-SPECIFIC FIXES
+   ============================================================================= */
+
+/* Hide duplicate title on all qbraid_algorithms submodule pages */
+section[id^="module-qbraid_algorithms."]>p:first-of-type {
+  display: none;
 }

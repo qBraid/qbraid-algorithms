@@ -32,9 +32,9 @@ from .local_device import LocalDevice
 RESOURCE_DIR = Path(__file__).parent / "resources" / "qpe"
 
 
-def test_load_program():
-    """Test that load_program correctly returns a pyqasm module object."""
-    qpe_module = qpe.load_program(
+def test_generate_program():
+    """Test that generate_program correctly returns a pyqasm module object."""
+    qpe_module = qpe.generate_program(
         unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
         psi_filepath=f"{RESOURCE_DIR}/prepare_state.qasm",
         num_qubits=3,
@@ -49,7 +49,7 @@ def test_valid_circuit_r_3pi4():
     if qpe_file.exists():
         qpe_file.unlink()
     device = LocalDevice()
-    qpe.generate_subroutine(
+    qpe.save_to_qasm(
         unitary_filepath=f"{RESOURCE_DIR}/r_3pi4.qasm",
         num_qubits=3,
         quiet=True,
@@ -78,7 +78,7 @@ def test_valid_circuit_t():
     if iqft_file.exists():
         iqft_file.unlink()
     device = LocalDevice()
-    qpe.generate_subroutine(
+    qpe.save_to_qasm(
         unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
         num_qubits=3,
         quiet=True,
@@ -109,7 +109,7 @@ def test_valid_circuit_z():
     if iqft_file.exists():
         iqft_file.unlink()
     device = LocalDevice()
-    qpe.generate_subroutine(
+    qpe.save_to_qasm(
         unitary_filepath=f"{RESOURCE_DIR}/z.qasm",
         num_qubits=3,
         quiet=True,
@@ -130,9 +130,9 @@ def test_valid_circuit_z():
     assert result == expected
 
 
-def test_load_program_without_measurement():
-    """Test load_program with include_measurement=False."""
-    qpe_module = qpe.load_program(
+def test_generate_program_without_measurement():
+    """Test generate_program with include_measurement=False."""
+    qpe_module = qpe.generate_program(
         unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
         psi_filepath=f"{RESOURCE_DIR}/prepare_state.qasm",
         num_qubits=3,
@@ -141,14 +141,14 @@ def test_load_program_without_measurement():
     assert isinstance(qpe_module, QasmModule)
 
 
-def test_generate_subroutine_default_path():
-    """Test generate_subroutine with default path (current working directory)."""
+def test_save_to_qasm_default_path():
+    """Test save_to_qasm with default path (current working directory)."""
     original_cwd = os.getcwd()
     # Create temporary directory and change to it
     with tempfile.TemporaryDirectory() as test_dir:
         os.chdir(test_dir)
         try:
-            qpe.generate_subroutine(
+            qpe.save_to_qasm(
                 unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
                 num_qubits=3,
                 quiet=True,
@@ -164,14 +164,14 @@ def test_generate_subroutine_default_path():
             os.chdir(original_cwd)
 
 
-def test_generate_subroutine_verbose():
-    """Test generate_subroutine with verbose output (quiet=False)."""
+def test_save_to_qasm_verbose():
+    """Test save_to_qasm with verbose output (quiet=False)."""
     with tempfile.TemporaryDirectory() as test_dir:
         # Capture stdout
         captured_output = io.StringIO()
         sys.stdout = captured_output
         try:
-            qpe.generate_subroutine(
+            qpe.save_to_qasm(
                 unitary_filepath=f"{RESOURCE_DIR}/t.qasm",
                 num_qubits=3,
                 quiet=False,

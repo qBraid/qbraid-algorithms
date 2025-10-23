@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Bernstein-Vazirani algorithm implementation.
+Bernstein-Vazirani Algorithm Implementation
 
 """
 import os
@@ -28,23 +28,24 @@ from pyqasm.modules.base import QasmModule
 from qbraid_algorithms.utils import _prep_qasm_file
 
 
-def load_program(bitstring: Union[str, list[int]]) -> QasmModule:
+def generate_program(bitstring: Union[str, list[int]]) -> QasmModule:
     """
     Load the Bernstein-Vazirani circuit as a pyqasm module.
 
     Args:
-        bitstring (Union[str, list[int]]): The hidden bitstring `s` as a string of '0's
-        and '1's
+        bitstring (Union[str, list[int]]): The hidden bitstring `s` as a string of '0's and '1's
 
     Returns:
-        (PyQasm Module) pyqasm module containing the Bernstein-Vazirani circuit
+        PyQASM module containing the Bernstein-Vazirani circuit
     """
 
     # Load the Bernstein-Vazirani QASM files into a staging directory
     temp_dir = tempfile.mkdtemp()
-    bernvaz_src = Path(__file__).parent / "bernvaz.qasm"
+    bernvaz_src = Path(__file__).parent.parent / "qasm_resources/bernvaz.qasm"
     bernvaz_dst = os.path.join(temp_dir, "bernvaz.qasm")
-    bernvaz_sub_src = Path(__file__).parent / "bernvaz_subroutine.qasm"
+    bernvaz_sub_src = (
+        Path(__file__).parent.parent / "qasm_resources/bernvaz_subroutine.qasm"
+    )
     bernvaz_sub_dst = os.path.join(temp_dir, "bernvaz_subroutine.qasm")
     shutil.copy(bernvaz_src, bernvaz_dst)
     shutil.copy(bernvaz_sub_src, bernvaz_sub_dst)
@@ -63,7 +64,7 @@ def load_program(bitstring: Union[str, list[int]]) -> QasmModule:
     return module
 
 
-def generate_subroutine(
+def save_to_qasm(
     bitstring: Union[str, list[int]], quiet: bool = False, path: Optional[str] = None
 ) -> None:
     """
@@ -79,7 +80,9 @@ def generate_subroutine(
         None
     """
     # Copy the B-V subroutine QASM file to the specified or current working directory
-    bernvaz_src = Path(__file__).parent / "bernvaz_subroutine.qasm"
+    bernvaz_src = (
+        Path(__file__).parent.parent / "qasm_resources/bernvaz_subroutine.qasm"
+    )
     if path is None:
         bernvaz_dst = os.path.join(os.getcwd(), "bernvaz.qasm")
     else:
@@ -111,7 +114,7 @@ def generate_oracle(
         None
     """
     # Copy the oracle QASM file to the specified or current working directory
-    oracle_src = Path(__file__).parent / "oracle.qasm"
+    oracle_src = Path(__file__).parent.parent / "qasm_resources/oracle.qasm"
     if path is None:
         oracle_dst = os.path.join(os.getcwd(), "oracle.qasm")
     else:

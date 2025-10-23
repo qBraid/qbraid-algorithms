@@ -13,28 +13,30 @@
 # limitations under the License.
 
 """
-Python package containing quantum and hybrid quantum-classical algorithms that can
-be used to carry out research and investigate how to solve problems in different
-domains on simulators and near-term real quantum devices using shallow circuits.
+.. admonition:: qBraid Algorithms
+   :class: note-enhanced
 
-.. currentmodule:: qbraid_algorithms
+   Python package containing quantum and hybrid quantum-classical algorithms that can
+   be used to carry out research and investigate how to solve problems in different
+   domains on simulators and near-term real quantum devices using shallow circuits.
 
-Modules
--------
+.. admonition:: Modules
+   :class: seealso
 
-.. autosummary::
-    :toctree: ../stubs/
-    
-    bernstein_vazirani
-    qft
-    iqft
-    qpe
-    qtran
-    hhl
-    evolution
-    embedding
-    amplitude_amplification
-    rodeo
+    .. autosummary::
+        :toctree: ../stubs/
+
+        bells_inequality
+        bernstein_vazirani
+        qft
+        iqft
+        qpe
+        qtran
+        hhl
+        evolution
+        embedding
+        amplitude_amplification
+        rodeo
 
 """
 
@@ -42,14 +44,15 @@ from ._version import __version__
 
 __all__ = [
     "__version__",
+    "bells_inequality",
     "qft",
     "iqft",
     "bernstein_vazirani",
     "qpe",
     "qtran",
-    'evolution',
-    'embedding',
-    'amplitude_amplification',
-    'hhl',
-    'rodeo'
+    "evolution",
+    "embedding",
+    "amplitude_amplification",
+    "hhl",
+    "rodeo",
 ]

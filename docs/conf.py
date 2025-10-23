@@ -25,7 +25,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinx.ext.autosummary",
-    "sphinx_copybutton"
+    "sphinx_copybutton",
 ]
 
 autodoc_mock_imports = ["qbraid", "pyqasm"]
@@ -52,4 +52,4 @@ html_static_path = ["_static"]
 html_favicon = "_static/favicon.ico"
 html_show_sphinx = False
 
-html_css_files = ["css/s4defs-roles.css"]
+html_css_files = ["css/s4defs-roles.css", "css/custom.css"]

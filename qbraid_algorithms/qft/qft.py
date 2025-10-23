@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Module providing Quantum Fourier Transform (QFT) algorithm implementation.
+Quantum Fourier Transform (QFT) Algorithm Interface
 
 """
 import os
@@ -29,9 +29,10 @@ from qbraid_algorithms.utils import _prep_qasm_file
 from .qft_lib import QFTLibrary
 
 
-def load_program(num_qubits: int) -> QasmModule:
+def generate_program(num_qubits: int) -> QasmModule:
     """
     Load the Quantum Fourier Transform circuit as a pyqasm module.
+
     Args:
         num_qubits (int): The number of qubits for the QFT.
 
@@ -45,12 +46,10 @@ def load_program(num_qubits: int) -> QasmModule:
     qft.QFT([*range(num_qubits)])
     module = pyqasm.loads(sys.build())
 
-
     return module
 
-def generate_subroutine(
-    num_qubits: int, quiet: bool = False, path: str | None = None
-) -> None:
+
+def save_to_qasm(num_qubits: int, quiet: bool = False, path: str | None = None) -> None:
     """
     Creates a QFT subroutine module with user-defined number of qubits.
 
@@ -64,7 +63,7 @@ def generate_subroutine(
         None
     """
     # Copy the QFT subroutine QASM file to the specified or current working directory
-    qft_src = Path(__file__).parent / "qft_subroutine.qasm"
+    qft_src = Path(__file__).parent.parent / "qasm_resources/qft_subroutine.qasm"
     if path is None:
         qft_dst = os.path.join(os.getcwd(), "qft.qasm")
     else:

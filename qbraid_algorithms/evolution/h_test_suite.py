@@ -55,6 +55,7 @@ class TransverseFieldIsing(GateLibrary):
     formulation is not a direct matrix embedding but is intended for use
     in series product formulation under small time steps
     """
+
     name = "TFIM"
 
     def __init__(self, reg=3, j=1.0, h=0.5, *args, **kwargs):
@@ -66,8 +67,9 @@ class TransverseFieldIsing(GateLibrary):
 
         # Generate unique qubit argument names
         names = string.ascii_letters
-        qargs = [names[i // len(names)] + names[i % len(names)]
-                for i in range(self.reg_size)]
+        qargs = [
+            names[i // len(names)] + names[i % len(names)] for i in range(self.reg_size)
+        ]
 
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -96,16 +98,15 @@ class TransverseFieldIsing(GateLibrary):
         # self.call_space = " {}"
 
         # Register the gate
-        self.merge(*sys.build(),self.name)
+        self.merge(*sys.build(), self.name)
 
     def apply(self, time, qubits):
         """Apply TFIM evolution for given time."""
-        self.call_gate(self.name, qubits[-1],qubits[:-1], phases=[time])
+        self.call_gate(self.name, qubits[-1], qubits[:-1], phases=[time])
 
     def controlled(self, time, qubits, control):
         """Apply controlled TFIM evolution."""
-        self.controlled_op(self.name, (qubits[-1],[control]+qubits[:-1], time), n=1)
-
+        self.controlled_op(self.name, (qubits[-1], [control] + qubits[:-1], time), n=1)
 
 
 class HeisenbergXYZ(GateLibrary):
@@ -115,6 +116,7 @@ class HeisenbergXYZ(GateLibrary):
     Implements all three Pauli interactions between neighboring qubits.
     Highly non-commuting due to different Pauli matrices on same qubits.
     """
+
     name = "HeisenbergXYZ"
 
     def __init__(self, reg=3, j_x=1.0, j_y=1.0, j_z=1.0, *args, **kwargs):
@@ -124,8 +126,9 @@ class HeisenbergXYZ(GateLibrary):
         self.name = f"HeisenbergXYZ_{self.reg_size}q_j_x{int(100*j_x)}_j_y{int(100*j_y)}_j_z{int(100*j_z)}"
 
         names = string.ascii_letters
-        qargs = [names[i // len(names)] + names[i % len(names)]
-                for i in range(self.reg_size)]
+        qargs = [
+            names[i // len(names)] + names[i % len(names)] for i in range(self.reg_size)
+        ]
 
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -135,21 +138,21 @@ class HeisenbergXYZ(GateLibrary):
 
         for i in range(self.reg_size - 1):
             # XX interaction: exp(-i * j_x * XX * time)
-            std.ry("pi/2", qargs[i])      # X basis rotation
+            std.ry("pi/2", qargs[i])  # X basis rotation
             std.ry("pi/2", qargs[i + 1])
             std.cnot(qargs[i], qargs[i + 1])
             std.rz(f"{2 * j_x} * time", qargs[i + 1])
             std.cnot(qargs[i], qargs[i + 1])
-            std.ry("-pi/2", qargs[i])     # Inverse rotation
+            std.ry("-pi/2", qargs[i])  # Inverse rotation
             std.ry("-pi/2", qargs[i + 1])
 
             # YY interaction: exp(-i * j_y * YY * time)
-            std.rx("-pi/2", qargs[i])     # Y basis rotation
+            std.rx("-pi/2", qargs[i])  # Y basis rotation
             std.rx("-pi/2", qargs[i + 1])
             std.cnot(qargs[i], qargs[i + 1])
             std.rz(f"{2 * j_y} * time", qargs[i + 1])
             std.cnot(qargs[i], qargs[i + 1])
-            std.rx("pi/2", qargs[i])      # Inverse rotation
+            std.rx("pi/2", qargs[i])  # Inverse rotation
             std.rx("pi/2", qargs[i + 1])
 
             # ZZ interaction: exp(-i * j_z * ZZ * time)
@@ -159,16 +162,15 @@ class HeisenbergXYZ(GateLibrary):
 
         std.end_gate()
         # self.call_space = " {}"
-        self.merge(*sys.build(),self.name)
+        self.merge(*sys.build(), self.name)
 
     def apply(self, time, qubits):
         """Apply Heisenberg XYZ evolution for given time."""
-        self.call_gate(self.name, qubits[-1],qubits[:-1], phases=[time])
+        self.call_gate(self.name, qubits[-1], qubits[:-1], phases=[time])
 
     def controlled(self, time, qubits, control):
         """Apply controlled Heisenberg evolution."""
-        self.controlled_op(self.name, (qubits[-1],[control]+qubits[:-1], time), n=1)
-
+        self.controlled_op(self.name, (qubits[-1], [control] + qubits[:-1], time), n=1)
 
 
 class RandomizedHamiltonian(GateLibrary):
@@ -178,6 +180,7 @@ class RandomizedHamiltonian(GateLibrary):
     Applies random combinations of single and two-qubit rotations
     with controlled dependencies. Designed to test algorithm robustness.
     """
+
     name = "RandomHam"
 
     def __init__(self, reg=3, seed=42, density=0.7, *args, **kwargs):
@@ -191,8 +194,9 @@ class RandomizedHamiltonian(GateLibrary):
         random.seed(seed)
 
         names = string.ascii_letters
-        qargs = [names[i // len(names)] + names[i % len(names)]
-                for i in range(self.reg_size)]
+        qargs = [
+            names[i // len(names)] + names[i % len(names)] for i in range(self.reg_size)
+        ]
 
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -201,7 +205,7 @@ class RandomizedHamiltonian(GateLibrary):
         std.begin_gate(self.name, qargs, params=["time"])
 
         # Random single-qubit rotations
-        pauli_gates = ['rx', 'ry', 'rz']
+        pauli_gates = ["rx", "ry", "rz"]
         for i in range(self.reg_size):
             if random.random() < density:
                 gate_type = random.choice(pauli_gates)
@@ -213,7 +217,7 @@ class RandomizedHamiltonian(GateLibrary):
             for j in range(i + 1, self.reg_size):
                 if random.random() < density * 0.5:  # Lower density for 2-qubit
                     # Random ZZ-type interaction with basis rotation
-                    basis_rot = random.choice(['rx', 'ry', 'rz'])
+                    basis_rot = random.choice(["rx", "ry", "rz"])
                     angle = random.uniform(0.1, 1.5)
 
                     # Apply random basis rotations
@@ -232,21 +236,23 @@ class RandomizedHamiltonian(GateLibrary):
         # Add some controlled single-qubit operations for extra complexity
         for i in range(self.reg_size - 1):
             if random.random() < density * 0.3:
-                ctrl_gate = random.choice(['cry', 'crx', 'crz'])
+                ctrl_gate = random.choice(["cry", "crx", "crz"])
                 angle = random.uniform(0.1, 1.0)
-                std.call_gate(ctrl_gate, qargs[i], qargs[i + 1], phases=[f"{angle} * time"])
+                std.call_gate(
+                    ctrl_gate, qargs[i], qargs[i + 1], phases=[f"{angle} * time"]
+                )
 
         std.end_gate()
         # self.call_space = " {}"
-        self.merge(*sys.build(),self.name)
+        self.merge(*sys.build(), self.name)
 
     def apply(self, time, qubits):
         """Apply Heisenberg XYZ evolution for given time."""
-        self.call_gate(self.name, qubits[-1],qubits[:-1], phases=[time])
+        self.call_gate(self.name, qubits[-1], qubits[:-1], phases=[time])
 
     def controlled(self, time, qubits, control):
         """Apply controlled Heisenberg evolution."""
-        self.controlled_op(self.name, (qubits[-1],[control]+qubits[:-1], time), n=1)
+        self.controlled_op(self.name, (qubits[-1], [control] + qubits[:-1], time), n=1)
 
 
 class FermionicHubbard(GateLibrary):
@@ -257,6 +263,7 @@ class FermionicHubbard(GateLibrary):
     transformation. Creates complex non-local interactions through string
     of Pauli operations.
     """
+
     name = "FermionicHubbard"
 
     def __init__(self, reg=3, t=1.0, U=2.0, *args, **kwargs):
@@ -267,8 +274,9 @@ class FermionicHubbard(GateLibrary):
         self.name = f"FermionicHubbard_{self.reg_size}q_t{int(100*t)}_U{int(100*U)}"
 
         names = string.ascii_letters
-        qargs = [names[i // len(names)] + names[i % len(names)]
-                for i in range(self.reg_size)]
+        qargs = [
+            names[i // len(names)] + names[i % len(names)] for i in range(self.reg_size)
+        ]
 
         sys = GateBuilder()
         std = sys.import_library(std_gates)
@@ -334,15 +342,15 @@ class FermionicHubbard(GateLibrary):
 
         std.end_gate()
         # self.call_space = " {}"
-        self.merge(*sys.build(),self.name)
+        self.merge(*sys.build(), self.name)
 
     def apply(self, time, qubits):
         """Apply Heisenberg XYZ evolution for given time."""
-        self.call_gate(self.name, qubits[-1],qubits[:-1], phases=[time])
+        self.call_gate(self.name, qubits[-1], qubits[:-1], phases=[time])
 
     def controlled(self, time, qubits, control):
         """Apply controlled Heisenberg evolution."""
-        self.controlled_op(self.name, (qubits[-1],[control]+qubits[:-1], time), n=1)
+        self.controlled_op(self.name, (qubits[-1], [control] + qubits[:-1], time), n=1)
 
 
 # Test suite factory function
@@ -356,6 +364,7 @@ def create_test_hamiltonians(reg_size=4):
     Returns:
         Dictionary of Hamiltonian instances for testing
     """
+
     # test_reg = list(range(reg_size))
     def anonymize(lib, aparams):
         """
@@ -369,18 +378,27 @@ def create_test_hamiltonians(reg_size=4):
         Returns:
             An anonymous subclass of the library
         """
+
         class anon(lib):
             "You don't get to know ;)"
-            def __init__(self,*args,**kwargs):
-                super().__init__(*aparams,*args,**kwargs)
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*aparams, *args, **kwargs)
+
         return anon
 
     hamiltonians = {
-        'tfim': (TransverseFieldIsing,(reg_size, 1.0, 0.7)),  #reg, j , h
-        'heisenberg': (HeisenbergXYZ,(reg_size, 1.0, 1.2, 0.8)), # reg, jx , jy, jz
-        'random_dense': (RandomizedHamiltonian,(reg_size, 42, 0.8)), #reg, seed, density
-        'random_sparse': (RandomizedHamiltonian,(reg_size, 123, 0.4)), #reg, seed, density
-        'hubbard': (FermionicHubbard,(reg_size, 1.0, 2.0))  # reg, t, U
+        "tfim": (TransverseFieldIsing, (reg_size, 1.0, 0.7)),  # reg, j , h
+        "heisenberg": (HeisenbergXYZ, (reg_size, 1.0, 1.2, 0.8)),  # reg, jx , jy, jz
+        "random_dense": (
+            RandomizedHamiltonian,
+            (reg_size, 42, 0.8),
+        ),  # reg, seed, density
+        "random_sparse": (
+            RandomizedHamiltonian,
+            (reg_size, 123, 0.4),
+        ),  # reg, seed, density
+        "hubbard": (FermionicHubbard, (reg_size, 1.0, 2.0)),  # reg, t, U
     }
 
-    return {k : anonymize(v[0],v[1]) for k, v in hamiltonians.items()}
+    return {k: anonymize(v[0], v[1]) for k, v in hamiltonians.items()}

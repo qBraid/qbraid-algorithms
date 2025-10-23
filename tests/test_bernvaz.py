@@ -29,32 +29,32 @@ from qbraid_algorithms.utils import get_max_count
 from .local_device import LocalDevice
 
 
-def test_load_program():
-    """Test that load_program correctly returns a pyqasm module object."""
-    bv_module = bv.load_program("101")
+def test_generate_program():
+    """Test that generate_program correctly returns a pyqasm module object."""
+    bv_module = bv.generate_program("101")
     assert isinstance(bv_module, QasmModule)
     assert bv_module.num_qubits == 4  # 3 data qubits + 1 ancilla qubit
 
 
-def test_generate_subroutine():
-    """Test that generate_subroutine correctly generates the subroutine QASM."""
+def test_save_to_qasm():
+    """Test that save_to_qasm correctly generates the subroutine QASM."""
     s = "101"
     with tempfile.TemporaryDirectory() as test_dir:
-        bv.generate_subroutine(s, quiet=True, path=test_dir)
+        bv.save_to_qasm(s, quiet=True, path=test_dir)
         # Ensure the file was created
         subroutine_qasm = Path(test_dir) / "bernvaz.qasm"
         assert subroutine_qasm.exists()
 
 
-def test_generate_subroutine_default_path():
-    """Test generate_subroutine with default path (current working directory)."""
+def test_save_to_qasm_default_path():
+    """Test save_to_qasm with default path (current working directory)."""
     s = "101"
     original_cwd = os.getcwd()
     # Create temporary directory and change to it
     with tempfile.TemporaryDirectory() as test_dir:
         os.chdir(test_dir)
         try:
-            bv.generate_subroutine(s, quiet=True, path=None)
+            bv.save_to_qasm(s, quiet=True, path=None)
             # Ensure the file was created in current directory
             subroutine_qasm = Path(test_dir) / "bernvaz.qasm"
             assert subroutine_qasm.exists()
@@ -63,15 +63,15 @@ def test_generate_subroutine_default_path():
             os.chdir(original_cwd)
 
 
-def test_generate_subroutine_verbose():
-    """Test generate_subroutine with verbose output (quiet=False)."""
+def test_save_to_qasm_verbose():
+    """Test save_to_qasm with verbose output (quiet=False)."""
     s = "101"
     with tempfile.TemporaryDirectory() as test_dir:
         # Capture stdout
         captured_output = io.StringIO()
         sys.stdout = captured_output
         try:
-            bv.generate_subroutine(s, quiet=False, path=test_dir)
+            bv.save_to_qasm(s, quiet=False, path=test_dir)
             # Get the captured output
             output = captured_output.getvalue()
             # Ensure the verbose message was printed
@@ -138,7 +138,7 @@ def test_algorithm_101():
     """Test the Bernstein-Vazirani algorithm implementation for the input '101'."""
     s = "101"
     device = LocalDevice()
-    module = bv.load_program(s)
+    module = bv.generate_program(s)
     # Unrolling is necessary for proper execution
     module.unroll()
     program_str = pyqasm.dumps(module)
@@ -152,7 +152,7 @@ def test_algorithm_10101():
     """Test the Bernstein-Vazirani algorithm implementation for the input '10101'."""
     s = "10101"
     device = LocalDevice()
-    module = bv.load_program(s)
+    module = bv.generate_program(s)
     # Unrolling is necessary for proper execution
     module.unroll()
     program_str = pyqasm.dumps(module)

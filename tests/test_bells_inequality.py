@@ -21,8 +21,8 @@ from pyqasm.modules.base import QasmModule
 from qbraid_algorithms import bells_inequality
 
 
-def test_load_program_returns_correct_type():
-    """Test that load_program returns a pyqasm module object."""
-    circuit = bells_inequality.load_program()
+def test_generate_program_returns_correct_type():
+    """Test that generate_program returns a pyqasm module object."""
+    circuit = bells_inequality.generate_program()
     # Check that it returns a valid Qasm# module module
     assert isinstance(circuit, QasmModule), f"Expected QasmModule, got {type(circuit)}"

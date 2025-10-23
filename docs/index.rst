@@ -51,7 +51,7 @@
       <span style="color:#808080"> | algorithms</span>
    </h1>
    <p style="text-align:center;font-style:italic;color:#808080">
-      Use and build quantum algorithms with qBraid.
+      Build Quantum Algorithms with qBraid.
    </p>
    </body>
    </html>
@@ -61,10 +61,21 @@
 :Release: |release|
 
 Overview
----------
+--------
 
-Python package for utilizing, implementing, and building quantum algorithms in OpenQASM 3.
+`qBraid Algorithms <https://docs.qbraid.com/qbraid-algorithms/user-guide/overview>`_ is a Python package designed for quantum algorithm development, implementation, and execution. Built on the `OpenQASM3 <https://openqasm.com/>`_ standard, this library provides researchers, developers, and quantum computing enthusiasts with a robust toolkit for exploring and deploying quantum algorithms across various domains.
 
+**Key Features:**
+
+* **Comprehensive Algorithm Library**: Implementation of fundamental quantum algorithms including Grover's search, Quantum Fourier Transform (QFT), Quantum Phase Estimation (QPE), and advanced techniques like amplitude amplification and Hamiltonian evolution.
+
+* **OpenQASM 3 Integration**: Native support for OpenQASM 3, enabling seamless integration with modern quantum hardware and simulators while maintaining compatibility with the evolving quantum computing ecosystem.
+
+* **Modular Architecture**: Clean, modular design that allows for easy extension, customization, and integration into existing quantum computing workflows.
+
+* **Research-Ready Implementation**: Optimized for both educational purposes and cutting-edge research, with implementations suitable for near-term quantum devices (NISQ era) and fault-tolerant quantum computers.
+
+* **Hardware Agnostic**: Designed to work across different quantum computing platforms and simulators, providing flexibility in deployment and testing.
 
 Installation
 -------------
@@ -77,7 +88,7 @@ qbraid-algorithms requires Python 3.11 or greater, and can be installed with pip
 
 
 Install from Source
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 You can also install from source by cloning this repository and running a pip install command in the root directory of the repository:
 
