@@ -1,4 +1,4 @@
 include *.txt *.md
 recursive-include docs *.txt *.rst *.py *.png *.ico
-recursive-include qbraid_algorithms *.py
+recursive-include qbraid_algorithms *.py *.qasm
 prune docs/build/
