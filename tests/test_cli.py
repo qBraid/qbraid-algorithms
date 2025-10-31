@@ -384,7 +384,7 @@ gate test_gate q {
     assert "OPENQASM" in result.stdout
 
 
-@patch("qbraid_algorithms.cli.generate.qft.generate_subroutine")
+@patch("qbraid_algorithms.cli.generate.qft.save_to_qasm")
 def test_qft_error_handling(mock_generate, runner, temp_dir):
     """Test QFT error handling."""
     mock_generate.side_effect = Exception("Test error")
@@ -394,7 +394,7 @@ def test_qft_error_handling(mock_generate, runner, temp_dir):
     assert result.exit_code == 1
 
 
-@patch("qbraid_algorithms.cli.generate.iqft.generate_subroutine")
+@patch("qbraid_algorithms.cli.generate.iqft.save_to_qasm")
 def test_iqft_error_handling(mock_generate, runner, temp_dir):
     """Test IQFT error handling."""
     mock_generate.side_effect = Exception("Test error")
@@ -404,7 +404,7 @@ def test_iqft_error_handling(mock_generate, runner, temp_dir):
     assert result.exit_code == 1
 
 
-@patch("qbraid_algorithms.cli.generate.bv.generate_subroutine")
+@patch("qbraid_algorithms.cli.generate.bv.save_to_qasm")
 def test_bernvaz_error_handling(mock_generate, runner, temp_dir):
     """Test Bernstein-Vazirani error handling."""
     mock_generate.side_effect = Exception("Test error")
@@ -416,7 +416,7 @@ def test_bernvaz_error_handling(mock_generate, runner, temp_dir):
     assert "Generating Bernstein-Vazirani circuit" in result.stdout
 
 
-@patch("qbraid_algorithms.cli.generate.qpe.generate_subroutine")
+@patch("qbraid_algorithms.cli.generate.qpe.save_to_qasm")
 def test_qpe_error_handling(mock_generate, runner, temp_dir, temp_path):
     """Test QPE error handling."""
     mock_generate.side_effect = Exception("Test error")

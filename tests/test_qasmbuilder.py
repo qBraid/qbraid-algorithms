@@ -40,17 +40,20 @@ from qbraid_algorithms.qtran import GateBuilder, QasmBuilder, std_gates
 
 try:
     import pyqasm as pq
+
     PYQASM_AVAILABLE = True
 except ImportError:
     PYQASM_AVAILABLE = False
     pytest.skip("pyqasm not available", allow_module_level=True)
 
+
 class TestQASMBuilderBasic:
     """Test basic QASM generation with exact string matching."""
+
     def test_simple_gate_sequence(self):
         """Test exact QASM output for simple gate sequence."""
         n = 3
-        builder = QasmBuilder(n,version=3)
+        builder = QasmBuilder(n, version=3)
         std = builder.import_library(std_gates)
         qubits = [*range(n)]
 
@@ -58,33 +61,33 @@ class TestQASMBuilderBasic:
         std.h(qubits[0])
         std.cnot(qubits[0], qubits[1])
         std.x(qubits[2])
-        std.measure(qubits,qubits)
+        std.measure(qubits, qubits)
 
         program = builder.build()
 
         # Expected QASM output (adjust based on your actual format)
         expected_lines = [
             "OPENQASM 3;",
-            "include \"stdgates.inc\";",
+            'include "stdgates.inc";',
             f"qubit[{n}] qb;",
             f"bit[{n}] cb;",
             "h qb[0];",
             "cnot qb[0], qb[1];",
             "x qb[2];",
-            "cb[{0, 1, 2}] = measure qb[{0, 1, 2}];"
+            "cb[{0, 1, 2}] = measure qb[{0, 1, 2}];",
         ]
 
         # Validate structure
         assert isinstance(program, str)
 
         # Basic content validation (exact matching would depend on your format)
-        program_lines = [line.strip() for line in program.split('\n') if line.strip()]
+        program_lines = [line.strip() for line in program.split("\n") if line.strip()]
         assert len(program_lines) > 0
 
         # Check for key elements
-        assert any('h' in line for line in program_lines)
-        assert any('cnot' in line for line in program_lines)
-        assert any('measure' in line for line in program_lines)
+        assert any("h" in line for line in program_lines)
+        assert any("cnot" in line for line in program_lines)
+        assert any("measure" in line for line in program_lines)
 
         stable = True
         try:
@@ -101,8 +104,8 @@ class TestQASMBuilderBasic:
         std = builder.import_library(std_gates)
 
         gate_name = "test_rotation"
-        qargs = ['a', 'b']
-        params = ['theta', 'phi']
+        qargs = ["a", "b"]
+        params = ["theta", "phi"]
 
         std.begin_gate(gate_name, qargs, params=params)
         std.rx(params[0], qargs[0])
@@ -123,9 +126,9 @@ class TestQASMBuilderBasic:
         assert all(qarg in gate_def for qarg in qargs)
 
         # Check for gate operations
-        assert 'rx' in gate_def
-        assert 'ry' in gate_def
-        assert 'cnot' in gate_def
+        assert "rx" in gate_def
+        assert "ry" in gate_def
+        assert "cnot" in gate_def
 
     def test_subroutine_generation(self):
         """Test QASM subroutine generation."""
@@ -133,7 +136,7 @@ class TestQASMBuilderBasic:
         std = builder.import_library(std_gates)
 
         subroutine_name = "test_subroutine"
-        params = ['qubit[3] qb', 'float time', 'int depth']
+        params = ["qubit[3] qb", "float time", "int depth"]
 
         std.begin_subroutine(subroutine_name, params)
         std.begin_if("depth > 0")
@@ -148,8 +151,8 @@ class TestQASMBuilderBasic:
         assert subroutine_name in program
         subroutine_def = program
 
-        assert 'def' in subroutine_def or 'subroutine' in subroutine_def
-        assert 'if' in subroutine_def
+        assert "def" in subroutine_def or "subroutine" in subroutine_def
+        assert "if" in subroutine_def
         assert all(param.split()[-1] in subroutine_def for param in params)
 
     def test_conditional_and_loops(self):
@@ -170,9 +173,9 @@ class TestQASMBuilderBasic:
         program, imports, defs = builder.build()
 
         # Check for control flow structures
-        assert 'if' in program
-        assert 'for' in program
-        assert 'h' in program
+        assert "if" in program
+        assert "for" in program
+        assert "h" in program
 
     def test_ancilla_claiming(self):
         sys = QasmBuilder(3)
@@ -193,7 +196,9 @@ class TestQASMBuilderBasic:
 
         try:
             # Create temporary file for pyqasm validation
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.qasm', delete=False) as f:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".qasm", delete=False
+            ) as f:
                 f.write(qasm_string)
                 f.flush()
                 temp_path = f.name
@@ -216,6 +221,7 @@ class TestQASMBuilderBasic:
         except Exception as e:
             return False, f"Validation setup failed: {str(e)}"
 
+
 class TestHamiltonianInterface:
     """Test Hamiltonian interface for correct QASM generation."""
 
@@ -230,11 +236,11 @@ class TestHamiltonianInterface:
             # Check required attributes exist
             sys = GateBuilder()
             H = sys.import_library(ham)
-            assert hasattr(H, 'name')
-            assert hasattr(H, 'apply')
-            assert hasattr(H, 'controlled')
-            assert hasattr(H, 'gate_defs')
-            assert hasattr(H, 'gate_ref')
+            assert hasattr(H, "name")
+            assert hasattr(H, "apply")
+            assert hasattr(H, "controlled")
+            assert hasattr(H, "gate_defs")
+            assert hasattr(H, "gate_ref")
 
             # Check name is reasonable
             assert isinstance(H.name, str)
@@ -255,9 +261,9 @@ class TestHamiltonianInterface:
             # Test apply method
             try:
                 ham_lib.apply("0.5", self.test_qubits)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
-                program= builder.build()
+                program = builder.build()
 
                 # Validate basic structure
                 assert isinstance(program, str)
@@ -266,7 +272,9 @@ class TestHamiltonianInterface:
 
                 # Test QASM validity with pyqasm
                 is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
-                assert is_valid, f"Invalid QASM for {name}: {error_msg}\nQASM:\n{program}"
+                assert (
+                    is_valid
+                ), f"Invalid QASM for {name}: {error_msg}\nQASM:\n{program}"
 
             except Exception as e:
                 pytest.fail(f"Failed to apply Hamiltonian {name}: {str(e)}")
@@ -290,7 +298,7 @@ class TestHamiltonianInterface:
                 target_qubits = self.test_qubits
 
                 ham_lib.controlled("0.3", target_qubits, control_qubit)
-                std.measure(self.test_qubits+anc_q,self.test_qubits+anc_c)
+                std.measure(self.test_qubits + anc_q, self.test_qubits + anc_c)
 
                 program = builder.build()
                 # Validate structure
@@ -300,7 +308,9 @@ class TestHamiltonianInterface:
                 full_qasm = program
                 is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
 
-                assert is_valid, f"Invalid controlled QASM for {name}: {error_msg}\nQASM:\n{full_qasm}"
+                assert (
+                    is_valid
+                ), f"Invalid controlled QASM for {name}: {error_msg}\nQASM:\n{full_qasm}"
             except Exception as e:
                 pytest.fail(f"Failed to apply controlled Hamiltonian {name}: {str(e)}")
 
@@ -315,7 +325,7 @@ class TestHamiltonianInterface:
                 ham_lib = builder.import_library(ham)
                 try:
                     ham_lib.apply(time_param, self.test_qubits)
-                    std.measure(self.test_qubits,self.test_qubits)
+                    std.measure(self.test_qubits, self.test_qubits)
 
                     program = builder.build()
 
@@ -323,17 +333,21 @@ class TestHamiltonianInterface:
                     full_qasm = program
 
                     # Basic validation - parameter should appear somewhere
-                    if not any(char.isalpha() for char in time_param):  # Numeric parameter
+                    if not any(
+                        char.isalpha() for char in time_param
+                    ):  # Numeric parameter
                         # For numeric parameters, check they're used
                         assert len(full_qasm) > 0
                     # else:  # Symbolic parameter
-                        # For symbolic parameters, they should appear in gate definitions
-                        # assert any(time_param.replace('*', '').replace('/', '').replace('pi', '') in gate_def
-                        #          for gate_def in defs.values() if gate_def)
+                    # For symbolic parameters, they should appear in gate definitions
+                    # assert any(time_param.replace('*', '').replace('/', '').replace('pi', '') in gate_def
+                    #          for gate_def in defs.values() if gate_def)
                 except Exception as e:
                     # Some parameter types might not be supported - that's OK
                     if "parameter" not in str(e).lower():
-                        pytest.fail(f"Unexpected error with {name} and parameter {time_param}: {e}")
+                        pytest.fail(
+                            f"Unexpected error with {name} and parameter {time_param}: {e}"
+                        )
 
     def _validate_qasm_with_pyqasm(self, qasm_string):
         """Helper method to validate QASM using pyqasm."""
@@ -349,20 +363,24 @@ class TestHamiltonianInterface:
         except Exception as e:
             return False, str(e)
 
+
 class TestQASMStability:
     """Test QASM output stability across runs."""
+
     def test_deterministic_output(self):
         """Test that identical inputs produce identical QASM output."""
+
         def create_test_program():
             builder = GateBuilder()
             std = builder.import_library(std_gates)
 
-            std.h('q[0]')
-            std.cnot('q[0]', 'q[1]')
-            std.cnot('q[1]', 'q[2]')
+            std.h("q[0]")
+            std.cnot("q[0]", "q[1]")
+            std.cnot("q[1]", "q[2]")
             # std.measure([0],[1])
 
             return builder.build()
+
         # Generate the same program multiple times
         results = [create_test_program() for _ in range(5)]
         # All results should be identical
@@ -375,7 +393,7 @@ class TestQASMStability:
     def test_hamiltonian_stability(self):
         """Test that Hamiltonian QASM generation is stable."""
         hamiltonians = create_test_hamiltonians(reg_size=3)
-        reg=  [*range(3)]
+        reg = [*range(3)]
         # Test each Hamiltonian multiple times
         for name, ham_class in hamiltonians.items():
             results = []
@@ -384,21 +402,27 @@ class TestQASMStability:
                 # Create fresh instances
                 class test_ham(ham_class):
                     pass
+
                 builder = QasmBuilder(len(reg))
                 std = builder.import_library(std_gates)
                 ham_lib = builder.import_library(test_ham)
 
-                ham_lib.apply("0.1", ['qb[0]', 'qb[1]', 'qb[2]'])
-                std.measure(reg,reg)
+                ham_lib.apply("0.1", ["qb[0]", "qb[1]", "qb[2]"])
+                std.measure(reg, reg)
 
                 results.append(builder.build())
 
             # All results for this Hamiltonian should be identical
             first_result = results[0]
             for i, result in enumerate(results[1:], 1):
-                assert result[0] == first_result[0], f"Hamiltonian {name} program differs at run {i}"
+                assert (
+                    result[0] == first_result[0]
+                ), f"Hamiltonian {name} program differs at run {i}"
                 # Gate definitions should be the same
-                assert result[2] == first_result[2], f"Hamiltonian {name} definitions differ at run {i}"
+                assert (
+                    result[2] == first_result[2]
+                ), f"Hamiltonian {name} definitions differ at run {i}"
+
 
 if __name__ == "__main__":
     # Run tests if executed directly

@@ -45,15 +45,15 @@ def _run_circuit_and_check_counts(
         assert lower <= count <= upper
 
 
-def test_load_program():
-    """Test that load_program correctly returns a pyqasm module object."""
-    qft_module = qft.load_program(3)
+def test_generate_program():
+    """Test that generate_program correctly returns a pyqasm module object."""
+    qft_module = qft.generate_program(3)
     assert isinstance(qft_module, QasmModule)
     assert qft_module.num_qubits == 3
 
 
-def test_generate_subroutine():
-    """Placeholder test for QFT generate_subroutine (to be implemented)."""
+def test_save_to_qasm():
+    """Placeholder test for QFT save_to_qasm (to be implemented)."""
     # TODO: Implement this test
     assert True  # Placeholder assertion
 
@@ -68,7 +68,7 @@ def test_valid_circuit_0():
     # Single qubit QFT circuit should just be H gate
     device = LocalDevice()
     # generate single qubit QFT circuit
-    qft.generate_subroutine(1, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(1, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_0.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -99,7 +99,7 @@ def test_valid_circuit_1():
     # Single qubit QFT circuit should just be H gate
     device = LocalDevice()
     # generate single qubit QFT circuit
-    qft.generate_subroutine(1, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(1, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_1.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -125,7 +125,7 @@ def test_valid_circuit_00():
     # we want to take in some binary number as a state - ie |00>
     device = LocalDevice()
     # generate two qubit QFT circuit
-    qft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_00.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -151,7 +151,7 @@ def test_valid_circuit_2qubit_superposition():
     # we want to take in some binary number as a state - ie 2 = |10>
     device = LocalDevice()
     # generate two qubit QFT circuit
-    qft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_2qubit_superposn.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -177,7 +177,7 @@ def test_valid_circuit_01():
     # we want to take in some binary number as a state - ie |01>
     device = LocalDevice()
     # generate two qubit QFT circuit
-    qft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_01.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -203,7 +203,7 @@ def test_valid_circuit_000():
     # we want to take in some binary number as a state - ie |000>
     device = LocalDevice()
     # generate three qubit QFT circuit
-    qft.generate_subroutine(3, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(3, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_000.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -239,7 +239,7 @@ def test_valid_circuit_010():
     # we want to take in some binary number as a state - ie |010>
     device = LocalDevice()
     # generate three qubit QFT circuit
-    qft.generate_subroutine(3, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(3, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_010.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -275,7 +275,7 @@ def test_valid_circuit_001():
     # we want to take in some binary number as a state - ie 3 = |011>
     device = LocalDevice()
     # generate two qubit QFT circuit
-    qft.generate_subroutine(3, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(3, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/qft_001.qasm")
     # delete the created subroutine file
     (RESOURCES_DIR / "qft.qasm").unlink()
@@ -320,8 +320,8 @@ def test_undo_iqft_00():
     iqft_file = RESOURCES_DIR / "iqft.qasm"
     if iqft_file.exists():
         iqft_file.unlink()
-    qft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
-    iqft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
+    iqft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/undo_iqft_00.qasm")
     (RESOURCES_DIR / "qft.qasm").unlink()
     (RESOURCES_DIR / "iqft.qasm").unlink()
@@ -354,8 +354,8 @@ def test_undo_iqft_superposition():
     iqft_file = RESOURCES_DIR / "iqft.qasm"
     if iqft_file.exists():
         iqft_file.unlink()
-    qft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
-    iqft.generate_subroutine(2, path=RESOURCES_DIR, quiet=True)
+    qft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
+    iqft.save_to_qasm(2, path=RESOURCES_DIR, quiet=True)
     program = pyqasm.load(f"{RESOURCES_DIR}/undo_iqft_00_superposition.qasm")
     (RESOURCES_DIR / "qft.qasm").unlink()
     (RESOURCES_DIR / "iqft.qasm").unlink()

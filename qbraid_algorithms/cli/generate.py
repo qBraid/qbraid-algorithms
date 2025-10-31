@@ -80,7 +80,7 @@ def generate_qft(
         target_file = os.path.join(target_dir, output)
 
         # Generate the subroutine using the path parameter
-        qft.generate_subroutine(qubits, quiet=True, path=target_dir)
+        qft.save_to_qasm(qubits, quiet=True, path=target_dir)
 
         # Rename to custom output if needed
         generated_file = os.path.join(target_dir, "qft.qasm")
@@ -153,7 +153,7 @@ def generate_iqft(
         target_file = os.path.join(target_dir, output)
 
         # Generate the subroutine using the path parameter
-        iqft.generate_subroutine(qubits, quiet=True, path=target_dir)
+        iqft.save_to_qasm(qubits, quiet=True, path=target_dir)
 
         # Rename to custom output if needed
         generated_file = os.path.join(target_dir, "iqft.qasm")
@@ -267,7 +267,7 @@ def generate_bernvaz(
             typer.echo("Bernstein-Vazirani oracle generated successfully.")
         else:
             # Generate complete circuit
-            bv.generate_subroutine(secret, quiet=True, path=target_dir)
+            bv.save_to_qasm(secret, quiet=True, path=target_dir)
             generated_file = os.path.join(target_dir, "bernvaz.qasm")
             typer.echo("Bernstein-Vazirani circuit generated successfully.")
 
@@ -365,7 +365,7 @@ def generate_qpe(
         target_file = os.path.join(target_dir, output)
 
         # Generate the subroutine using the path parameter
-        qpe.generate_subroutine(unitary_file, qubits, quiet=True, path=target_dir)
+        qpe.save_to_qasm(unitary_file, qubits, quiet=True, path=target_dir)
 
         # Rename to custom output if needed
         generated_file = os.path.join(target_dir, "qpe.qasm")

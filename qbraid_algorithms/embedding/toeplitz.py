@@ -15,8 +15,8 @@
 """
 Toeplitz and Diagonal Gate Libraries for Quantum Algorithms.
 
-NOTE (WIP, untested): This implementation requires claiming ancilla qubits/clbits 
-to operate. Ancilla claiming embeddings are a future completion task once 
+NOTE (WIP, untested): This implementation requires claiming ancilla qubits/clbits
+to operate. Ancilla claiming embeddings are a future completion task once
 QASM subroutines have been fully debugged in PyQASM.
 
 This module provides:
@@ -84,7 +84,7 @@ class Toeplitz(GateLibrary):
             else:
                 line = np.concatenate((vals, [0], np.flip(vals)))
                 circ_mat = scp.linalg.circulant(line[:-1])
-                circ_mat = circ_mat[:len(vals), :len(vals)]
+                circ_mat = circ_mat[: len(vals), : len(vals)]
 
         # Diagonalize via FFT
         dft = np.fft.fft(np.eye(2 * len(vals)))
@@ -107,7 +107,9 @@ class Toeplitz(GateLibrary):
 
         std.begin_gate(name, qargs)
         qft.inverse_op(qft.QFT, (qargs[1:],))
-        diagonal.controlled_op(diagonal.diag_scale, (qargs[1:], diag_vals, ([qargs[0]], 0)))
+        diagonal.controlled_op(
+            diagonal.diag_scale, (qargs[1:], diag_vals, ([qargs[0]], 0))
+        )
         qft.QFT(qargs[1:])
         std.end_gate()
 
@@ -201,7 +203,7 @@ class Diagonal(GateLibrary):
         Returns:
             str: Gate name.
         """
-        print("building diagonal gate:",qubits, vals, depth)
+        print("building diagonal gate:", qubits, vals, depth)
         qb = int(np.log2(len(vals)) + 0.01)
         name = f"diag{qb}_{np.abs(hash(tuple(vals)))}"
 
@@ -211,10 +213,7 @@ class Diagonal(GateLibrary):
 
         # Argument names
         names = string.ascii_letters
-        qargs = [
-            names[i // len(names)] + names[i % len(names)]
-            for i in range(qb)
-        ]
+        qargs = [names[i // len(names)] + names[i % len(names)] for i in range(qb)]
 
         # Build subcircuit
         sys = GateBuilder()
@@ -223,7 +222,7 @@ class Diagonal(GateLibrary):
 
         std.begin_gate(name, qargs)
         std.x(qargs[0])
-        std.call_gate("p",qargs[0],phases=projection[0] )
+        std.call_gate("p", qargs[0], phases=projection[0])
         std.x(qargs[0])
 
         # Apply projections
@@ -234,11 +233,11 @@ class Diagonal(GateLibrary):
                     pindex += 1
                     continue
                 if len(c) == 1:
-                    std.call_gate("p",qargs[c[0]],phases=projection[pindex] )
+                    std.call_gate("p", qargs[c[0]], phases=projection[pindex])
                 else:
                     std.controlled_op(
                         "p",
-                        ( qargs[c[0]], [qargs[n] for n in c[1:]], projection[pindex]),
+                        (qargs[c[0]], [qargs[n] for n in c[1:]], projection[pindex]),
                         n=len(c) - 1,
                     )
                 pindex += 1
@@ -248,7 +247,7 @@ class Diagonal(GateLibrary):
         self.call_gate(name, qubits[-1], qubits[:-1])
         return name
 
-    def phase_projector(self,target, depth):
+    def phase_projector(self, target, depth):
         """
         Construct a phase projector decomposition.
 
@@ -267,7 +266,7 @@ class Diagonal(GateLibrary):
             for c in [list(combo) for combo in combinations(range(qb), i + 1)]:
                 r = np.ones(2**qb)
                 for e in c:
-                    r *= ((basis / (2**e)).astype(int) % 2)
+                    r *= (basis / (2**e)).astype(int) % 2
 
                 if i == 0 and c == [0]:
                     space.append(np.logical_xor(r, np.ones(2**qb)))

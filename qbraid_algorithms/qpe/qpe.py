@@ -13,8 +13,21 @@
 # limitations under the License.
 
 """
-Module providing Quantum Phase Estimation algorithm implementation.
+Quantum Phase Estimation (QPE) Algorithm Implementation
 
+This module provides a complete implementation of the Quantum Phase Estimation algorithm,
+a fundamental quantum algorithm that estimates the eigenvalues of unitary operators.
+
+QPE estimates the phase φ of an eigenvalue e^(2πiφ) by preparing ancilla qubits in
+superposition, applying controlled powers of the unitary operator, then using the
+inverse quantum Fourier transform to extract the phase. It's a key subroutine in
+Shor's algorithm, quantum simulation, and quantum machine learning.
+
+Mathematical Formulation:
+    Given a unitary operator U with eigenstate |ψ⟩ such that U|ψ⟩ = e^(2πiφ)|ψ⟩, QPE
+    prepares the state 1/√(2^t) Σⱼ₌₀^(2^t-1) |j⟩|ψ⟩, applies controlled-U^(2^j) operations,
+    then applies IQFT to the first register. The final measurement yields φ with
+    precision t bits and success probability ≥ 4/π² ≈ 0.405.
 """
 import os
 import shutil
@@ -30,7 +43,7 @@ from qbraid_algorithms import iqft
 from qbraid_algorithms.utils import _prep_qasm_file
 
 
-def load_program(
+def generate_program(
     unitary_filepath: str,
     psi_filepath: str,
     num_qubits: int = 4,
@@ -54,13 +67,13 @@ def load_program(
     """
     # Load the QPE QASM files into a staging directory
     temp_dir = tempfile.mkdtemp()
-    qpe_src = Path(__file__).parent / "qpe.qasm"
-    qpe_sub_src = Path(__file__).parent / "qpe_subroutine.qasm"
+    qpe_src = Path(__file__).parent.parent / "qasm_resources/qpe.qasm"
+    qpe_sub_src = Path(__file__).parent.parent / "qasm_resources/qpe_subroutine.qasm"
     qpe_dst = os.path.join(temp_dir, "qpe.qasm")
     qpe_sub_dst = os.path.join(temp_dir, "qpe_subroutine.qasm")
     shutil.copy(qpe_src, qpe_dst)
     shutil.copy(qpe_sub_src, qpe_sub_dst)
-    iqft.generate_subroutine(num_qubits, quiet=True, path=temp_dir)
+    iqft.save_to_qasm(num_qubits, quiet=True, path=temp_dir)
     # Get the string defining the custom gate and its controlled version
     custom_gate_str = _get_unitary(unitary_filepath)
     # Get the string defining the eigenstate preparation gate
@@ -82,7 +95,7 @@ def load_program(
     return module
 
 
-def generate_subroutine(
+def save_to_qasm(
     unitary_filepath: str,
     num_qubits: int = 4,
     quiet: bool = False,
@@ -104,13 +117,13 @@ def generate_subroutine(
         None
     """
     # Copy the QPE subroutine QASM file to the specified or current working directory
-    qpe_src = Path(__file__).parent / "qpe_subroutine.qasm"
+    qpe_src = Path(__file__).parent.parent / "qasm_resources/qpe_subroutine.qasm"
     if path is None:
         qpe_dst = os.path.join(os.getcwd(), "qpe.qasm")
     else:
         qpe_dst = os.path.join(path, "qpe.qasm")
     shutil.copy(qpe_src, qpe_dst)
-    iqft.generate_subroutine(num_qubits, quiet=True, path=path)
+    iqft.save_to_qasm(num_qubits, quiet=True, path=path)
     # Get the string defining the custom gate and its controlled version
     custom_gate_str = _get_unitary(unitary_filepath)
     # Replace variable placeholders with user-defined parameters

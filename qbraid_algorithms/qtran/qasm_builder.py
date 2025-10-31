@@ -22,16 +22,17 @@ Built on top of the the root FileBuilder class which seperates text content from
 structure/semantics requirements unique to each file
 
 Key Features:
-- Automatic scope and indentation management
-- Library import and gate definition tracking
-- Multiple output formats (QASM circuits, includes, gate definitions)
-- Resource allocation for qubits and classical bits
-- Extensible design for custom quantum libraries
+
+    - Automatic scope and indentation management
+    - Library import and gate definition tracking
+    - Multiple output formats (QASM circuits, includes, gate definitions)
+    - Resource allocation for qubits and classical bits
+    - Extensible design for custom quantum libraries
 
 Class Extensions:
-- GateBuilder
-- QasmBuilder
-- IncludeBuilder
+    - GateBuilder
+    - QasmBuilder
+    - IncludeBuilder
 """
 
 
@@ -44,11 +45,12 @@ class FileBuilder:
     for specialized builders that generate different types of OpenQASM output.
 
     The FileBuilder maintains several key data structures:
-    - imports: List of library files to include
-    - gate_defs: Dictionary mapping gate names to their definitions
-    - gate_refs: List of available gate names for validation
-    - program: Accumulated program code with proper indentation
-    - scope: Current nesting level for proper code formatting
+
+        - imports: List of library files to include
+        - gate_defs: Dictionary mapping gate names to their definitions
+        - gate_refs: List of available gate names for validation
+        - program: Accumulated program code with proper indentation
+        - scope: Current nesting level for proper code formatting
     """
 
     def __init__(self):
@@ -56,17 +58,18 @@ class FileBuilder:
         Initialize the base file builder with empty data structures.
 
         Sets up the foundational components needed for code generation:
-        - Empty import list for library dependencies
-        - Empty gate definitions dictionary for custom gates
-        - Empty gate references list for scope validation
-        - Empty program string for accumulating generated code
-        - Zero scope level for proper indentation tracking
+
+            - Empty import list for library dependencies
+            - Empty gate definitions dictionary for custom gates
+            - Empty gate references list for scope validation
+            - Empty program string for accumulating generated code
+            - Zero scope level for proper indentation tracking
         """
-        self.imports = []      # List of library names to import (e.g., "std_gates.inc")
-        self.gate_defs = {}    # Dictionary mapping gate names to definition strings
-        self.gate_refs = []    # List of available gate names for validation
-        self.program = ""      # Accumulated OpenQASM program code
-        self.scope = 0         # Current indentation/nesting level
+        self.imports = []  # List of library names to import (e.g., "std_gates.inc")
+        self.gate_defs = {}  # Dictionary mapping gate names to definition strings
+        self.gate_refs = []  # List of available gate names for validation
+        self.program = ""  # Accumulated OpenQASM program code
+        self.scope = 0  # Current indentation/nesting level
 
     def import_library(self, lib_class, annotated=False):
         """
@@ -89,12 +92,12 @@ class FileBuilder:
             program.x(0)  # Apply X gate to qubit 0
         """
         return lib_class(
-            gate_import=self.imports,     # Share import list with library
-            gate_ref=self.gate_refs,      # Share gate references for validation
-            gate_defs=self.gate_defs,     # Share gate definitions dictionary
+            gate_import=self.imports,  # Share import list with library
+            gate_ref=self.gate_refs,  # Share gate references for validation
+            gate_defs=self.gate_defs,  # Share gate definitions dictionary
             program_append=self.program_append,  # Provide code appending function
-            builder=self,                 # Pass reference to this builder
-            annotated=annotated          # Set annotation mode
+            builder=self,  # Pass reference to this builder
+            annotated=annotated,  # Set annotation mode
         )
 
     def program_append(self, line):
@@ -112,7 +115,7 @@ class FileBuilder:
             Indentation is automatically applied based on self.scope.
             Each scope level contributes one tab character.
         """
-        self.program += self.scope * '\t' + line + "\n"
+        self.program += self.scope * "\t" + line + "\n"
 
 
 class GateBuilder(FileBuilder):
@@ -125,15 +128,16 @@ class GateBuilder(FileBuilder):
     complete circuit structure.
 
     Use cases:
-    - Creating custom gate libraries
-    - Generating reusable quantum subroutines
-    - Building modular quantum components
+
+        - Creating custom gate libraries
+        - Generating reusable quantum subroutines
+        - Building modular quantum components
     """
 
     def import_library(self, lib_class, annotated=False):
         ret = super().import_library(lib_class, annotated)
         ret.call_space = " {}"
-        return  ret
+        return ret
 
     def build(self):
         """
@@ -151,8 +155,10 @@ class GateBuilder(FileBuilder):
             Prints warning if scope is not zero (unclosed blocks)
         """
         if self.scope != 0:
-            print("Warning (GateBuilder): built qasm has unclosed scope, "
-                  "string will fail compile in native")
+            print(
+                "Warning (GateBuilder): built qasm has unclosed scope, "
+                "string will fail compile in native"
+            )
         return self.program, self.imports, self.gate_defs
 
 
@@ -166,12 +172,13 @@ class QasmBuilder(FileBuilder):
     resource allocation and generates standards-compliant OpenQASM code.
 
     Features:
-    - Automatic OpenQASM version header generation
-    - Qubit and classical bit resource management
-    - Dynamic resource allocation with claim methods
-    - Complete circuit structure generation
-    - Library import management
-    - Gate definition embedding
+
+        - Automatic OpenQASM version header generation
+        - Qubit and classical bit resource management
+        - Dynamic resource allocation with claim methods
+        - Complete circuit structure generation
+        - Library import management
+        - Gate definition embedding
     """
 
     def __init__(self, qubits, clbits=None, version=3):
@@ -254,11 +261,12 @@ class QasmBuilder(FileBuilder):
         Generate the complete OpenQASM circuit code.
 
         Assembles all components into a valid OpenQASM program including:
-        1. Version header (OPENQASM 3;)
-        2. Include statements for imported libraries
-        3. Qubit and classical bit declarations
-        4. Custom gate definitions
-        5. Main program code
+
+            1. Version header (OPENQASM 3;)
+            2. Include statements for imported libraries
+            3. Qubit and classical bit declarations
+            4. Custom gate definitions
+            5. Main program code
 
         Returns:
             str: Complete OpenQASM program ready for execution
@@ -277,14 +285,20 @@ class QasmBuilder(FileBuilder):
             Prints warning if scope is not zero (unclosed blocks)
         """
         if self.scope != 0:
-            print("Warning (QasmBuilder): built qasm has unclosed scope, "
-                  "string will fail compile in native")
+            print(
+                "Warning (QasmBuilder): built qasm has unclosed scope, "
+                "string will fail compile in native"
+            )
 
         # Start with version header
         qasm_code = self.qasm_header
 
         # Add all library includes
-        qasm_code += "\n".join(f"include \"{import_line}\";" for import_line in self.imports)
+        qasm_code += "\n".join(
+            f'include "{import_line}";' for import_line in self.imports
+        )
+        if self.imports:  # Add newline after includes if there are any
+            qasm_code += "\n"
 
         # Add qubit declaration
         circuit_def = f"qubit[{int(self.qubits)}] qb;\n"
@@ -313,10 +327,11 @@ class IncludeBuilder(FileBuilder):
     subroutines but do not include qubit declarations or main program logic.
 
     Include files are useful for:
-    - Sharing gate definitions across multiple circuits
-    - Creating domain-specific gate libraries
-    - Modular quantum program development
-    - Standardizing common quantum operations
+
+        - Sharing gate definitions across multiple circuits
+        - Creating domain-specific gate libraries
+        - Modular quantum program development
+        - Standardizing common quantum operations
     """
 
     def build(self):
@@ -342,14 +357,18 @@ class IncludeBuilder(FileBuilder):
             Prints warning if scope is not zero (unclosed blocks)
         """
         if self.scope != 0:
-            print("Warning (IncludeBuilder): built include has unclosed scope, "
-                  "string will fail compile in native")
+            print(
+                "Warning (IncludeBuilder): built include has unclosed scope, "
+                "string will fail compile in native"
+            )
 
         # Initialize with empty string (note: original code had bug with undefined qasm_code)
         qasm_code = ""
 
         # Add all library includes
-        qasm_code += "\n".join(f"include \"{import_line}\";" for import_line in self.imports)
+        qasm_code += "\n".join(
+            f'include "{import_line}";' for import_line in self.imports
+        )
 
         # Add all gate definitions
         for gate_def in self.gate_defs.values():

@@ -15,7 +15,7 @@
 """
 Test Algorithms - Semantic Validation
 
-This module tests the implementations of several semi static algorithms which 
+This module tests the implementations of several semi static algorithms which
 dont accept a arbitrary oracle/hamiltonian.
 Tests include:
 1. Grovers
@@ -35,23 +35,24 @@ import pyqasm as pq
 from qbraid_algorithms.amplitude_amplification import AALibrary
 from qbraid_algorithms.embedding import Toeplitz
 
-#package modules
+# package modules
 from qbraid_algorithms.qtran import GateBuilder, GateLibrary, QasmBuilder, std_gates
 from qbraid_algorithms.rodeo import RodeoLibrary
 
 
 class Za(GateLibrary):
     """Custom gate: controlled-Z on all qubits except index 2."""
+
     name = "Z_on_two"
     reg = [*range(3)]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.name = f"Z_on_two{len(self.reg)}"
         names = string.ascii_letters
         qargs = [
-            names[i // len(names)] + names[i % len(names)]
-            for i in range(len(self.reg))
+            names[i // len(names)] + names[i % len(names)] for i in range(len(self.reg))
         ]
 
         sys = GateBuilder()
@@ -89,6 +90,7 @@ class Za(GateLibrary):
         """Controlled version of the custom gate."""
         self.controlled_op(self.name, (qubits[-1], [control] + qubits[:-1]))
 
+
 class TestGrover:
     def test_full_algorithm_builds(self):
         """Ensure full algorithm builds and pq.loads() runs."""
@@ -116,11 +118,12 @@ class TestGrover:
         # Validation (commented for now)
         # res.validate()
 
-class TestToeplitz():
+
+class TestToeplitz:
     def test_full_algorithm_builds(self):
         """Ensure full algorithm builds and pq.loads() runs."""
-        t= np.linspace(0.01, 4*2*np.pi, 8,endpoint=True)
-        f = np.sin(t)/t
+        t = np.linspace(0.01, 4 * 2 * np.pi, 8, endpoint=True)
+        f = np.sin(t) / t
 
         # Build algorithm with 3 qubits
         alg = QasmBuilder(3, 0, version="3")
@@ -131,7 +134,7 @@ class TestToeplitz():
         toeplitz_lib = alg.import_library(Toeplitz)
 
         # Add Toeplitz operator
-        toeplitz_lib.real_toeplitz(reg,f)
+        toeplitz_lib.real_toeplitz(reg, f)
 
         # Build OpenQASM code
         prog = alg.build()
@@ -145,7 +148,8 @@ class TestToeplitz():
         # Validation (commented for now)
         # res.validate()
 
-class TestRodeo():
+
+class TestRodeo:
     def test_mcm_builds(self):
         """Ensure full algorithm builds and pq.loads() runs."""
         t = np.linspace(0.01, 4 * 2 * np.pi, 8, endpoint=True)

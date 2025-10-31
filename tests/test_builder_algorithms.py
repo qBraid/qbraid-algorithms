@@ -27,7 +27,7 @@ Tests include:
 """
 import string
 
-#lotta disabled linting cases cause of general stability testing
+# lotta disabled linting cases cause of general stability testing
 # ruff: noqa: F841
 # pylint: disable=C0303,broad-exception-caught,missing-class-docstring, unused-variable
 # pylint: disable=missing-function-docstring,too-many-locals,duplicate-code,attribute-defined-outside-init
@@ -46,10 +46,12 @@ from qbraid_algorithms.qtran import GateBuilder, GateLibrary, QasmBuilder, std_g
 
 try:
     import pyqasm as pq
+
     PYQASM_AVAILABLE = True
 except ImportError:
     PYQASM_AVAILABLE = False
     pytest.skip("pyqasm not available", allow_module_level=True)
+
 
 class TestPhaseEstimationAlgorithm:
     """Test Phase Estimation algorithm."""
@@ -66,6 +68,7 @@ class TestPhaseEstimationAlgorithm:
             anc_c = builder.claim_clbits(3)
             std = builder.import_library(std_gates)
             pe = builder.import_library(PhaseEstimationLibrary)
+
             class Ham(hamiltonian):
                 def apply(self, *args, **kwargs):
                     super().apply(0.1, *args, **kwargs)
@@ -84,14 +87,16 @@ class TestPhaseEstimationAlgorithm:
                 assert len(program) > 0
 
                 # Should contain Phase Estimation-specific elements
-                assert 'P_EST' in program or 'p_est' in program.lower()
+                assert "P_EST" in program or "p_est" in program.lower()
 
                 # Validate with pyqasm
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
                 # assert is_valid, f"Phase Estimation failed for {ham_name}: {error_msg}\nQASM:\n{program}"
 
             except Exception as e:
-                pytest.fail(f"Phase Estimation basic test failed for {ham_name}: {str(e)}")
+                pytest.fail(
+                    f"Phase Estimation basic test failed for {ham_name}: {str(e)}"
+                )
 
     def test_phase_estimation_evolution(self):
         """Test Phase Estimation with circuit evolution."""
@@ -113,14 +118,17 @@ class TestPhaseEstimationAlgorithm:
                 assert len(program) > 0
 
                 # Should contain Phase Estimation-specific elements
-                assert 'P_EST' in program or 'p_est' in program.lower()
+                assert "P_EST" in program or "p_est" in program.lower()
 
                 # Validate with pyqasm
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
                 # assert is_valid, f"Phase Estimation failed for {ham_name}: {error_msg}\nQASM:\n{program}"
 
             except Exception as e:
-                pytest.fail(f"Phase Estimation evolution test failed for {ham_name}: {str(e)}")
+                pytest.fail(
+                    f"Phase Estimation evolution test failed for {ham_name}: {str(e)}"
+                )
+
 
 class TestGQSPAlgorithm:
     """Test Generalized Quantum Signal Processing algorithm."""
@@ -137,17 +145,18 @@ class TestGQSPAlgorithm:
             builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
             gqsp = builder.import_library(GQSP)
-            class Ham(hamiltonian):
-                def apply(self,*args,**kwargs):
-                    super().apply(.1,*args,**kwargs)
 
-                def controlled(self,*args,**kwargs):
-                    super().controlled(.1,*args,**kwargs)
+            class Ham(hamiltonian):
+                def apply(self, *args, **kwargs):
+                    super().apply(0.1, *args, **kwargs)
+
+                def controlled(self, *args, **kwargs):
+                    super().controlled(0.1, *args, **kwargs)
 
             try:
                 # Test GQSP with depth 3
                 gqsp.GQSP(self.test_qubits, self.test_phases, Ham, depth=3)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 program = builder.build()
 
@@ -156,7 +165,7 @@ class TestGQSPAlgorithm:
                 assert len(program) > 0
 
                 # Should contain GQSP-specific elements
-                assert 'GQSP' in program or 'gqsp' in program.lower()
+                assert "GQSP" in program or "gqsp" in program.lower()
 
                 # Validate with pyqasm
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(program)
@@ -169,12 +178,14 @@ class TestGQSPAlgorithm:
         """Test GQSP with various circuit depths."""
         depths = [1, 2, 3, 5]
         hamiltonian = list(self.test_hamiltonians.values())[0]  # Use first Hamiltonian
-        class Ham(hamiltonian):
-            def apply(self,*args,**kwargs):
-                super().apply(.1,*args,**kwargs)
 
-            def controlled(self,*args,**kwargs):
-                super().controlled(.1,*args,**kwargs)
+        class Ham(hamiltonian):
+            def apply(self, *args, **kwargs):
+                super().apply(0.1, *args, **kwargs)
+
+            def controlled(self, *args, **kwargs):
+                super().controlled(0.1, *args, **kwargs)
+
         for depth in depths:
             builder = QasmBuilder(3)
             std = builder.import_library(std_gates)
@@ -185,7 +196,7 @@ class TestGQSPAlgorithm:
 
             try:
                 gqsp.GQSP(self.test_qubits, phases, Ham, depth=depth)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 full_qasm = builder.build()
 
@@ -194,7 +205,9 @@ class TestGQSPAlgorithm:
                 # assert is_valid, f"GQSP depth {depth} invalid: {error_msg}"
 
                 # Check depth appears in gate name
-                assert f"_{depth}_" in full_qasm or f"depth={depth}" in full_qasm.lower()
+                assert (
+                    f"_{depth}_" in full_qasm or f"depth={depth}" in full_qasm.lower()
+                )
 
             except Exception as e:
                 pytest.fail(f"GQSP depth {depth} test failed: {str(e)}")
@@ -264,6 +277,7 @@ class TestGQSPAlgorithm:
         except Exception as e:
             return False, str(e)
 
+
 class TestTrotterAlgorithm:
     """Test Trotter decomposition algorithm."""
 
@@ -274,7 +288,9 @@ class TestTrotterAlgorithm:
 
     def test_trotter_basic_functionality(self):
         """Test basic Trotter decomposition between Hamiltonian pairs."""
-        ham_pairs = list(combinations(self.test_hamiltonians.items(), 2))[:3]  # Test 3 pairs
+        ham_pairs = list(combinations(self.test_hamiltonians.items(), 2))[
+            :3
+        ]  # Test 3 pairs
 
         for (name1, ham1), (name2, ham2) in ham_pairs:
             builder = QasmBuilder(3)
@@ -284,12 +300,12 @@ class TestTrotterAlgorithm:
             try:
                 # Test Suzuki-Trotter decomposition
                 trotter.trot_suz(self.test_qubits, "0.5", ham1, ham2, depth=2)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 full_qasm = builder.build()
                 # print(program)
                 # Validate structure
-                assert 'trot_suz' in full_qasm or 'trotter' in full_qasm.lower()
+                assert "trot_suz" in full_qasm or "trotter" in full_qasm.lower()
 
                 # Validate with pyqasm
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
@@ -310,7 +326,7 @@ class TestTrotterAlgorithm:
 
             try:
                 trotter.trot_suz(self.test_qubits, "0.3", ham1, ham2, depth=depth)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 # full_qasm = builder.build()
 
@@ -323,7 +339,9 @@ class TestTrotterAlgorithm:
 
     def test_trotter_multi_hamiltonian(self):
         """Test Trotter with multiple Hamiltonians."""
-        hamiltonians = list(self.test_hamiltonians.values())[:3]  # Test with 3 Hamiltonians
+        hamiltonians = list(self.test_hamiltonians.values())[
+            :3
+        ]  # Test with 3 Hamiltonians
 
         builder = QasmBuilder(3)
         std = builder.import_library(std_gates)
@@ -332,7 +350,7 @@ class TestTrotterAlgorithm:
         try:
             # Test multi-Hamiltonian Trotter
             trotter.multi_trot_suz(self.test_qubits, "0.4", hamiltonians, depth=2)
-            std.measure(self.test_qubits,self.test_qubits)
+            std.measure(self.test_qubits, self.test_qubits)
 
             # full_qasm  = builder.build()
 
@@ -354,7 +372,7 @@ class TestTrotterAlgorithm:
         try:
             # Test linear Trotter
             trotter.trot_linear(self.test_qubits, "0.2", hamiltonians, steps=4)
-            std.measure(self.test_qubits,self.test_qubits)
+            std.measure(self.test_qubits, self.test_qubits)
 
             # full_qasm  = builder.build()
 
@@ -377,7 +395,7 @@ class TestTrotterAlgorithm:
 
             try:
                 trotter.trot_suz(self.test_qubits, time_param, ham1, ham2, depth=1)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 # full_qasm = builder.build()
 
@@ -386,7 +404,9 @@ class TestTrotterAlgorithm:
                 # assert is_valid, f"Trotter with time {time_param} invalid: {error_msg}"
 
             except Exception as e:
-                pytest.fail(f"Trotter time parameter {time_param} test failed: {str(e)}")
+                pytest.fail(
+                    f"Trotter time parameter {time_param} test failed: {str(e)}"
+                )
 
     def _validate_qasm_with_pyqasm(self, qasm_string):
         """Helper method to validate QASM using pyqasm."""
@@ -401,20 +421,21 @@ class TestTrotterAlgorithm:
         except Exception as e:
             return False, str(e)
 
+
 class TestPrepSelAlgorithm:
     """Test Preparation-Selection library algorithms."""
 
     def setup_method(self):
         """Set up test environment."""
-        self.test_qubits = [f'q[{i}]' for i in range(4)]
+        self.test_qubits = [f"q[{i}]" for i in range(4)]
 
     def test_prep_select_with_matrix(self):
         """Test prep-select with matrix input."""
         # Create test matrices of different sizes
         test_matrices = [
             np.array([[1, 0], [0, -1]]),  # Pauli-Z
-            np.array([[0, 1], [1, 0]]),   # Pauli-X
-            np.random.random((4, 4)) + 1j * np.random.random((4, 4))  # Random 4x4
+            np.array([[0, 1], [1, 0]]),  # Pauli-X
+            np.random.random((4, 4)) + 1j * np.random.random((4, 4)),  # Random 4x4
         ]
 
         for i, matrix in enumerate(test_matrices):
@@ -428,12 +449,12 @@ class TestPrepSelAlgorithm:
             try:
                 # Test prep-select with matrix
                 prep_sel.prep_select(self.test_qubits, matrix, approximate=0.1)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 full_qasm = builder.build()
 
                 # Should contain prep-select elements
-                assert 'PS_' in full_qasm or 'prep' in full_qasm.lower()
+                assert "PS_" in full_qasm or "prep" in full_qasm.lower()
 
                 # Validate QASM
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
@@ -448,7 +469,7 @@ class TestPrepSelAlgorithm:
         test_chains = [
             [("X", 0.5), ("Z", 0.3), ("Y", 0.2)],
             [("XX", 0.7), ("ZZ", 0.4), ("XY", 0.1)],
-            [("XXXX", 0.8), ("ZZZZ", 0.2)]
+            [("XXXX", 0.8), ("ZZZZ", 0.2)],
         ]
 
         for i, chain in enumerate(test_chains):
@@ -461,7 +482,7 @@ class TestPrepSelAlgorithm:
 
             try:
                 prep_sel.prep_select(self.test_qubits, chain)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 # full_qasm = builder.build()
 
@@ -479,7 +500,7 @@ class TestPrepSelAlgorithm:
             [0.5, 0.3, 0.2],
             [0.25, 0.25, 0.25, 0.25],
             [0.1, 0.2, 0.3, 0.4],
-            [0.8, 0.1, 0.05, 0.05]
+            [0.8, 0.1, 0.05, 0.05],
         ]
 
         for i, dist in enumerate(test_distributions):
@@ -487,19 +508,19 @@ class TestPrepSelAlgorithm:
             std = builder.import_library(std_gates)
             prep = builder.import_library(Prep)
 
-            qubits = [f'q[{j}]' for j in range(int(np.ceil(np.log2(len(dist)))))]
+            qubits = [f"q[{j}]" for j in range(int(np.ceil(np.log2(len(dist)))))]
 
             # std.qubit(len(qubits) + 1)
             # std.bit(len(qubits) + 1)
 
             try:
                 prep.prep(qubits, dist)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 full_qasm = builder.build()
 
                 # Should contain preparation elements
-                assert 'PREP_' in full_qasm or 'prep' in full_qasm.lower()
+                assert "PREP_" in full_qasm or "prep" in full_qasm.lower()
 
                 # Validate QASM
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
@@ -521,16 +542,16 @@ class TestPrepSelAlgorithm:
         # std.bit(6)
 
         try:
-            target_qubits = ['q[0]', 'q[1]']
-            ancilla_qubits = ['q[2]', 'q[3]']
+            target_qubits = ["q[0]", "q[1]"]
+            ancilla_qubits = ["q[2]", "q[3]"]
 
             select.select(target_qubits, ancilla_qubits, operators, mapping)
-            std.measure(self.test_qubits,self.test_qubits)
+            std.measure(self.test_qubits, self.test_qubits)
 
-            full_qasm  = builder.build()
+            full_qasm = builder.build()
 
             # Should contain selection elements
-            assert 'SEL_' in full_qasm or 'select' in full_qasm.lower()
+            assert "SEL_" in full_qasm or "select" in full_qasm.lower()
 
             # Validate QASM
             # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
@@ -549,19 +570,21 @@ class TestPrepSelAlgorithm:
             std = builder.import_library(std_gates)
             pauli = builder.import_library(PauliOperator)
 
-            qubits = [f'q[{i}]' for i in range(len(pauli_str))]
+            qubits = [f"q[{i}]" for i in range(len(pauli_str))]
 
             # std.qubit(len(qubits))
             # std.bit(len(qubits))
 
             try:
                 pauli.pauli_operator(qubits, pauli_str)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 full_qasm = builder.build()
 
                 # Should contain the Pauli string name or operations
-                assert pauli_str in full_qasm or any(p in full_qasm.lower() for p in ['x', 'y', 'z'])
+                assert pauli_str in full_qasm or any(
+                    p in full_qasm.lower() for p in ["x", "y", "z"]
+                )
 
                 # Validate QASM
                 # is_valid, error_msg = self._validate_qasm_with_pyqasm(full_qasm)
@@ -581,13 +604,14 @@ class TestPrepSelAlgorithm:
         except Exception as e:
             return False, str(e)
 
+
 class TestAlgorithmIntegration:
     """Test algorithm interactions and edge cases."""
 
     def setup_method(self):
         """Set up test environment."""
         self.test_hamiltonians = create_test_hamiltonians(reg_size=3)
-        self.test_qubits = [f'q[{i}]' for i in range(3)]
+        self.test_qubits = [f"q[{i}]" for i in range(3)]
 
     def test_gqsp_with_all_hamiltonians(self):
         """Test GQSP works with all Hamiltonian types."""
@@ -599,15 +623,15 @@ class TestAlgorithmIntegration:
             gqsp = builder.import_library(GQSP)
 
             class Ham(hamiltonian):
-                def apply(self,*args,**kwargs):
-                    super().apply(.1,*args,**kwargs)
+                def apply(self, *args, **kwargs):
+                    super().apply(0.1, *args, **kwargs)
 
-                def controlled(self,*args,**kwargs):
-                    super().controlled(.1,*args,**kwargs)
+                def controlled(self, *args, **kwargs):
+                    super().controlled(0.1, *args, **kwargs)
 
             try:
                 gqsp.GQSP(self.test_qubits, phases, Ham, depth=1)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 # full_qasm = builder.build()
 
@@ -632,7 +656,7 @@ class TestAlgorithmIntegration:
 
             try:
                 trotter.trot_suz(self.test_qubits, "0.1", ham1, ham2, depth=1)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 # full_qasm = builder.build()
 
@@ -641,7 +665,9 @@ class TestAlgorithmIntegration:
                 # assert is_valid, f"Trotter+{name1}+{name2} invalid: {error_msg}"
 
             except Exception as e:
-                pytest.fail(f"Trotter integration with {name1}+{name2} failed: {str(e)}")
+                pytest.fail(
+                    f"Trotter integration with {name1}+{name2} failed: {str(e)}"
+                )
 
     def test_algorithm_parameter_edge_cases(self):
         """Test algorithms with edge case parameters."""
@@ -655,8 +681,10 @@ class TestAlgorithmIntegration:
 
             try:
                 ham_pair = list(self.test_hamiltonians.values())[:2]
-                trotter.trot_suz(self.test_qubits, time, ham_pair[0], ham_pair[1], depth=1)
-                std.measure(self.test_qubits,self.test_qubits)
+                trotter.trot_suz(
+                    self.test_qubits, time, ham_pair[0], ham_pair[1], depth=1
+                )
+                std.measure(self.test_qubits, self.test_qubits)
 
                 full_qasm = builder.build()
 
@@ -676,7 +704,7 @@ class TestAlgorithmIntegration:
         for n_qubits in qubit_counts:
             # Create appropriate Hamiltonians for this qubit count
             test_hams = create_test_hamiltonians(reg_size=n_qubits)
-            qubits = [f'q[{i}]' for i in range(n_qubits)]
+            qubits = [f"q[{i}]" for i in range(n_qubits)]
 
             # Test GQSP scaling
             builder = QasmBuilder(3)
@@ -689,14 +717,16 @@ class TestAlgorithmIntegration:
             try:
                 phases = [0.1, 0.2, 0.3]  # depth=1
                 hamiltonian = list(test_hams.values())[0]
-                class Ham(hamiltonian):
-                    def apply(self,*args,**kwargs):
-                        super().apply(.1,*args,**kwargs)
 
-                    def controlled(self,*args,**kwargs):
-                        super().controlled(.1,*args,**kwargs)
+                class Ham(hamiltonian):
+                    def apply(self, *args, **kwargs):
+                        super().apply(0.1, *args, **kwargs)
+
+                    def controlled(self, *args, **kwargs):
+                        super().controlled(0.1, *args, **kwargs)
+
                 gqsp.GQSP(qubits, phases, Ham, depth=1)
-                std.measure(self.test_qubits,self.test_qubits)
+                std.measure(self.test_qubits, self.test_qubits)
 
                 # full_qasm = builder.build()
 
@@ -720,6 +750,7 @@ class TestAlgorithmIntegration:
         except Exception as e:
             return False, str(e)
 
+
 class TestAlgorithmStressTests:
     """Stress tests for algorithm robustness."""
 
@@ -736,11 +767,11 @@ class TestAlgorithmStressTests:
         prep_sel = builder.import_library(PrepSelLibrary)
 
         class H1(ham_list[0]):
-            def apply(self,*args,**kwargs):
-                super().apply(.1,*args,**kwargs)
+            def apply(self, *args, **kwargs):
+                super().apply(0.1, *args, **kwargs)
 
-            def controlled(self,*args,**kwargs):
-                super().controlled(.1,*args,**kwargs)
+            def controlled(self, *args, **kwargs):
+                super().controlled(0.1, *args, **kwargs)
 
         try:
             # Apply Trotter decomposition
@@ -753,7 +784,7 @@ class TestAlgorithmStressTests:
             test_matrix = np.array([[1, 0], [0, -1]])
             prep_sel.prep_select(qubits[6:], test_matrix)
 
-            std.measure(qubits,qubits)
+            std.measure(qubits, qubits)
 
             # full_qasm  = builder.build()
 
@@ -776,16 +807,16 @@ class TestAlgorithmStressTests:
         gqsp = builder.import_library(GQSP)
 
         class H1(hamiltonian):
-            def apply(self,*args,**kwargs):
-                super().apply(.1,*args,**kwargs)
+            def apply(self, *args, **kwargs):
+                super().apply(0.1, *args, **kwargs)
 
-            def controlled(self,*args,**kwargs):
-                super().controlled(.1,*args,**kwargs)
+            def controlled(self, *args, **kwargs):
+                super().controlled(0.1, *args, **kwargs)
 
         try:
             phases = [0.1 * i for i in range(7)]  # depth=3
             gqsp.GQSP(reg[:2], phases, H1, depth=3)
-            std.measure(reg,reg)
+            std.measure(reg, reg)
 
             # full_qasm  = builder.build()
 
@@ -811,8 +842,10 @@ class TestAlgorithmStressTests:
 class TestAmplitude:
     class Za(GateLibrary):
         """Custom gate: controlled-Z on all qubits except index 2."""
+
         name = "Z_on_two"
         reg = [*range(3)]
+
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
@@ -883,6 +916,7 @@ class TestAmplitude:
 
         # Validation (commented for now)
         # res.validate()
+
 
 if __name__ == "__main__":
     # Run tests if executed directly
