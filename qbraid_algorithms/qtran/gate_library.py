@@ -407,6 +407,16 @@ class GateLibrary:
         call = f"{qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
+    
+    def classical_op(self, operation):
+        """
+        simple stub for programatically perform a classical operation
+
+        Args:
+            operation: operation string
+        """
+        call = f"{operation};"
+        self.program(call)
 
     def merge(self, program, imports, definitions, name):
         """
