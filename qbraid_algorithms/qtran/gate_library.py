@@ -408,6 +408,34 @@ class GateLibrary:
         self.program(call)
         return name
     
+    def add_input_var(self, name, assignment=None, qtype=None):
+        """
+        simple stub for programatically adding a variable
+
+        Args:
+            name: variable name
+            Assignment: whatever definition you want as long as it resolves to a string
+        """
+        if name in self.gate_ref:
+            print(f"warning:  gate {name} replacing existing namespace")
+        call = f"input {qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
+        self.program(call)
+        return name
+    
+    def add_output_var(self, name, assignment=None, qtype=None):
+        """
+        simple stub for programatically adding a variable
+
+        Args:
+            name: variable name
+            Assignment: whatever definition you want as long as it resolves to a string
+        """
+        if name in self.gate_ref:
+            print(f"warning:  gate {name} replacing existing namespace")
+        call = f"output {qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
+        self.program(call)
+        return name
+    
     def classical_op(self, operation):
         """
         simple stub for programatically perform a classical operation
@@ -476,6 +504,7 @@ class std_gates(GateLibrary):
         "swap",
         "ccx",
         "cswap",
+        "reset"
     ]
 
     name = "stdgates.inc"  # Standard library file name
@@ -540,6 +569,10 @@ class std_gates(GateLibrary):
         """Apply rz gate"""
         self.call_gate("rz", targ, phases=theta)
 
+    def reset(self, targ):
+        """Apply reset command"""
+        self.call_gate("reset", targ)
+
     # ═══════════════════════════════════════════════════════════════════════════
     #                           Two-QUBIT GATES
     # ═══════════════════════════════════════════════════════════════════════════
@@ -550,3 +583,10 @@ class std_gates(GateLibrary):
     def cry(self, theta, control, targ):
         """Apply controlled ry gate"""
         self.call_gate("cry", targ, controls=control, phases=theta)
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    #                           Three-QUBIT GATES
+    # ═══════════════════════════════════════════════════════════════════════════
+    def cswap(self, control, targ1, targ2):
+        """Apply controlled swap gate"""
+        self.call_gate("cswap", f"{targ1}, {targ2}", controls=control)
