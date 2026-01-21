@@ -11,32 +11,59 @@ class QAOA:
     layer_circuit : str
 
     def __init__(self, num_qubits : int):
-        builder = QasmBuilder(num_qubits)
-
-    def qaoa_maxcut(self, graph : nx.Graph) -> tuple[str, str] : 
+        self.builder = QasmBuilder(num_qubits)
+    
+    def xy_mixer(self, graph : nx.Graph) -> str:
+        """
+        Generate XY mixer Hamiltonian subroutine.
+        
+        xy_mixer_hamiltonian = $$\frac{1}{2}\sum_{(i,j)\in E(G)} X_iX_j + Y_iY_j$$
+        Args:
+            graph : nx.Graph
+                Graph that describes the problem
+        Returns:
+            mixer Hamiltonian subroutine name
+        """
         std = self.builder.import_library(lib_class=std_gates)
             
-        cost_name = f"qaoa_maxcut_cost_{self.builder.qubits}"
+        mixer_name = f"qaoa_xy_mixer_{self.builder.qubits}"
 
         qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
-        gamma = "float gamma"
+        alpha = "float alpha"
 
-        # cost hamiltonian \sum_{E(graph)} Z_i @ Z_j
         std.begin_subroutine(
-            cost_name, [qubit_array_param , gamma]
+            mixer_name, [qubit_array_param, alpha]
         )
 
         for i,j in graph.edges:
             std.cnot(i,j)
-            std.rz("2 * gamma", j)
+            std.rx("-alpha", j)
             std.cnot(i,j)
-
+            std.cnot(i,j)
+            std.ry("-alpha", j)
+            std.cnot(i,j)
+        
         std.end_subroutine()
 
+        return mixer_name
+    
+    def x_mixer(self, graph : nx.Graph) -> str:
+        """
+        Generate X mixer Hamiltonian subroutine.
+        
+        x_mixer_hamiltonian = $$\sum_{i} X_i$$
+        Args:
+            graph : nx.Graph
+                Graph that describes the problem
+        Returns:
+            mixer Hamiltonian subroutine name
+        """
+        std = self.builder.import_library(lib_class=std_gates)
+            
+        mixer_name = f"qaoa_x_mixer_{self.builder.qubits}"
 
-        # mixer hamiltonian \sum_{i} X_i
-        mixer_name = f"qaoa_maxcut_mixer_{self.builder.qubits}"
+        qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
         alpha = "float alpha"
 
@@ -49,13 +76,151 @@ class QAOA:
         
         std.end_subroutine()
 
+        return mixer_name
+    
+    def min_vertex_cover_cost(self, graph : nx.Graph) -> str:
+        """
+        Generate min vertex cover cost Hamiltonian subroutine.
+        
+        cost_hamiltonian $$3\sum_{(i,j)\in E(G)} (Z_i \otimes Z_j + Z_i + Z_j)-\sum_{i \in V(G)} Z_i$$
+        Args:
+            graph : nx.Graph
+                Graph that describes the problem
+        Returns:
+            Cost Hamiltonian subroutine name
+        """
+        std = self.builder.import_library(lib_class=std_gates)
+            
+        cost_name = f"qaoa_min_vertex_cover_cost_{self.builder.qubits}"
+
+        qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
+
+        gamma = "float gamma"
+
+        # cost hamiltonian $$3\sum_{(i,j)\in E(G)} (Z_i \otimes Z_j + Z_i + Z_j)-\sum_{i \in V(G)} Z_i$$
+        std.begin_subroutine(
+            cost_name, [qubit_array_param , gamma]
+        )
+
+        for i,j in graph.edges:
+            std.cnot(i,j)
+            std.rz("3 * 2 * gamma", j)
+            std.cnot(i,j)
+            std.rz("3 * 2 * gamma", i)
+            std.rz("3 * 2 * gamma", j)
+        
+        for i in graph.nodes:
+            std.rz("-2 * gamma", i)
+
+        std.end_subroutine()
+
+
+        return cost_name
+    
+    def max_clique_cost(self, graph : nx.Graph) -> str:
+        """
+        Generate max clique cost Hamiltonian subroutine.
+        
+        cost_hamiltonian $$3\sum_{(i,j)\in E(\bar{G})} (Z_i \otimes Z_j - Z_i - Z_j)+\sum_{i \in V(G)} Z_i$$
+        Args:
+            graph : nx.Graph
+                Graph that describes the problem
+        Returns:
+            Cost Hamiltonian subroutine name
+        """
+        std = self.builder.import_library(lib_class=std_gates)
+            
+        cost_name = f"qaoa_min_vertex_cover_cost_{self.builder.qubits}"
+
+        qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
+
+        gamma = "float gamma"
+
+        # cost hamiltonian $$3\sum_{(i,j)\in E(\bar{G})} (Z_i \otimes Z_j - Z_i - Z_j)+\sum_{i \in V(G)} Z_i$$
+        std.begin_subroutine(
+            cost_name, [qubit_array_param , gamma]
+        )
+
+        graph_complement = nx.complement(graph)
+
+        for i,j in graph_complement.edges:
+            std.cnot(i,j)
+            std.rz("3 * 2 * gamma", j)
+            std.cnot(i,j)
+            std.rz("-3 * 2 * gamma", i)
+            std.rz("-3 * 2 * gamma", j)
+        
+        for i in graph.nodes:
+            std.rz("2 * gamma", i)
+
+        std.end_subroutine()
+
+
+        return cost_name
+
+
+
+    def qaoa_maxcut(self, graph : nx.Graph) -> tuple[str, str] : 
+        """
+        Generate cost hamiltonian and mixer hamiltonian subroutines.
+
+        cost_hamiltonian = $$\sum_{E(graph)} Z_i \otimes Z_j$$
+        
+        mixer_hamiltonian = $$\sum_{i} X_i$$
+        Args:
+            graph : nx.Graph
+                Graph that describes the problem
+        Returns:
+            (mixer, cost) : tuple[str, str] mixer and cost hamiltonian subroutine names respectively
+        """
+        std = self.builder.import_library(lib_class=std_gates)
+            
+        cost_name = f"qaoa_maxcut_cost_{self.builder.qubits}"
+
+        qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
+
+        gamma = "float gamma"
+
+        # cost hamiltonian $$\sum_{E(graph)} Z_i \otimes Z_j$$
+        std.begin_subroutine(
+            cost_name, [qubit_array_param , gamma]
+        )
+
+        for i,j in graph.edges:
+            std.cnot(i,j)
+            std.rz("2 * gamma", j)
+            std.cnot(i,j)
+
+        std.end_subroutine()
+
+
+        # mixer hamiltonian $$\sum_{i} X_i$$
+        mixer_name = self.x_mixer(graph)
+
         return mixer_name, cost_name
     
     def setup_maxcut(self, graph : nx.Graph):
+        """
+        Perform the setup for a Max Cut problem with the given graph.
+
+        Args:
+            graph : nx.Graph
+                Graph that describes the problem
+        """
         self.mixer_hamiltonian, self.cost_hamiltonian = self.qaoa_maxcut(graph=graph)
         self.layer_circuit = self.layer(self.cost_hamiltonian, self.mixer_hamiltonian)
 
     def layer(self, cost_ham : str, mixer_ham : str) -> str :
+        """
+        Create layer circuit.
+        Args:
+            cost_ham : str
+                Name of cost Hamiltonian subroutine
+            mixer_ham : str
+                Name of mixer Hamiltonian subroutine
+        Returns:
+            Name of layer subroutine
+        """
         std = self.builder.import_library(lib_class=std_gates)
 
         name = f"qaoa_layer_function_{self.builder.qubits}"
@@ -75,26 +240,27 @@ class QAOA:
 
         return name
 
-    def cost_function(self, layer : str, depth : int, params : list[tuple[float, float]]) -> str :
-        std = self.builder.import_library(lib_class=std_gates)
-
-        name = f"qaoa_cost_function_{layer}"
-
-        qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
-
-        for i in range(self.builder.qubits):
-            std.h(i)
-
-        for i in range(depth):
-            std.call_subroutine(layer, parameters=["qubits", params[i][0], params[i][1]])
-
-        return name
-
     def generate_algorithm(self, cost_ham : str, depth : int, layer : str = "", epsilon : float = 0.01) -> QasmModule:
+        """
+        Load the Quantum Approximate Optimization Algorithm (QAOA) ansatz as a pyqasm module.
+
+        Args:
+            cost_ham : str
+                Name of the cost Hamiltonian subroutine
+            depth : int
+                Depth of the circuit (i.e. number of layer repetitions)
+            layer : str
+                Name of the layer circuit subroutine
+            epsilon : float
+                Error for expectation value calculation
+
+        Returns:
+            (PyQasm Module) pyqasm module containing the QAOA ansatz circuit
+        """
         std = self.builder.import_library(lib_class=std_gates)
 
         layer = self.layer_circuit if layer == "" else layer
-        
+
         num_qubits = self.builder.qubits
         self.builder.claim_qubits(self.builder.qubits)
         self.builder.claim_qubits(1)
