@@ -39,8 +39,6 @@ class QAOA:
         for i,j in graph.edges:
             std.cnot(i,j)
             std.rx("-alpha", j)
-            std.cnot(i,j)
-            std.cnot(i,j)
             std.ry("-alpha", j)
             std.cnot(i,j)
         
@@ -157,8 +155,6 @@ class QAOA:
 
 
         return cost_name
-
-
 
     def qaoa_maxcut(self, graph : nx.Graph) -> tuple[str, str] : 
         """
