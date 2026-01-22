@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .qaoa import *
+from .qaoa import QAOA
 
-#__all__ = ["qaoa", "cost", "mixer"]
+__all__ = ["QAOA"]

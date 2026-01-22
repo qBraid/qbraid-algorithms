@@ -9,9 +9,12 @@ class QAOA:
     mixer_hamiltonian : str
     cost_hamiltonian : str
     layer_circuit : str
+    use_subroutines : bool
 
-    def __init__(self, num_qubits : int):
-        self.builder = QasmBuilder(num_qubits)
+    def __init__(self, num_qubits : int, use_subroutines : bool = False, qasm_version : int = 3):
+        self.builder = QasmBuilder(num_qubits, version=qasm_version)
+        self.builder.claim_clbits(num_qubits)
+
     
     def xy_mixer(self, graph : nx.Graph) -> str:
         """
@@ -236,7 +239,7 @@ class QAOA:
 
         return name
 
-    def generate_algorithm(self, cost_ham : str, depth : int, layer : str = "", epsilon : float = 0.01) -> QasmModule:
+    def generate_algorithm(self, cost_ham : str, depth : int, layer : str = "", epsilon : float = 0.01) -> str:
         """
         Load the Quantum Approximate Optimization Algorithm (QAOA) ansatz as a pyqasm module.
 
@@ -286,7 +289,7 @@ class QAOA:
         for q in range(num_qubits):
             std.cswap(control=f"qb[{self.builder.qubits - 1}]", targ1=f"qb[{q}]", targ2=f"qb[{q+num_qubits}]")
         
-        std.measure(f"qb[{self.builder.qubits - 1}", "cb[0]")
+        std.measure([self.builder.qubits - 1], [0])
 
         std.begin_if("cb[0] == 0")
         std.classical_op("measure_0 = measure_0 + 1")
@@ -299,4 +302,4 @@ class QAOA:
         std.classical_op("expval = sqrt(expval)")
         std.classical_op("expval = log(expval)")
 
-        return pyqasm.load(self.builder.build())
+        return self.builder.build()
