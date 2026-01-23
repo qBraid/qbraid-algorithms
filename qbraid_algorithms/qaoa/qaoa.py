@@ -288,7 +288,7 @@ class QAOA:
         std.h(self.builder.qubits - 1)
         for q in range(num_qubits):
             std.cswap(control=f"qb[{self.builder.qubits - 1}]", targ1=f"qb[{q}]", targ2=f"qb[{q+num_qubits}]")
-        
+        std.h(self.builder.qubits - 1)
         std.measure([self.builder.qubits - 1], [0])
 
         std.begin_if("cb[0] == 0")
