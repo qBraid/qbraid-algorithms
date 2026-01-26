@@ -68,6 +68,7 @@ class FileBuilder:
         self.imports = []  # List of library names to import (e.g., "std_gates.inc")
         self.gate_defs = {}  # Dictionary mapping gate names to definition strings
         self.gate_refs = []  # List of available gate names for validation
+        self.subroutine_refs = [] # List of available subroutine names for validation
         self.program = ""  # Accumulated OpenQASM program code
         self.scope = 0  # Current indentation/nesting level
 
@@ -98,6 +99,7 @@ class FileBuilder:
             program_append=self.program_append,  # Provide code appending function
             builder=self,  # Pass reference to this builder
             annotated=annotated,  # Set annotation mode
+            subroutine_ref=self.subroutine_refs # Share subroutine definitions dictionary
         )
 
     def program_append(self, line):
