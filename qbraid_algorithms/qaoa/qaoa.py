@@ -276,8 +276,8 @@ class QAOA:
                 std.add_input_var(f"gamma_{i}", qtype="float")
                 std.add_input_var(f"alpha_{i}", qtype="float")
             else:
-                std.classical_op(f"float gamma_{i} = {param[i]}")
-                std.classical_op(f"float alpha_{i} = {param[i+1]}")
+                std.classical_op(f"float gamma_{i} = {param[i*2]}")
+                std.classical_op(f"float alpha_{i} = {param[i*2+1]}")
         
         for q in range(self.builder.qubits):
             std.reset(q)
