@@ -52,7 +52,7 @@ class GateLibrary:
     """
 
     def __init__(
-        self, gate_import, gate_ref, gate_defs, program_append, builder, annotated=False
+        self, gate_import, gate_ref, gate_defs, program_append, builder, subroutine_ref, annotated=False
     ):
         """
         Initialize the gate library with necessary components.
@@ -67,6 +67,7 @@ class GateLibrary:
         """
         self.gate_import = gate_import  # Libraries to import
         self.gate_ref = gate_ref  # Available gate names
+        self.subroutine_ref = subroutine_ref  # Available subroutine names
         self.gate_defs = gate_defs  # Gate definitions dictionary
         self.program = program_append  # Function to append code
         self.builder = builder  # Circuit builder reference
@@ -142,7 +143,7 @@ class GateLibrary:
             subroutine: Name of the gate to apply
             parameters: list of all parameters to apply
         """
-        if subroutine not in self.gate_ref:
+        if subroutine not in self.subroutine_ref:
             print(
                 f"stdgates: subroutine {subroutine} is not part of visible scope, "
                 f"make sure that this isn't a floating reference / malformed statement, "
@@ -304,7 +305,7 @@ class GateLibrary:
             parameters: List of parameter names
             return_type: Optional return type specification
         """
-        if name in self.gate_ref:
+        if name in self.subroutine_ref:
             print(f"warning:  subroutine {name} replacing existing namespace")
         call = (
             f"def {name}({','.join(parameters)}) {' -> ' + return_type if return_type is not None else ''}"
@@ -312,6 +313,7 @@ class GateLibrary:
         )
         self.program(call)
         self.builder.scope += 1
+        self.subroutine_ref.append(name)
 
     def close_scope(self):
         """Close the current scope block and decrease indentation level."""

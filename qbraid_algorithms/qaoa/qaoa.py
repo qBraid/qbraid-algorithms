@@ -10,10 +10,11 @@ class QAOA:
     cost_hamiltonian : str
     layer_circuit : str
     use_subroutines : bool
+    use_input : bool
 
-    def __init__(self, num_qubits : int, use_subroutines : bool = False, qasm_version : int = 3):
+    def __init__(self, num_qubits : int, qasm_version : int = 3, use_input : bool = True):
         self.builder = QasmBuilder(num_qubits, version=qasm_version)
-        self.builder.claim_clbits(num_qubits)
+        self.use_input = use_input
 
     
     def xy_mixer(self, graph : nx.Graph) -> str:
@@ -38,13 +39,15 @@ class QAOA:
         std.begin_subroutine(
             mixer_name, [qubit_array_param, alpha]
         )
+        old_call_space = std.call_space
+        std.call_space = "qubits[{}]"
 
         for i,j in graph.edges:
             std.cnot(i,j)
             std.rx("-alpha", j)
             std.ry("-alpha", j)
             std.cnot(i,j)
-        
+        std.call_space = old_call_space
         std.end_subroutine()
 
         return mixer_name
@@ -71,10 +74,11 @@ class QAOA:
         std.begin_subroutine(
             mixer_name, [qubit_array_param, alpha]
         )
-
-        for i in range(self.builder.qubits):
-            std.rx("-2 * alpha", i)
-        
+        old_call_space = std.call_space
+        std.call_space = "qubits[{}]"
+        for i in graph.nodes:
+            std.rx("2 * alpha", i)
+        std.call_space = old_call_space
         std.end_subroutine()
 
         return mixer_name
@@ -102,7 +106,8 @@ class QAOA:
         std.begin_subroutine(
             cost_name, [qubit_array_param , gamma]
         )
-
+        old_call_space = std.call_space
+        std.call_space = "qubits[{}]"
         for i,j in graph.edges:
             std.cnot(i,j)
             std.rz("3 * 2 * gamma", j)
@@ -112,7 +117,7 @@ class QAOA:
         
         for i in graph.nodes:
             std.rz("-2 * gamma", i)
-
+        std.call_space = old_call_space
         std.end_subroutine()
 
 
@@ -141,7 +146,8 @@ class QAOA:
         std.begin_subroutine(
             cost_name, [qubit_array_param , gamma]
         )
-
+        old_call_space = std.call_space
+        std.call_space = "qubits[{}]"
         graph_complement = nx.complement(graph)
 
         for i,j in graph_complement.edges:
@@ -153,7 +159,7 @@ class QAOA:
         
         for i in graph.nodes:
             std.rz("2 * gamma", i)
-
+        std.call_space = old_call_space
         std.end_subroutine()
 
 
@@ -184,12 +190,13 @@ class QAOA:
         std.begin_subroutine(
             cost_name, [qubit_array_param , gamma]
         )
-
+        old_call_space = std.call_space
+        std.call_space = "qubits[{}]"
         for i,j in graph.edges:
             std.cnot(i,j)
-            std.rz("2 * gamma", j)
+            std.rz("-2 * gamma", j)
             std.cnot(i,j)
-
+        std.call_space = old_call_space
         std.end_subroutine()
 
 
@@ -239,7 +246,7 @@ class QAOA:
 
         return name
 
-    def generate_algorithm(self, cost_ham : str, depth : int, layer : str = "", epsilon : float = 0.01) -> str:
+    def generate_algorithm(self, depth : int, layer : str = "", param : list[float] = []) -> str:
         """
         Load the Quantum Approximate Optimization Algorithm (QAOA) ansatz as a pyqasm module.
 
@@ -261,18 +268,16 @@ class QAOA:
         layer = self.layer_circuit if layer == "" else layer
 
         num_qubits = self.builder.qubits
-        self.builder.claim_qubits(self.builder.qubits)
-        self.builder.claim_qubits(1)
-
-        repetitions = int(round((1.0/epsilon)**2))
+        #self.builder.claim_qubits(self.builder.qubits)
+        #self.builder.claim_qubits(1)
         
         for i in range(depth):
-            std.add_input_var(f"gamma_{i}", qtype="float")
-            std.add_input_var(f"alpha_{i}", qtype="float")
-        
-        std.add_var(name="measure_0", qtype="int")
-        std.add_output_var("expval", qtype="float")
-        std.begin_loop(repetitions)
+            if self.use_input:
+                std.add_input_var(f"gamma_{i}", qtype="float")
+                std.add_input_var(f"alpha_{i}", qtype="float")
+            else:
+                std.classical_op(f"float gamma_{i} = {param[i]}")
+                std.classical_op(f"float alpha_{i} = {param[i+1]}")
         
         for q in range(self.builder.qubits):
             std.reset(q)
@@ -282,24 +287,22 @@ class QAOA:
 
         for i in range(depth):
             std.call_subroutine(layer, parameters=[f"qb[0:{num_qubits}]", f"gamma_{i}", f"alpha_{i}"])
-            std.call_subroutine(layer, parameters=[f"qb[{num_qubits}:{num_qubits*2}]", f"gamma_{i}", f"alpha_{i}"])
 
-        std.call_subroutine(cost_ham, [f"qb[0:{num_qubits}]", "1"])
-        std.h(self.builder.qubits - 1)
-        for q in range(num_qubits):
+        #std.call_subroutine(cost_ham, [f"qb[0:{num_qubits}]", "1"])
+        #std.h(self.builder.qubits - 1)
+        std.measure(list(range(num_qubits)), list(range(num_qubits)))
+        """for q in range(num_qubits):
             std.cswap(control=f"qb[{self.builder.qubits - 1}]", targ1=f"qb[{q}]", targ2=f"qb[{q+num_qubits}]")
         std.h(self.builder.qubits - 1)
         std.measure([self.builder.qubits - 1], [0])
 
         std.begin_if("cb[0] == 0")
         std.classical_op("measure_0 = measure_0 + 1")
-        std.end_if()
-        
-        std.end_loop()
+        std.end_if()"""
 
-        std.classical_op(f"expval = measure_0/{repetitions}")
+        """std.classical_op(f"expval = measure_0/{repetitions}")
         std.classical_op("expval = 2*(expval - 0.5)")
         std.classical_op("expval = sqrt(expval)")
-        std.classical_op("expval = log(expval)")
+        std.classical_op("expval = log(expval)")"""
 
         return self.builder.build()
