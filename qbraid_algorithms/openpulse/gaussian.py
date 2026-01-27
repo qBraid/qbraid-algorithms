@@ -21,7 +21,8 @@ calibration syntax.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from typing import Any
 
 import pyqasm
 
@@ -33,10 +34,34 @@ def _complex_to_qasm(z: complex) -> str:
     sign = "+" if b >= 0 else "-"
     return f"{a} {sign} {abs(b)}im"
 
+@dataclass(frozen=True)
+class PulseParams:
+    """Common parameters for building an OpenPulse calibration program.
+
+        frame_frequency (float): Initial frequency of the drive frame in Hz.
+        frame_phase (float): Initial phase of the drive frame in radians.
+        port_name (str): Name of the OpenPulse port.
+        frame_name (str): Name of the OpenPulse frame.
+        waveform_name (str): Identifier for the Gaussian waveform.
+        defcal_name (str): Name of the generated calibration routine.
+        qubit (int): Target qubit index for the calibration routine.
+    """
+
+    frame_frequency: float = 5.0e9
+    frame_phase: float = 0.0
+    port_name: str = "d0"
+    frame_name: str = "driveframe"
+    waveform_name: str = "wf"
+    defcal_name: str = "play_pulse"
+    qubit: int = 0
 
 @dataclass(frozen=True)
 class GaussianPulse:
     """A minimal Gaussian waveform spec for OpenPulse.
+
+        amplitude (complex): Complex amplitude of the Gaussian pulse.
+        duration (str): Total pulse duration (e.g. "16ns").
+        sigma (str): Standard deviation of the Gaussian envelope.
 
     Notes:
       - duration/sigma are strings like "16ns", "100e-6s", etc.
@@ -54,50 +79,37 @@ class GaussianPulse:
 
 
 def generate_program(
-    *,
-    amplitude: complex = 1.0 + 0.0j,
-    duration: str = "16ns",
-    sigma: str = "4ns",
-    frame_frequency: float = 5.0e9,
-    frame_phase: float = 0.0,
-    port_name: str = "d0",
-    frame_name: str = "driveframe",
-    waveform_name: str = "wf",
-    defcal_name: str = "play_gaussian",
-    qubit: int = 0,
+    pulse: GaussianPulse,
+    params: PulseParams | None = None,
+    **kwargs: Any,
 ) -> "pyqasm.QasmModule":
     """
     Load a Gaussian OpenPulse waveform program as a pyqasm module.
 
     Args:
-        amplitude (complex): Complex amplitude of the Gaussian pulse.
-        duration (str): Total pulse duration (e.g. "16ns").
-        sigma (str): Standard deviation of the Gaussian envelope.
-        frame_frequency (float): Initial frequency of the drive frame in Hz.
-        frame_phase (float): Initial phase of the drive frame in radians.
-        port_name (str): Name of the OpenPulse port.
-        frame_name (str): Name of the OpenPulse frame.
-        waveform_name (str): Identifier for the Gaussian waveform.
-        defcal_name (str): Name of the generated calibration routine.
-        qubit (int): Target qubit index for the calibration routine.
+        pulse (GaussianPulse): Pulse specification (amplitude, duration, sigma).
+        params (PulseParams | None): Common OpenPulse/program parameters.
+        **kwargs: Overrides for fields in PulseParams (e.g. frame_name="...", qubit=1).
 
     Returns:
         (PyQasm Module) pyqasm module containing the Gaussian OpenPulse program
     """
-    pulse = GaussianPulse(amplitude=amplitude, duration=duration, sigma=sigma)
-    wf_line = pulse.to_waveform_qasm(var_name=waveform_name)
+    params = params or PulseParams()
+    p = {**asdict(params), **kwargs}
+
+    wf_line = pulse.to_waveform_qasm(var_name=p["waveform_name"])
 
     qasm = f"""OPENQASM 3.0;
 defcalgrammar "openpulse";
 
 cal {{
-    port {port_name};
-    frame {frame_name} = newframe({port_name}, {frame_frequency}, {frame_phase});
+    port {p["port_name"]};
+    frame {p["frame_name"]} = newframe({p["port_name"]}, {p["frame_frequency"]}, {p["frame_phase"]});
     {wf_line}
 }}
 
-defcal {defcal_name} ${qubit} {{
-    play({frame_name}, {waveform_name});
+defcal {p["defcal_name"]} ${p["qubit"]} {{
+    play({p["frame_name"]}, {p["waveform_name"]});
 }}
 """
 

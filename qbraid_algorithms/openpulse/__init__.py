@@ -13,6 +13,6 @@
 # limitations under the License.
 
 """OpenPulse generators for qbraid-algorithms."""
-from .gaussian import GaussianPulse, generate_program
+from .gaussian import GaussianPulse, PulseParams, generate_program
 
-__all__ = ["GaussianPulse", "generate_program"]
+__all__ = ["GaussianPulse", "PulseParams", "generate_program"]
