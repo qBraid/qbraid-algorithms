@@ -26,42 +26,42 @@ from .local_device import LocalDevice
 
 def test_generate_program():
     """Test that generate_program correctly returns a str object."""
-    qaoa_module = qaoa.QAOA(4)
+    qaoa_module = qaoa.QAOA(5)
     edges = [(0, 1), (0, 2), (0, 4), (1, 2), (2, 3), (3, 4)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
     program = qaoa_module.generate_algorithm(2)
     assert isinstance(program, str)
-    assert qaoa_module.builder.qubits == 4  # 4 data qubits
+    assert qaoa_module.builder.qubits == 5  # 5 data qubits
 
 
 def test_unroll():
     """Test that pyqasm unrolls correclty."""
-    qaoa_module = qaoa.QAOA(4)
+    qaoa_module = qaoa.QAOA(5, use_input=False)
     edges = [(0, 1), (0, 2), (0, 4), (1, 2), (2, 3), (3, 4)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
-    program = qaoa_module.generate_algorithm(2)
+    program = qaoa_module.generate_algorithm(2, param=[1, 2, 3, 4])
     module = pyqasm.loads(program)
     module.unroll()
 
 def test_correct_hamiltonian_from_graph():
     """Test that the cost Hamiltonian for maxcut is generated correctly."""
-    qaoa_module = qaoa.QAOA(4)
+    qaoa_module = qaoa.QAOA(5)
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
     program = qaoa_module.generate_algorithm(2)
-    assert ("cnot qubits[0],qubits[1];"+os.linesep+
-            "rz(-2 * gamma) qubits[1];"+os.linesep+
-            "cnot qubits[0],qubits[1];"+os.linesep+
-            "cnot qubits[0],qubits[2];"+os.linesep+
-            "rz(-2 * gamma) qubits[2];"+os.linesep+
-            "cnot qubits[0],qubits[2];") in program
+    assert ("\tcnot qubits[0],qubits[1];\n"+
+            "\trz(-2 * gamma) qubits[1];\n"+
+            "\tcnot qubits[0],qubits[1];\n"+
+            "\tcnot qubits[0],qubits[2];\n"+
+            "\trz(-2 * gamma) qubits[2];\n"+
+            "\tcnot qubits[0],qubits[2];") in program
 
 def test_use_input():
     """Test the use_input parameter."""
-    qaoa_module = qaoa.QAOA(4, use_input=False)
+    qaoa_module = qaoa.QAOA(5, use_input=False)
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
@@ -75,7 +75,7 @@ def test_use_input():
 def test_execution():
     """Test correct execution in local device."""
     device = LocalDevice()
-    qaoa_module = qaoa.QAOA(4, use_input=False)
+    qaoa_module = qaoa.QAOA(5, use_input=False)
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
@@ -86,27 +86,29 @@ def test_execution():
     _ = device.run(program_str, shots=1000)
 
 def test_x_mixer():
+    """Test that the x mixer Hamiltonian is generated correctly."""
     qaoa_module = qaoa.QAOA(8)
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
     program = qaoa_module.generate_algorithm(2)
-    assert ("rx(2 * alpha) qubits[0];"+os.linesep+
-	        "rx(2 * alpha) qubits[1];"+os.linesep+
-	        "rx(2 * alpha) qubits[2];") in program
+    assert ("\trx(2 * alpha) qubits[0];\n"+
+	        "\trx(2 * alpha) qubits[1];\n"+
+	        "\trx(2 * alpha) qubits[2];") in program
 
 def test_xy_mixer():
+    """Test that the x mixer Hamiltonian is generated correctly."""
     qaoa_module = qaoa.QAOA(8)
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
     qaoa_module.mixer_hamiltonian = qaoa_module.xy_mixer(graph=graph)
     program = qaoa_module.generate_algorithm(2)
-    assert ("cnot qubits[0],qubits[1];"+os.linesep+
-	        "rx(-alpha) qubits[1];"+os.linesep+
-            "ry(-alpha) qubits[1];"+os.linesep+
-            "cnot qubits[0],qubits[1];"+os.linesep+
-            "cnot qubits[0],qubits[2];"+os.linesep+
-            "rx(-alpha) qubits[2];"+os.linesep+
-            "ry(-alpha) qubits[2];"+os.linesep+
-            "cnot qubits[0],qubits[2];") in program
+    assert ("\tcnot qubits[0],qubits[1];\n"
+	        "\trx(-alpha) qubits[1];\n"+
+            "\try(-alpha) qubits[1];\n"+
+            "\tcnot qubits[0],qubits[1];\n"+
+            "\tcnot qubits[0],qubits[2];\n"+
+            "\trx(-alpha) qubits[2];\n"+
+            "\try(-alpha) qubits[2];\n"+
+            "\tcnot qubits[0],qubits[2];") in program
