@@ -404,8 +404,6 @@ class GateLibrary:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
         """
-        if name in self.gate_ref:
-            print(f"warning:  gate {name} replacing existing namespace")
         call = f"{qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
@@ -418,8 +416,6 @@ class GateLibrary:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
         """
-        if name in self.gate_ref:
-            print(f"warning:  gate {name} replacing existing namespace")
         call = f"input {qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
@@ -432,8 +428,6 @@ class GateLibrary:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
         """
-        if name in self.gate_ref:
-            print(f"warning:  gate {name} replacing existing namespace")
         call = f"output {qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name

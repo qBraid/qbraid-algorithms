@@ -5,13 +5,6 @@ from pyqasm.modules.base import QasmModule
 
 class QAOA:
 
-    builder : QasmBuilder
-    mixer_hamiltonian : str
-    cost_hamiltonian : str
-    layer_circuit : str
-    use_subroutines : bool
-    use_input : bool
-
     def __init__(self, num_qubits : int, qasm_version : int = 3, use_input : bool = True):
         self.builder = QasmBuilder(num_qubits, version=qasm_version)
         self.use_input = use_input
@@ -28,9 +21,15 @@ class QAOA:
         Returns:
             mixer Hamiltonian subroutine name
         """
+        if len(graph.nodes) > self.builder.qubits:
+            raise ValueError(
+                f"The graph provided has more nodes ({len(graph.nodes)}) than the qubits initialized ({self.builder.qubits})"
+            )
+        
         std = self.builder.import_library(lib_class=std_gates)
             
-        mixer_name = f"qaoa_xy_mixer_{self.builder.qubits}"
+        mixer_name = f"qaoa_xy_mixer_{self._xy_mixer_count}_{self.builder.qubits}"
+        self._xy_mixer_count += 1
 
         qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
@@ -63,9 +62,14 @@ class QAOA:
         Returns:
             mixer Hamiltonian subroutine name
         """
+        if len(graph.nodes) > self.builder.qubits:
+            raise ValueError(
+                f"The graph provided has more nodes ({len(graph.nodes)}) than the qubits initialized ({self.builder.qubits})"
+            )
         std = self.builder.import_library(lib_class=std_gates)
             
-        mixer_name = f"qaoa_x_mixer_{self.builder.qubits}"
+        mixer_name = f"qaoa_x_mixer_{self._x_mixer_count}_{self.builder.qubits}"
+        self._x_mixer_count += 1
 
         qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
@@ -94,9 +98,14 @@ class QAOA:
         Returns:
             Cost Hamiltonian subroutine name
         """
+        if len(graph.nodes) > self.builder.qubits:
+            raise ValueError(
+                f"The graph provided has more nodes ({len(graph.nodes)}) than the qubits initialized ({self.builder.qubits})"
+            )
         std = self.builder.import_library(lib_class=std_gates)
             
-        cost_name = f"qaoa_min_vertex_cover_cost_{self.builder.qubits}"
+        cost_name = f"qaoa_min_vertex_cover_cost_{self._min_vertex_cover_cost_count}_{self.builder.qubits}"
+        self._min_vertex_cover_cost_count += 1
 
         qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
@@ -134,9 +143,14 @@ class QAOA:
         Returns:
             Cost Hamiltonian subroutine name
         """
+        if len(graph.nodes) > self.builder.qubits:
+            raise ValueError(
+                f"The graph provided has more nodes ({len(graph.nodes)}) than the qubits initialized ({self.builder.qubits})"
+            )
         std = self.builder.import_library(lib_class=std_gates)
             
-        cost_name = f"qaoa_min_vertex_cover_cost_{self.builder.qubits}"
+        cost_name = f"qaoa_max_clique_cost_{self._max_clique_cost_count}_{self.builder.qubits}"
+        self._max_clique_cost_count += 1
 
         qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
@@ -178,9 +192,14 @@ class QAOA:
         Returns:
             (mixer, cost) : tuple[str, str] mixer and cost hamiltonian subroutine names respectively
         """
+        if len(graph.nodes) > self.builder.qubits:
+            raise ValueError(
+                f"The graph provided has more nodes ({len(graph.nodes)}) than the qubits initialized ({self.builder.qubits})"
+            )
         std = self.builder.import_library(lib_class=std_gates)
             
-        cost_name = f"qaoa_maxcut_cost_{self.builder.qubits}"
+        cost_name = f"qaoa_maxcut_cost_{self._maxcut_cost_count}_{self.builder.qubits}"
+        self._maxcut_cost_count += 1
 
         qubit_array_param = f"qubit[{self.builder.qubits}] qubits"
 
@@ -251,17 +270,17 @@ class QAOA:
         Load the Quantum Approximate Optimization Algorithm (QAOA) ansatz as a pyqasm module.
 
         Args:
-            cost_ham : str
-                Name of the cost Hamiltonian subroutine
             depth : int
                 Depth of the circuit (i.e. number of layer repetitions)
             layer : str
                 Name of the layer circuit subroutine
-            epsilon : float
-                Error for expectation value calculation
+            param : list[float]
+                Parameters for circuit definitions, the number of parameters to provide is 2*depth.
+                The expected format is [gamma_0 alpha_0 gamma_1 alpha_1 ... gamma_(depth-1) alpha_(depth-1)], 
+                where gamma and alpha are the coefficients for the cost and mixer Hamiltonians respetively
 
         Returns:
-            (PyQasm Module) pyqasm module containing the QAOA ansatz circuit
+            (str) qasm code containing the QAOA ansatz circuit
         """
         std = self.builder.import_library(lib_class=std_gates)
 
@@ -288,21 +307,6 @@ class QAOA:
         for i in range(depth):
             std.call_subroutine(layer, parameters=[f"qb[0:{num_qubits}]", f"gamma_{i}", f"alpha_{i}"])
 
-        #std.call_subroutine(cost_ham, [f"qb[0:{num_qubits}]", "1"])
-        #std.h(self.builder.qubits - 1)
         std.measure(list(range(num_qubits)), list(range(num_qubits)))
-        """for q in range(num_qubits):
-            std.cswap(control=f"qb[{self.builder.qubits - 1}]", targ1=f"qb[{q}]", targ2=f"qb[{q+num_qubits}]")
-        std.h(self.builder.qubits - 1)
-        std.measure([self.builder.qubits - 1], [0])
-
-        std.begin_if("cb[0] == 0")
-        std.classical_op("measure_0 = measure_0 + 1")
-        std.end_if()"""
-
-        """std.classical_op(f"expval = measure_0/{repetitions}")
-        std.classical_op("expval = 2*(expval - 0.5)")
-        std.classical_op("expval = sqrt(expval)")
-        std.classical_op("expval = log(expval)")"""
 
         return self.builder.build()
