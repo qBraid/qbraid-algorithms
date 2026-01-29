@@ -16,31 +16,42 @@
 
 from __future__ import annotations
 
+import textwrap
+
 import pyqasm
 import pytest
 
 from qbraid_algorithms.openpulse import GaussianPulse, PulseParams, generate_program
 
 
-def test_generate_program_dumps_contains_expected_sections() -> None:
-    """Verify generated OpenPulse program contains expected QASM sections."""
+def test_generate_program_emits_expected_qasm() -> None:
+    """Generated OpenPulse QASM should match the expected structure and order."""
     pulse = GaussianPulse(amplitude=1.0 + 2.0j, duration="16ns", sigma="4ns")
     params = PulseParams(frame_frequency=5.0e9, frame_phase=0.0, defcal_name="play_gaussian", qubit=0)
 
     module = generate_program(pulse, params=params)
-    qasm = pyqasm.dumps(module)
+    actual = pyqasm.dumps(module).strip()
 
-    assert 'defcalgrammar "openpulse";' in qasm
-    assert "cal {" in qasm
-    assert "port d0;" in qasm
-    assert "frame driveframe = newframe(d0, 5000000000.0, 0.0);" in qasm
-    assert "waveform wf = gaussian(1.0 + 2.0im, 16ns, 4ns);" in qasm
-    assert "defcal play_gaussian" in qasm
-    assert "play(driveframe, wf);" in qasm
+    expected = textwrap.dedent(
+        """\
+        OPENQASM 3.0;
+        defcalgrammar "openpulse";
+        cal {
+            port d0;
+            frame driveframe = newframe(d0, 5000000000.0, 0.0);
+            waveform wf = gaussian(1.0 + 2.0im, 16ns, 4ns);
+        }
+        defcal play_gaussian() $0 {
+            play(driveframe, wf);
+        }
+        """
+    ).strip()
+
+    assert actual == expected
 
 
-def test_generate_program_kwargs_override_names() -> None:
-    """Verify kwargs correctly override parameters."""
+def test_generate_program_kwargs_override_names_emits_expected_qasm() -> None:
+    """kwargs overrides should be reflected in the emitted QASM (structure + order)."""
     pulse = GaussianPulse(amplitude=0.5 + 0.0j, duration="8ns", sigma="2ns")
     params = PulseParams(frame_frequency=5.0e9, frame_phase=0.0, defcal_name="play_gaussian", qubit=0)
 
@@ -51,12 +62,24 @@ def test_generate_program_kwargs_override_names() -> None:
         waveform_name="wf2",
         port_name="d1",
     )
-    qasm = pyqasm.dumps(module)
+    actual = pyqasm.dumps(module).strip()
 
-    assert "port d1;" in qasm
-    assert "frame driveframe2 = newframe(d1, 5000000000.0, 0.0);" in qasm
-    assert "waveform wf2 = gaussian(0.5 + 0.0im, 8ns, 2ns);" in qasm
-    assert "play(driveframe2, wf2);" in qasm
+    expected = textwrap.dedent(
+        """\
+        OPENQASM 3.0;
+        defcalgrammar "openpulse";
+        cal {
+            port d1;
+            frame driveframe2 = newframe(d1, 5000000000.0, 0.0);
+            waveform wf2 = gaussian(0.5 + 0.0im, 8ns, 2ns);
+        }
+        defcal play_gaussian() $0 {
+            play(driveframe2, wf2);
+        }
+        """
+    ).strip()
+
+    assert actual == expected
 
 
 def test_unroll_succeeds_when_pulse_dependencies_present() -> None:
