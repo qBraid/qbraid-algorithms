@@ -110,3 +110,71 @@ def test_xy_mixer():
             "\trx(-alpha) qubits[2];\n"+
             "\try(-alpha) qubits[2];\n"+
             "\tcnot qubits[0],qubits[2];") in program
+
+def test_min_vertex_cover():
+    """Test that the cost Hamiltonian for min vertex cover is generated correctly."""
+    qaoa_module = qaoa.QAOA(5)
+    edges = [(0, 1), (0, 2)]
+    graph = nx.Graph(edges)
+    qaoa_module.cost_hamiltonian = qaoa_module.min_vertex_cover_cost(graph=graph)
+    program = qaoa_module.generate_algorithm(2)
+    assert ("cnot qubits[0],qubits[1];\n"+
+            "\trz(3 * 2 * gamma) qubits[1];\n"+
+            "\tcnot qubits[0],qubits[1];\n"+
+            "\trz(3 * 2 * gamma) qubits[0];\n"+
+            "\trz(3 * 2 * gamma) qubits[1];\n"+
+            "\tcnot qubits[0],qubits[2];\n"+
+            "\trz(3 * 2 * gamma) qubits[2];\n"+
+            "\tcnot qubits[0],qubits[2];\n"+
+            "\trz(3 * 2 * gamma) qubits[0];\n"+
+            "\trz(3 * 2 * gamma) qubits[2];\n"+
+            "\trz(-2 * gamma) qubits[0];\n"+
+            "\trz(-2 * gamma) qubits[1];\n"+
+            "\trz(-2 * gamma) qubits[2];") in program
+
+def test_max_clique():
+    """Test that the cost Hamiltonian for max clique is generated correctly."""
+    qaoa_module = qaoa.QAOA(5)
+    edges = [(0, 1), (0, 2)]
+    graph = nx.Graph(edges)
+    qaoa_module.cost_hamiltonian = qaoa_module.max_clique_cost(graph=graph)
+    program = qaoa_module.generate_algorithm(2)
+    assert ("\tcnot qubits[1],qubits[2];\n"+
+	        "\trz(3 * 2 * gamma) qubits[2];\n"+
+	        "\tcnot qubits[1],qubits[2];\n"+
+	        "\trz(-3 * 2 * gamma) qubits[1];\n"+
+	        "\trz(-3 * 2 * gamma) qubits[2];\n"+
+	        "\trz(2 * gamma) qubits[0];\n"+
+	        "\trz(2 * gamma) qubits[1];\n"+
+	        "\trz(2 * gamma) qubits[2];") in program
+
+def test_validation():
+    """Test the validation inside Hamiltonian generation"""
+    qaoa_module = qaoa.QAOA(1)
+    edges = [(0, 1), (0, 2)]
+    graph = nx.Graph(edges)
+    try:
+        qaoa_module.x_mixer(graph=graph)
+        assert False
+    except ValueError:
+        assert True
+    try:
+        qaoa_module.xy_mixer(graph=graph)
+        assert False
+    except ValueError:
+        assert True
+    try:
+        qaoa_module.qaoa_maxcut(graph=graph)
+        assert False
+    except ValueError:
+        assert True
+    try:
+        qaoa_module.min_vertex_cover_cost(graph=graph)
+        assert False
+    except ValueError:
+        assert True
+    try:
+        qaoa_module.max_clique_cost(graph=graph)
+        assert False
+    except ValueError:
+        assert True
