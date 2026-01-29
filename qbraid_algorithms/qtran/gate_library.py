@@ -315,26 +315,26 @@ class GateLibrary:
         self.builder.scope += 1
         self.subroutine_ref.append(name)
 
-    def close_scope(self):
+    def __close_scope(self):
         """Close the current scope block and decrease indentation level."""
         self.builder.scope -= 1
         self.program("}")
 
     def end_if(self):
         """End conditional block."""
-        self.close_scope()
+        self.__close_scope()
 
     def end_loop(self):
         """End loop block."""
-        self.close_scope()
+        self.__close_scope()
 
     def end_gate(self):
         """End gate definition block."""
-        self.close_scope()
+        self.__close_scope()
 
     def end_subroutine(self):
         """End subroutine definition block."""
-        self.close_scope()
+        self.__close_scope()
 
     def controlled_op(self, gate_call, params, n=0):
         """
@@ -407,7 +407,7 @@ class GateLibrary:
         call = f"{qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
-    
+
     def add_input_var(self, name, assignment=None, qtype=None):
         """
         simple stub for programatically adding a variable
@@ -416,10 +416,11 @@ class GateLibrary:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
         """
-        call = f"input {qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
+        call = (f"input {qtype if qtype is not None else 'let'} "
+                f"{name} {f'= {assignment}' if assignment is not None else ''};")
         self.program(call)
         return name
-    
+
     def add_output_var(self, name, assignment=None, qtype=None):
         """
         simple stub for programatically adding a variable
@@ -428,10 +429,11 @@ class GateLibrary:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
         """
-        call = f"output {qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
+        call = (f"output {qtype if qtype is not None else 'let'} "
+                f"{name} {f'= {assignment}' if assignment is not None else ''};")
         self.program(call)
         return name
-    
+
     def classical_op(self, operation):
         """
         simple stub for programatically perform a classical operation

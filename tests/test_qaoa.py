@@ -14,19 +14,13 @@
 """
 Tests for QAOA implementation.
 """
-import io
 import os
-import sys
-import tempfile
-from pathlib import Path
-
-import pyqasm
-from pyqasm.modules.base import QasmModule
-
-from qbraid_algorithms import qaoa
-from qbraid_algorithms.utils import get_max_count
 
 import networkx as nx
+
+import pyqasm
+
+from qbraid_algorithms import qaoa
 
 from .local_device import LocalDevice
 
@@ -89,4 +83,4 @@ def test_execution():
     module = pyqasm.loads(program)
     module.unroll()
     program_str = pyqasm.dumps(module)
-    result = device.run(program_str, shots=1000)
+    _ = device.run(program_str, shots=1000)
