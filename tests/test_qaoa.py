@@ -17,12 +17,12 @@ Tests for QAOA implementation.
 import os
 
 import networkx as nx
-
 import pyqasm
 
 from qbraid_algorithms import qaoa
 
 from .local_device import LocalDevice
+
 
 def test_generate_program():
     """Test that generate_program correctly returns a str object."""

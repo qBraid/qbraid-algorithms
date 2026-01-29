@@ -18,9 +18,11 @@ Quantum Approximate Optimization Algorithm (QAOA) Implementation
 This module provides an implementation of the Quantum Approximate Optimization Algorithm ansatz
 for different standard mixer and cost Hamiltonians, namely maximum-cut, maximum clique and minimum vertex cover.
 """
+
 import networkx as nx
 
 from qbraid_algorithms.qtran import QasmBuilder, std_gates
+
 
 class QAOA:
     """
@@ -311,7 +313,7 @@ class QAOA:
 
         return name
 
-    def generate_algorithm(self, depth : int, layer : str = "", param : list[float] | None = None) -> str:
+    def generate_algorithm(self, depth : int, layer : str = "", param = None) -> str:
         r"""
         Load the Quantum Approximate Optimization Algorithm (QAOA) ansatz as a pyqasm module.
 
@@ -330,7 +332,7 @@ class QAOA:
         """
         if param is None and self.use_input is False:
             raise ValueError(
-                "Param cannot be None if use_input is False"
+                "param cannot be None if use_input is False"
             )
         std = self.builder.import_library(lib_class=std_gates)
 
