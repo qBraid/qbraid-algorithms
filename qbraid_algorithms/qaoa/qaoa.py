@@ -6,6 +6,11 @@ class QAOA:
     def __init__(self, num_qubits : int, qasm_version : int = 3, use_input : bool = True):
         self.builder = QasmBuilder(num_qubits, version=qasm_version)
         self.use_input = use_input
+        self._x_mixer_count = 0
+        self._max_clique_cost_count = 0
+        self._xy_mixer_count = 0
+        self._min_vertex_cover_cost_count = 0
+        self._maxcut_cost_count = 0
 
     
     def xy_mixer(self, graph : nx.Graph) -> str:
