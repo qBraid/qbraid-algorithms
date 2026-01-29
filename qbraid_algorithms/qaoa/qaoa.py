@@ -1,7 +1,5 @@
 from qbraid_algorithms.qtran import QasmBuilder, std_gates, GateLibrary, GateBuilder
 import networkx as nx
-import pyqasm
-from pyqasm.modules.base import QasmModule
 
 class QAOA:
 
@@ -15,6 +13,8 @@ class QAOA:
         Generate XY mixer Hamiltonian subroutine.
         
         xy_mixer_hamiltonian = $$\frac{1}{2}\sum_{(i,j)\in E(G)} X_iX_j + Y_iY_j$$
+
+        This mixer was introduced in From the Quantum Approximate Optimization Algorithm to a Quantum Alternating Operator Ansatz by Stuart Hadfield, Zhihui Wang, Bryan O’Gorman, Eleanor G. Rieffel, Davide Venturelli, and Rupak Biswas Algorithms 12.2 (2019).
         Args:
             graph : nx.Graph
                 Graph that describes the problem
@@ -56,6 +56,8 @@ class QAOA:
         Generate X mixer Hamiltonian subroutine.
         
         x_mixer_hamiltonian = $$\sum_{i} X_i$$
+        
+        This mixer is used in A Quantum Approximate Optimization Algorithm by Edward Farhi, Jeffrey Goldstone, Sam Gutmann [arXiv:1411.4028].
         Args:
             graph : nx.Graph
                 Graph that describes the problem
@@ -92,6 +94,8 @@ class QAOA:
         Generate min vertex cover cost Hamiltonian subroutine.
         
         cost_hamiltonian $$3\sum_{(i,j)\in E(G)} (Z_i \otimes Z_j + Z_i + Z_j)-\sum_{i \in V(G)} Z_i$$
+        https://openqaoa.entropicalabs.com/problems/minimum-vertex-cover/
+        As described in Ising formulations of many NP problems by Andrew Lucas [arXiv:1302.5843]
         Args:
             graph : nx.Graph
                 Graph that describes the problem
@@ -137,6 +141,7 @@ class QAOA:
         Generate max clique cost Hamiltonian subroutine.
         
         cost_hamiltonian $$3\sum_{(i,j)\in E(\bar{G})} (Z_i \otimes Z_j - Z_i - Z_j)+\sum_{i \in V(G)} Z_i$$
+        As described in Ising formulations of many NP problems by Andrew Lucas [arXiv:1302.5843]
         Args:
             graph : nx.Graph
                 Graph that describes the problem
@@ -184,6 +189,7 @@ class QAOA:
         Generate cost hamiltonian and mixer hamiltonian subroutines.
 
         cost_hamiltonian = $$\sum_{E(graph)} Z_i \otimes Z_j$$
+        This Hamiltonian is decribed in Quantum Approximate Optimization Algorithm for MaxCut: A Fermionic View by Zhihui Wang, Stuart Hadfield, Zhang Jiang, Eleanor G. Rieffel [arXiv:1706.02998].
         
         mixer_hamiltonian = $$\sum_{i} X_i$$
         Args:
