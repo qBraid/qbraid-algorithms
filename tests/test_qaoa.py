@@ -65,7 +65,7 @@ def test_use_input():
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
-    program = qaoa_module.generate_algorithm(2, [1, 2, 3, 4])
+    program = qaoa_module.generate_algorithm(2, param=[1, 2, 3, 4])
     assert "gamma_0 = 1" in program
     assert "alpha_0 = 2" in program
     assert "gamma_1 = 3" in program
@@ -79,8 +79,34 @@ def test_execution():
     edges = [(0, 1), (0, 2)]
     graph = nx.Graph(edges)
     qaoa_module.setup_maxcut(graph=graph)
-    program = qaoa_module.generate_algorithm(2, [1, 2, 3, 4])
+    program = qaoa_module.generate_algorithm(2, param=[1, 2, 3, 4])
     module = pyqasm.loads(program)
     module.unroll()
     program_str = pyqasm.dumps(module)
     _ = device.run(program_str, shots=1000)
+
+def test_x_mixer():
+    qaoa_module = qaoa.QAOA(8)
+    edges = [(0, 1), (0, 2)]
+    graph = nx.Graph(edges)
+    qaoa_module.setup_maxcut(graph=graph)
+    program = qaoa_module.generate_algorithm(2)
+    assert ("rx(2 * alpha) qubits[0];"+os.linesep+
+	        "rx(2 * alpha) qubits[1];"+os.linesep+
+	        "rx(2 * alpha) qubits[2];") in program
+
+def test_xy_mixer():
+    qaoa_module = qaoa.QAOA(8)
+    edges = [(0, 1), (0, 2)]
+    graph = nx.Graph(edges)
+    qaoa_module.setup_maxcut(graph=graph)
+    qaoa_module.mixer_hamiltonian = qaoa_module.xy_mixer(graph=graph)
+    program = qaoa_module.generate_algorithm(2)
+    assert ("cnot qubits[0],qubits[1];"+os.linesep+
+	        "rx(-alpha) qubits[1];"+os.linesep+
+            "ry(-alpha) qubits[1];"+os.linesep+
+            "cnot qubits[0],qubits[1];"+os.linesep+
+            "cnot qubits[0],qubits[2];"+os.linesep+
+            "rx(-alpha) qubits[2];"+os.linesep+
+            "ry(-alpha) qubits[2];"+os.linesep+
+            "cnot qubits[0],qubits[2];") in program
