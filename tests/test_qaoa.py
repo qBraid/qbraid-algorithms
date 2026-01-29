@@ -14,8 +14,6 @@
 """
 Tests for QAOA implementation.
 """
-import os
-
 import networkx as nx
 import pyqasm
 
