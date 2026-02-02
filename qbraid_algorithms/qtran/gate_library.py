@@ -52,7 +52,7 @@ class GateLibrary:
     """
 
     def __init__(
-        self, gate_import, gate_ref, gate_defs, program_append, builder, annotated=False
+        self, gate_import, gate_ref, gate_defs, program_append, builder, subroutine_ref, annotated=False
     ):
         """
         Initialize the gate library with necessary components.
@@ -67,6 +67,7 @@ class GateLibrary:
         """
         self.gate_import = gate_import  # Libraries to import
         self.gate_ref = gate_ref  # Available gate names
+        self.subroutine_ref = subroutine_ref  # Available subroutine names
         self.gate_defs = gate_defs  # Gate definitions dictionary
         self.program = program_append  # Function to append code
         self.builder = builder  # Circuit builder reference
@@ -142,7 +143,7 @@ class GateLibrary:
             subroutine: Name of the gate to apply
             parameters: list of all parameters to apply
         """
-        if subroutine not in self.gate_ref:
+        if subroutine not in self.subroutine_ref:
             print(
                 f"stdgates: subroutine {subroutine} is not part of visible scope, "
                 f"make sure that this isn't a floating reference / malformed statement, "
@@ -304,7 +305,7 @@ class GateLibrary:
             parameters: List of parameter names
             return_type: Optional return type specification
         """
-        if name in self.gate_ref:
+        if name in self.subroutine_ref:
             print(f"warning:  subroutine {name} replacing existing namespace")
         call = (
             f"def {name}({','.join(parameters)}) {' -> ' + return_type if return_type is not None else ''}"
@@ -312,27 +313,28 @@ class GateLibrary:
         )
         self.program(call)
         self.builder.scope += 1
+        self.subroutine_ref.append(name)
 
-    def close_scope(self):
+    def __close_scope(self):
         """Close the current scope block and decrease indentation level."""
         self.builder.scope -= 1
         self.program("}")
 
     def end_if(self):
         """End conditional block."""
-        self.close_scope()
+        self.__close_scope()
 
     def end_loop(self):
         """End loop block."""
-        self.close_scope()
+        self.__close_scope()
 
     def end_gate(self):
         """End gate definition block."""
-        self.close_scope()
+        self.__close_scope()
 
     def end_subroutine(self):
         """End subroutine definition block."""
-        self.close_scope()
+        self.__close_scope()
 
     def controlled_op(self, gate_call, params, n=0):
         """
@@ -402,11 +404,45 @@ class GateLibrary:
             name: variable name
             Assignment: whatever definition you want as long as it resolves to a string
         """
-        if name in self.gate_ref:
-            print(f"warning:  gate {name} replacing existing namespace")
         call = f"{qtype if qtype is not None else 'let'} {name} {f'= {assignment}' if assignment is not None else ''};"
         self.program(call)
         return name
+
+    def add_input_var(self, name, assignment=None, qtype=None):
+        """
+        simple stub for programatically adding a variable
+
+        Args:
+            name: variable name
+            Assignment: whatever definition you want as long as it resolves to a string
+        """
+        call = (f"input {qtype if qtype is not None else 'let'} "
+                f"{name} {f'= {assignment}' if assignment is not None else ''};")
+        self.program(call)
+        return name
+
+    def add_output_var(self, name, assignment=None, qtype=None):
+        """
+        simple stub for programatically adding a variable
+
+        Args:
+            name: variable name
+            Assignment: whatever definition you want as long as it resolves to a string
+        """
+        call = (f"output {qtype if qtype is not None else 'let'} "
+                f"{name} {f'= {assignment}' if assignment is not None else ''};")
+        self.program(call)
+        return name
+
+    def classical_op(self, operation):
+        """
+        simple stub for programatically perform a classical operation
+
+        Args:
+            operation: operation string
+        """
+        call = f"{operation};"
+        self.program(call)
 
     def merge(self, program, imports, definitions, name):
         """
@@ -466,6 +502,7 @@ class std_gates(GateLibrary):
         "swap",
         "ccx",
         "cswap",
+        "reset"
     ]
 
     name = "stdgates.inc"  # Standard library file name
@@ -530,6 +567,10 @@ class std_gates(GateLibrary):
         """Apply rz gate"""
         self.call_gate("rz", targ, phases=theta)
 
+    def reset(self, targ):
+        """Apply reset command"""
+        self.call_gate("reset", targ)
+
     # ═══════════════════════════════════════════════════════════════════════════
     #                           Two-QUBIT GATES
     # ═══════════════════════════════════════════════════════════════════════════
@@ -540,3 +581,10 @@ class std_gates(GateLibrary):
     def cry(self, theta, control, targ):
         """Apply controlled ry gate"""
         self.call_gate("cry", targ, controls=control, phases=theta)
+
+    # ═══════════════════════════════════════════════════════════════════════════
+    #                           Three-QUBIT GATES
+    # ═══════════════════════════════════════════════════════════════════════════
+    def cswap(self, control, targ1, targ2):
+        """Apply controlled swap gate"""
+        self.call_gate("cswap", f"{targ1}, {targ2}", controls=control)
