@@ -37,6 +37,9 @@ cli = [
     "rich>=10.11.0",
     "typing-extensions"
 ]
+pulse = [
+  "pyqasm[pulse]"
+]
 
 [project.scripts]
 qbraid-algorithms = "qbraid_algorithms.cli.main:app"
