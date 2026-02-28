@@ -50,10 +50,9 @@ dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
 Homepage = "https://github.com/qBraid/qbraid-algorithms"
-Documentation = "https://docs.qbraid.com"
+Documentation = "https://docs.qbraid.com/v2/algorithms"
 "Bug Tracker" = "https://github.com/qBraid/qbraid-algorithms/issues"
 Discord = "https://discord.gg/TPBU2sa8Et"
-"Launch on Lab" = "https://account.qbraid.com/?gitHubUrl=https://github.com/qBraid/qbraid-algorithms.git"
 
 [tool.isort]
 profile = "black"

@@ -9,7 +9,7 @@
 import qbraid_algorithms
 
 project = "qBraid"
-copyright = "2025, qBraid Development Team"
+copyright = "2026, qBraid Development Team"
 author = "qBraid Development Team"
 
 # Set the version

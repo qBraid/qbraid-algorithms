@@ -1,69 +1,20 @@
 .. raw:: html
-
-   <html>
-   <head>
-   <meta name="viewport" content="width=device-width, initial-scale=1">
-   <style>
-   * {
-   box-sizing: border-box;
-   }
-
-   body {
-   font-family: Arial, Helvetica, sans-serif;
-   }
-
-   /* Float four columns side by side */
-   .column {
-   display: inline-block;
-   vertical-align: middle;
-   float: none;
-   width: 25%;
-   padding: 0 10px;
-   }
-
-   /* Remove extra left and right margins, due to padding */
-   .row {
-   text-align: center;
-   margin:0 auto;
-   }
-
-   /* Clear floats after the columns */
-   .row:after {
-   content: "";
-   display: table;
-   clear: both;
-   }
-
-   /* Responsive columns */
-   @media screen and (max-width: 600px) {
-      .column {
-         width: 100%;
-         margin-bottom: 20px;
-      }
-   }
-
-   </style>
-   </head>
-   <body>
+   
    <h1 style="text-align: center">
-      <img src="_static/logo.png" alt="qbraid logo" style="width:60px;height:60px;">
+      <img src="./_static/logo.png" alt="qbraid logo" style="width:60px;height:60px;">
       <span> qBraid</span>
-      <span style="color:#808080"> | algorithms</span>
+      <span style="color:#808080"> | ALGOS</span>
    </h1>
    <p style="text-align:center;font-style:italic;color:#808080">
       Build Quantum Algorithms with qBraid.
    </p>
-   </body>
-   </html>
-
-|
 
 :Release: |release|
 
 Overview
 --------
 
-`qBraid Algorithms <https://docs.qbraid.com/qbraid-algorithms/user-guide/overview>`_ is a Python package designed for quantum algorithm development, implementation, and execution. Built on the `OpenQASM3 <https://openqasm.com/>`_ standard, this library provides researchers, developers, and quantum computing enthusiasts with a robust toolkit for exploring and deploying quantum algorithms across various domains.
+`qBraid Algorithms <https://docs.qbraid.com/v2/algorithms/user-guide/overview>`_ is a Python package designed for quantum algorithm development, implementation, and execution. Built on the `OpenQASM3 <https://openqasm.com/>`_ standard, this library provides researchers, developers, and quantum computing enthusiasts with a robust toolkit for exploring and deploying quantum algorithms across various domains.
 
 **Key Features:**
 
@@ -102,7 +53,7 @@ You can also install from source by cloning this repository and running a pip in
 Resources
 ----------
 
-- `User Guide <https://docs.qbraid.com/qbraid-algorithms/user-guide/overview>`_
+- `User Guide <https://docs.qbraid.com/v2/algorithms/user-guide/overview>`_
 - `Example Notebooks <https://github.com/qBraid/qbraid-algorithms/tree/main/examples>`_
 - `API Reference <https://sdk.qbraid.com/qBraid/api/qbraid_algorithms.html>`_
 - `Source Code <https://github.com/qBraid/qbraid-algorithms>`_
@@ -127,6 +78,7 @@ Resources
    qbraid_qir <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.html>
    qbraid_qir.cirq <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.cirq.html>
    qbraid_qir.qasm3 <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.qasm3.html>
+   qbraid_qir.squin <https://sdk.qbraid.com/qbraid-qir/api/qbraid_qir.squin.html>
 
 .. toctree::
    :caption: CORE API Reference
