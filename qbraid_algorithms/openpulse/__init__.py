@@ -1,4 +1,4 @@
-# Copyright 2025 qBraid
+# Copyright 2026 qBraid
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Module containing version information
+"""OpenPulse generators for qbraid-algorithms."""
+from .gaussian import GaussianPulse, PulseParams, generate_program
 
-Version number (major.minor.patch[-label])
-
-"""
-
-__version__ = "0.1.2"
+__all__ = ["GaussianPulse", "PulseParams", "generate_program"]

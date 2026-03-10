@@ -11,12 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
-Module containing version information
-
-Version number (major.minor.patch[-label])
-
+    Quantum Approximate Optimization Algorithm (QAOA) used to define cost and mixer Hamiltonians
+    and generate QASM programs accordingly.
 """
+from .qaoa import QAOA
 
-__version__ = "0.1.2"
+__all__ = ["QAOA"]

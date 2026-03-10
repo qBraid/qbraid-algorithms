@@ -23,7 +23,7 @@
 
 Python package for building, simulating, and benchmarking hybrid quantum-classical algorithms.
 
-[<img src="https://qbraid-static.s3.amazonaws.com/logos/Launch_on_qBraid_white.png" width="150">](https://account.qbraid.com?gitHubUrl=https://github.com/qBraid/qbraid-algorithms.git)
+[<img src="https://qbraid-static.s3.amazonaws.com/logos/Launch_on_qBraid_white.png" width="150">](https://account.qbraid.com/explore/projects/qbraid-algorithms)
 
 ## Installation
 
@@ -60,7 +60,7 @@ qbraid_algorithms.__version__
 ## Key Features: Load algorithms as PyQASM modules and QASM files
 
 qBraid Algorithms provides a collection of quantum algorithms that can be loaded
-as [PyQASM](https://docs.qbraid.com/pyqasm/user-guide/overview) modules, or
+as [PyQASM](https://docs.qbraid.com/v2/pyqasm/user-guide/overview) modules, or
 you can generate .qasm files to use them as subroutines in your own circuits.
 
 ### Loading Algorithms as PyQASM Modules
