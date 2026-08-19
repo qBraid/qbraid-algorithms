@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: 'qbraid-algorithms: Python package for utilizing, implementing, and building
+  quantum algorithms in OpenQASM 3.'
+message: If you use this software, please cite it using the metadata from this file.
+type: software
+authors:
+- given-names: Ryan James
+  family-names: Hill
+  affiliation: qBraid Co.
+  orcid: https://orcid.org/0009-0006-9222-0810
+- given-names: Harshit
+  family-names: Gupta
+  affiliation: qBraid Co.
+repository-code: https://github.com/qBraid/qbraid-algorithms
+url: https://docs.qbraid.com/v2/algorithms
+repository-artifact: https://github.com/qBraid/qbraid-algorithms/releases/tag/v0.1.2
+keywords:
+- python
+- quantum-computing
+- quantum-algorithms
+- openqasm
+- qbraid
+license: Apache-2.0
+version: 0.1.2
+date-released: '2026-02-28'
