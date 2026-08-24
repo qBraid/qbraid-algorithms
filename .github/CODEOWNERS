@@ -1,0 +1,10 @@
+# Owners listed here are requested for review automatically when a pull request
+# touches a path they own. Ownership confers no permissions by itself: whether an
+# owner's approval is required before merging depends on a branch protection rule
+# or ruleset enabling "require review from Code Owners", and the ability to merge
+# comes from a user's repository role.
+#
+# The pattern below matches every path in the repository.
+#
+# qBraid algorithms maintainers
+* @ryanhill1
